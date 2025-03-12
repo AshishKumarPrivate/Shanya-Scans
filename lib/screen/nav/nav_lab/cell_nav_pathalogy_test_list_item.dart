@@ -1,0 +1,216 @@
+import 'package:flutter/material.dart';
+import 'package:healthians/base_widgets/common/home_service_shimmer.dart';
+import 'package:healthians/base_widgets/loading_indicator.dart';
+import 'package:healthians/screen/nav/nav_lab/controller/pathalogy_test_provider.dart';
+import 'package:healthians/screen/nav/nav_lab/model/PathalogyTestListModel.dart';
+import 'package:healthians/screen/nav/nav_lab/nav_pathalogy_test_detail.dart';
+import 'package:healthians/screen/nav/nav_lab/widget/nav_lab_test_list_shimmer.dart';
+import 'package:healthians/screen/service/service_detail_list_detail_buy_now.dart';
+import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:healthians/base_widgets/solid_rounded_button.dart';
+import 'package:provider/provider.dart';
+
+import '../../../ui_helper/app_colors.dart';
+import '../../../ui_helper/app_text_styles.dart';
+
+class CellNavLabListItem extends StatefulWidget {
+  // final double borderRadius;
+  // final double elevation;
+  // final Color backgroundColor;
+  // final Color borderColor; // New for stroke color
+  // final double borderWidth; // New for stroke width
+  // final EdgeInsetsGeometry? padding;
+  // final EdgeInsetsGeometry? margin;
+  // final GestureTapCallback? onTap;
+  //
+  // const CellNavLabListItem({
+  //   Key? key,
+  //   required this.borderRadius,
+  //   required this.elevation,
+  //   required this.backgroundColor,
+  //   required this.borderColor,
+  //   required this.borderWidth,
+  //   this.padding,
+  //   this.margin,
+  //   this.onTap,
+  // }) : super(key: key);
+
+  @override
+  State<CellNavLabListItem> createState() => _CellNavLabListItemState();
+}
+
+class _CellNavLabListItemState extends State<CellNavLabListItem> {
+  final double circleRadius = 60.0;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    Future.microtask(() {
+      // Clear old data and fetch new service details
+      Provider.of<PathalogyTestApiProvider>(context, listen: false)
+          .loadCachedNavPathalogyTests(context);
+    });
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 50) {
+        final provider =
+            Provider.of<PathalogyTestApiProvider>(context, listen: false);
+        if (!provider.isFetchingMore) {
+          provider.getPathalogyTestList(context, loadMore: true);
+        }
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      child: Consumer<PathalogyTestApiProvider>(
+          builder: (context, provider, child) {
+        // Check if the loading state is true
+        if (provider.isLoading && provider.filteredPathalogyTest.isEmpty) {
+          return loadingIndicator(); // Show shimmer effect while loading
+        }
+
+        // Check if there was an error
+        if (provider.errorMessage.isNotEmpty) {
+          return _buildErrorWidget(); // Show error widget if there's an error
+        }
+
+        // Check if the data is null or empty
+        if (provider.pathalogyTestListModel?.data == null ||
+            provider.pathalogyTestListModel!.data!.isEmpty) {
+          return _buildEmptyListWidget(); // Show empty list widget if data is null or empty
+        }
+
+        // If data is loaded, display the rate list
+        return _buildPathalogyList(provider.filteredPathalogyTest, provider);
+      }),
+    );
+  }
+
+  Widget _buildErrorWidget() {
+    print("ErrorWidget");
+    return Center(
+      child: SizedBox(
+        width: ResponsiveHelper.containerWidth(context, 50),
+        height: ResponsiveHelper.containerWidth(context, 50),
+        child: Image.asset(
+          "assets/images/img_error.jpg",
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyListWidget() {
+    print("EmptyList");
+    return Center(
+      child: SizedBox(
+        width: ResponsiveHelper.containerWidth(context, 50),
+        height: ResponsiveHelper.containerWidth(context, 50),
+        child: Image.asset(
+          "assets/images/img_error.png",
+          fit: BoxFit.cover,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPathalogyList(
+      List<Data> pathalogyTestList, PathalogyTestApiProvider provider) {
+    print("BuildRateList ");
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: ListView.builder(
+        scrollDirection: Axis.vertical,
+        itemCount: provider.filteredPathalogyTest.length +
+            (provider.isFetchingMore ? 1 : 0),
+        // itemCount: pathalogyTestList.length,
+        itemBuilder: (context, index) {
+          final item = pathalogyTestList[index];
+          // ✅ Calculate dynamic padding
+          EdgeInsets itemPadding = EdgeInsets.only(
+            top: index == 0 ? 8.0 : 0.0,
+            // Extra padding for first item
+            bottom: index == pathalogyTestList.length - 1 ? 8.0 : 0.0,
+            // Extra padding for last item
+            left: 0.0,
+            right: 0.0,
+          );
+          return InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ViewDetailPathalogyTestScreen(
+                    patahlogyTestName: item.testDetailName.toString(),
+                    pathalogyTestSlug: item.slug.toString(),
+                  ),
+                ),
+              );
+              print(
+                  "Test naem => ${item.testDetailName}  Test Slug => ${item.slug} ");
+            },
+            splashColor: AppColors.whiteColor,
+            highlightColor: AppColors.whiteColor,
+            child: Padding(
+              padding: itemPadding,
+              child: Card(
+                color: AppColors.primary,
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 0.0,
+                  vertical: 8.0,
+                ),
+                shape: RoundedRectangleBorder(
+                    // side: BorderSide(
+                    //     color: AppColors.txtLightGreyColor, width: 0.2),
+                    borderRadius: BorderRadius.circular(5.0),
+                    side:
+                        BorderSide(color: AppColors.txtGreyColor, width: 0.12)),
+                elevation: 0,
+                // Elevation for shadow effect
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 5.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          // color: AppColors.pinkColor,
+                          colors: [Color(0xFFF9F7F4), Color(0xFFF1FBFC)],
+                          // Lighter shades
+                          begin: Alignment.bottomLeft,
+                          end: Alignment.topRight,
+                          stops: [0.4, 0.7],
+                          tileMode: TileMode.repeated,
+                        ),
+                        // image: DecorationImage(
+                        //     fit: BoxFit.fill,
+                        //     image: AssetImage("assets/images/pattern7.png")),
+                        // color: AppColors.lightYellowColor,
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(5),
+                            bottomLeft: Radius.circular(5))),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0, vertical: 15),
+                      child: Text(
+                        item.testDetailName.toString(),
+                        // '${category['title']} (${category['count']})',
+                        style: AppTextStyles.heading1(context,
+                            overrideStyle: TextStyle(
+                                fontSize:
+                                    ResponsiveHelper.fontSize(context, 12))),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

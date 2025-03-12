@@ -1,0 +1,2 @@
+D:/ASHISH/New folder/CodeCrafter/healthians/healthians/android/app/.cxx/Debug/i545yq6t/x86_64/CMakeFiles/edit_cache.dir
+D:/ASHISH/New folder/CodeCrafter/healthians/healthians/android/app/.cxx/Debug/i545yq6t/x86_64/CMakeFiles/rebuild_cache.dir
