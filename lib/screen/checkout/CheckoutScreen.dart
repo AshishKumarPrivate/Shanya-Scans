@@ -1,13 +1,11 @@
+import 'package:easy_stepper/easy_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:easy_stepper/easy_stepper.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:healthians/screen/checkout/checkout_text_fields.dart';
 import 'package:healthians/screen/order/controller/order_provider.dart';
 import 'package:healthians/screen/order/model/OrderItem.dart';
-import 'package:healthians/screen/service/model/ServiceDetailRateListModel.dart';
 import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/snack_bar.dart';
 import 'package:healthians/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -17,8 +15,8 @@ import '../../base_widgets/loading_indicator.dart';
 import '../../base_widgets/solid_rounded_button.dart';
 import '../../ui_helper/app_text_styles.dart';
 import '../../ui_helper/responsive_helper.dart';
+import '../../util/date_formate.dart';
 import '../cart/cart_list_screen.dart';
-import '../cart/controller/cart_list_api_provider.dart';
 import 'controller/checkout_api_provider.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -44,17 +42,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController localityController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController postalController = TextEditingController();
-  final TextEditingController cityAddressController = TextEditingController();
+  final TextEditingController cityAddressController =
+      TextEditingController(text: "Lucknow");
 
   final _formKey = GlobalKey<FormState>(); // Add this at the class level
 
-  String? selectedBookingFor;
-  String? selectedGender;
+  String? selectedBookingFor = "Self";
+  String? selectedGender = "Male";
   String? selectedCity;
   String? selectedAddressType = "Home";
 
   /// Date Selection
-  DateTime? selectedDate;
+  DateTime? selectedDate = DateTime.now();
   TimeOfDay? selectedTime;
 
   /// Date Selection
@@ -203,13 +202,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
           ),
           centerTitle: true,
-          actions: [
-            IconButton(
-              icon:
-                  const Icon(Icons.shopping_cart_outlined, color: Colors.white),
-              onPressed: () {},
-            ),
-          ],
+          // actions: [
+          //   IconButton(
+          //     icon:
+          //         const Icon(Icons.shopping_cart_outlined, color: Colors.white),
+          //     onPressed: () {},
+          //   ),
+          // ],
         ),
         body: SafeArea(
           child: Container(
@@ -485,6 +484,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget buildBookingForm() {
+    print("Booking for=> ${selectedBookingFor}");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -563,11 +563,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         ),
         // buildTextField("Locality*", "Enter locality", localityController),
 
-        CheckoutTextField(
-          label: "Locality",
-          hint: "Enter locality",
-          controller: localityController,
-        ),
+        // CheckoutTextField(
+        //   label: "Locality",
+        //   hint: "Enter locality",
+        //   controller: localityController,
+        // ),
 
         // buildTextField("Postal Code*", "Enter postal code", postalController,
         //     keyboardType: TextInputType.number),
@@ -590,8 +590,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         // buildTextField( "City , Address*", "City , Address", cityAddressController),
 
         CheckoutTextField(
-          label: "City , Address*",
-          hint: "City , Address",
+          label: "City",
+          hint: "City",
           controller: cityAddressController,
         ),
 
@@ -654,10 +654,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text("Select Booking Date",
-              style: TextStyle(fontWeight: FontWeight.bold)),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 5),
           GestureDetector(
-            onTap: () => _selectDate(),
+            onTap: _selectDate,
             child: Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -670,10 +670,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    selectedDate != null
-                        ? "${selectedDate!.day}-${selectedDate!.month}-${selectedDate!.year}"
-                        : "Select Booking Date",
-                    style: const TextStyle(color: Colors.black54),
+                    "${DateUtil.formatDate(
+                      date: "${selectedDate}",
+                      currentFormat: "yyyy-MM-dd",
+                      desiredFormat: "dd-MM-yy",
+                    )}", // ✅ Formatted date
+                    // DateFormat("dd-MM-yy").format(selectedDate), // ✅ Formatted date
+                    style: const TextStyle(color: Colors.black54, fontSize: 16),
                   ),
                   const Icon(Icons.calendar_today, color: Colors.black54),
                 ],
@@ -686,19 +689,18 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   /// **Date Picker Function**
-  void _selectDate() async {
-    DateTime? pickedDate = await showDatePicker(
+
+  Future<void> _selectDate() async {
+    DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime.now(), // No past dates allowed
-      lastDate: DateTime(2100),
+      initialDate: selectedDate, // ✅ Default today’s date
+      firstDate: DateTime.now(), // ✅ Prevents past date selection
+      lastDate: DateTime(2101),
     );
 
-    if (pickedDate != null && pickedDate != selectedDate) {
+    if (picked != null) {
       setState(() {
-        selectedDate = pickedDate;
-        selectedDateString =
-            "${selectedDate!.day}-${selectedDate!.month}-${selectedDate!.year}";
+        selectedDate = picked;
       });
     }
   }
@@ -1391,11 +1393,8 @@ class _PaymentSelectionWidgetState extends State<PaymentSelectionWidget> {
                     style: AppTextStyles.heading1(
                       context,
                       overrideStyle: TextStyle(
-                        fontWeight:
-                        FontWeight.bold,
-                        fontSize: ResponsiveHelper
-                            .fontSize(
-                            context, 14),
+                        fontWeight: FontWeight.bold,
+                        fontSize: ResponsiveHelper.fontSize(context, 14),
                       ),
                     ),
                   ),
@@ -1405,11 +1404,8 @@ class _PaymentSelectionWidgetState extends State<PaymentSelectionWidget> {
                     style: AppTextStyles.caption(
                       context,
                       overrideStyle: TextStyle(
-                        fontWeight:
-                        FontWeight.bold,
-                        fontSize: ResponsiveHelper
-                            .fontSize(
-                            context, 10),
+                        fontWeight: FontWeight.bold,
+                        fontSize: ResponsiveHelper.fontSize(context, 10),
                       ),
                     ),
                   ),

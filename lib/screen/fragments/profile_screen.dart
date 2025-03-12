@@ -2,20 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:healthians/screen/auth/controller/auth_provider.dart';
 import 'package:healthians/screen/auth/forget_password_screen.dart';
-import 'package:healthians/screen/auth/login_screen.dart';
 import 'package:healthians/screen/cart/cart_list_screen.dart';
-import 'package:healthians/screen/other/coming_soon_screen.dart';
+import 'package:healthians/screen/nav/nav_profile/cell_profile_list_tile.dart';
+import 'package:healthians/screen/order/screen/order_list_screen.dart';
 import 'package:healthians/screen/other/webview_screen.dart';
 import 'package:healthians/screen/profile/edit_profile.dart';
-import 'package:healthians/screen/nav/nav_profile/cell_profile_list_tile.dart';
-import 'package:healthians/screen/profile/screen/my_appointments_screen.dart';
-import 'package:healthians/screen/profile/screen/my_wishlist_list_screen.dart';
 import 'package:healthians/screen/profile/screen/need_help_screen.dart';
-import 'package:healthians/screen/order/screen/order_list_screen.dart';
 import 'package:healthians/screen/profile/screen/refer_and_earn.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:healthians/ui_helper/app_text_styles.dart';
-import 'package:healthians/base_widgets/solid_rounded_button.dart';
+import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:healthians/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
 
@@ -36,7 +31,7 @@ class ProfileScreen extends StatelessWidget {
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
-        statusBarColor:AppColors.primary, // Same as Clipper color
+        statusBarColor: AppColors.primary, // Same as Clipper color
         statusBarIconBrightness:
             Brightness.light, // Light icons on dark background
       ),
@@ -56,7 +51,7 @@ class ProfileScreen extends StatelessWidget {
                   children: [
                     ClipPath(
                       clipper: CustomClipPath(),
-                      child:Container(
+                      child: Container(
                         height: 170, // Height of the curved container
                         // height: ResponsiveHelper.containerHeight(context, 20), // Height of the curved container
                         color: AppColors.primary,
@@ -68,23 +63,30 @@ class ProfileScreen extends StatelessWidget {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  SizedBox(height: 20,),
                                   SizedBox(
-                                    width: ResponsiveHelper.containerWidth(context, 10),
-                                    height: ResponsiveHelper.containerWidth(context, 10),
+                                    height: 20,
+                                  ),
+                                  SizedBox(
+                                    width: ResponsiveHelper.containerWidth(
+                                        context, 10),
+                                    height: ResponsiveHelper.containerWidth(
+                                        context, 10),
                                     child: CircleAvatar(
                                       radius: 20, // Image radius
-                                      backgroundImage: AssetImage('assets/images/user.png'),
+                                      backgroundImage:
+                                          AssetImage('assets/images/user.png'),
                                     ),
                                   ),
-                                  ResponsiveHelper.sizeBoxHeightSpace(context, 1),
+                                  ResponsiveHelper.sizeBoxHeightSpace(
+                                      context, 1),
                                   Text(
                                     "Hi, ${userName}",
                                     style: AppTextStyles.heading1(
                                       context,
                                       overrideStyle: TextStyle(
                                         color: Colors.white,
-                                        fontSize: ResponsiveHelper.fontSize(context, 14),
+                                        fontSize: ResponsiveHelper.fontSize(
+                                            context, 14),
                                       ),
                                     ),
                                   ),
@@ -94,14 +96,14 @@ class ProfileScreen extends StatelessWidget {
                                       context,
                                       overrideStyle: TextStyle(
                                         color: Colors.white,
-                                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                                        fontSize: ResponsiveHelper.fontSize(
+                                            context, 12),
                                       ),
                                     ),
                                   ),
-
-                                  ResponsiveHelper.sizeBoxHeightSpace(context, 1),
+                                  ResponsiveHelper.sizeBoxHeightSpace(
+                                      context, 1),
                                 ],
-
                               ),
                             ),
 
@@ -127,7 +129,6 @@ class ProfileScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 18.0),
@@ -267,10 +268,6 @@ class ProfileScreen extends StatelessWidget {
                           SizedBox(
                             height: 15,
                           ),
-
-
-
-
                           ProfileListTile(
                             title: "Share App",
                             leadingIcon: Icons.share,
@@ -281,11 +278,9 @@ class ProfileScreen extends StatelessWidget {
                                   context); // Call the reusable share function
                             },
                           ),
-
                           SizedBox(
                             height: 15,
                           ),
-
                           ProfileListTile(
                             title: "Sales Dashoard",
                             leadingIcon: Icons.share,
@@ -293,11 +288,12 @@ class ProfileScreen extends StatelessWidget {
                             onTap: () {
                               // Call the reusable share function
                               Navigator.of(context).push(
-                                MaterialPageRoute(builder: (context) => DeliveryBoyDashboardScreen()), // Replace with your home screen
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        DeliveryBoyDashboardScreen()), // Replace with your home screen
                               );
                             },
                           ),
-
                           Visibility(
                             visible: false,
                             child: ProfileListTile(
@@ -307,26 +303,30 @@ class ProfileScreen extends StatelessWidget {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => ForgotPasswordScreen(),
+                                    builder: (context) =>
+                                        ForgotPasswordScreen(),
                                     // builder: (context) => MyWishListScreen(),
                                   ),
                                 );
                               },
-                              titleStyle: TextStyle(color: Colors.red,),
+                              titleStyle: TextStyle(
+                                color: Colors.red,
+                              ),
                               backgroundColor: Colors.transparent,
                               leadingIcon: Icons.lock_reset_outlined,
                               leadingIconColor: Colors.red,
                             ),
                           ),
-
                           SizedBox(
                             height: 15,
                           ),
                           Align(
                             alignment: Alignment.center,
                             child: SizedBox(
-                              width:  ResponsiveHelper.containerWidth(context, 30),
-                              height: ResponsiveHelper.containerWidth(context, 8),
+                              width:
+                                  ResponsiveHelper.containerWidth(context, 30),
+                              height:
+                                  ResponsiveHelper.containerWidth(context, 8),
                               child: OutlinedRoundedButton(
                                 text: 'Logout',
                                 borderWidth: 0.2,
@@ -335,13 +335,13 @@ class ProfileScreen extends StatelessWidget {
                                   color: Colors.red,
                                 ),
                                 color: Colors.red,
-                                borderColor:Colors.red,
+                                borderColor: Colors.red,
                                 borderRadius: 10.0,
                                 onPressed: () {
                                   showLogoutBottomSheet(context);
                                   print('Button clicked!');
                                 },
-                                textStyle: TextStyle( fontSize: 18),
+                                textStyle: TextStyle(fontSize: 18),
                                 // icon: Icon(Icons.touch_app, color: Colors.white),
                               ),
                             ),
@@ -428,19 +428,19 @@ void showLogoutBottomSheet(BuildContext context) {
                           overrideStyle: new TextStyle(
                             color: Colors.red,
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 18,
                           )),
                     ),
                     const SizedBox(height: 8),
 
                     /// **Confirmation Message**
                     Text(
-                      "Are you sure you would like to sign-out\nof your Account",
+                      "Are you sure you would like to signout of your Account",
                       textAlign: TextAlign.start,
                       style: AppTextStyles.bodyText1(context,
                           overrideStyle: new TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 14,
                           )),
                     ),
                     const SizedBox(height: 20),
