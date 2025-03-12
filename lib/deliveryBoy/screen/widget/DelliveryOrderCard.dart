@@ -25,6 +25,7 @@ class DeliveryOrderCard extends StatelessWidget {
           ],
         ),
         child: Padding(
+          // commit just check
           padding: const EdgeInsets.all(12.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,7 +88,10 @@ class DeliveryOrderCard extends StatelessWidget {
                 children: [
                   Text(
                     "Payment Mode:",
-                    style: TextStyle(fontSize: 13, color: Colors.black,fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 13,
+                        color: Colors.black,
+                        fontWeight: FontWeight.bold),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -95,7 +99,10 @@ class DeliveryOrderCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       "Cash on delivery ",
-                      style: TextStyle(fontSize: 13, color: Colors.black,fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.black,
+                          fontWeight: FontWeight.bold),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -114,7 +121,8 @@ class DeliveryOrderCard extends StatelessWidget {
                     icon: Icon(Icons.call, color: Colors.green),
                     label: Text(
                       "Call Customer",
-                      style: TextStyle(color: Colors.green, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          color: Colors.green, fontWeight: FontWeight.w600),
                     ),
                   ),
                   TextButton.icon(
@@ -123,7 +131,10 @@ class DeliveryOrderCard extends StatelessWidget {
                     },
                     label: Text(
                       "\u20B9 1200",
-                      style: TextStyle(color: Colors.blue,fontSize: 18, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600),
                     ),
                   ),
                 ],
