@@ -20,12 +20,12 @@ import '../cart/cart_list_screen.dart';
 import 'controller/checkout_api_provider.dart';
 
 class CheckoutScreen extends StatefulWidget {
-  final categoryName, name, price;
-
-  // final Data rateListData; // Accepts the clicked service item
-
-  CheckoutScreen(
-      {required this.categoryName, required this.name, required this.price});
+  // final categoryName, name, price;
+  //
+  // // final Data rateListData; // Accepts the clicked service item
+  //
+  // CheckoutScreen(
+  //     {required this.categoryName, required this.name, required this.price});
 
   @override
   _CheckoutScreenState createState() => _CheckoutScreenState();
@@ -57,7 +57,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   TimeOfDay? selectedTime;
 
   /// Date Selection
-  String? selectedDateString;
+  String? selectedDateString = DateUtil.formatDate(
+      date: DateTime.now().toString(),
+      currentFormat: "yyyy-MM-dd HH:mm:ss.SSS",
+      desiredFormat: "yyyy-MM-dd"
+  ); // ✅ Store default date
   String? selectedTimeString;
 
   bool showBookingFor = false;
@@ -87,10 +91,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     //   Provider.of<CartProvider>(context, listen: false).loadCartItems();
     // });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<OrderApiProvider>(context, listen: false)
-          .loadSingleTestScanItem();
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   Provider.of<OrderApiProvider>(context, listen: false)
+    //       .loadSingleTestScanItem();
+    // });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CheckoutProvider>(context, listen: false).loadCheckoutItems();
     });
@@ -406,22 +411,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       } else {
                         print("Finish button clicked");
 
-                        // Provider.of<CheckoutProvider>(context, listen: false)
-                        //     .createOrder(
-                        //   context,
-                        //   widget.name.toString(),
-                        //   selectedDateString.toString(),
-                        //   selectedTimeString.toString(),
-                        //   widget.categoryName.toString(),
-                        //   widget.price.toString(),
-                        //   StorageHelper().getEmail(),
-                        //   fullNameController.text.toString(),
-                        //   ageController.text.toString(),
-                        //   phoneController.text.toString(),
-                        //   phoneController.text.toString(),
-                        //   selectedGender.toString(),
-                        //   cityAddressController.text.toString(),
-                        // );
+                        Provider.of<CheckoutProvider>(context, listen: false)
+                            .createOrder(
+                          context,
+                          selectedDateString.toString(),
+                          selectedTimeString.toString(),
+                          StorageHelper().getEmail(),
+                          fullNameController.text.toString(),
+                          ageController.text.toString(),
+                          phoneController.text.toString(),
+                          phoneController.text.toString(),
+                          selectedGender.toString(),
+                          cityAddressController.text.toString(),
+                        );
                       }
                     },
                     textStyle: const TextStyle(
@@ -488,20 +490,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildExpandableList(
-            "Booking For",
-            bookingForOptions,
-            selectedBookingFor,
-            (value) {
-              setState(() {
-                selectedBookingFor = value;
-                showBookingFor = false;
-              });
-            },
-            showBookingFor,
-            () {
-              setState(() => showBookingFor = !showBookingFor);
-            }),
+        // buildExpandableList(
+        //     "Booking For",
+        //     bookingForOptions,
+        //     selectedBookingFor,
+        //     (value) {
+        //       setState(() {
+        //         selectedBookingFor = value;
+        //         showBookingFor = false;
+        //       });
+        //     },
+        //     showBookingFor,
+        //     () {
+        //       setState(() => showBookingFor = !showBookingFor);
+        //     }),
 
         // buildTextField("Name", "Enter name", fullNameController,
         //     isRequired: true),
@@ -538,6 +540,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             () {
               setState(() => showGender = !showGender);
             }),
+
         buildPhoneField(),
       ],
     );
@@ -581,17 +584,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         // buildTextField("House No / Flat No / Landmark*",
         //     "House No / Flat No / Landmark", addressController),
 
-        CheckoutTextField(
-          label: "House No / Flat No / Landmark*",
-          hint: "House No / Flat No / Landmark",
-          controller: addressController,
-        ),
+        // CheckoutTextField(
+        //   label: "House No / Flat No / Landmark*",
+        //   hint: "House No / Flat No / Landmark",
+        //   controller: addressController,
+        // ),
 
         // buildTextField( "City , Address*", "City , Address", cityAddressController),
 
         CheckoutTextField(
-          label: "City",
-          hint: "City",
+          label: "Address",
+          hint: "123 Main Street, City, Country",
           controller: cityAddressController,
         ),
 
@@ -648,6 +651,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget buildBookingDate() {
+
+    print("selectedDateString: $selectedDateString"); // Debugging output
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
       child: Column(
@@ -670,11 +675,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "${DateUtil.formatDate(
-                      date: "${selectedDate}",
-                      currentFormat: "yyyy-MM-dd",
-                      desiredFormat: "dd-MM-yy",
-                    )}", // ✅ Formatted date
+                    selectedDateString ?? "Select Date", // ✅ Display formatted date
+                    // "${DateUtil.formatDate(
+                    //   date: "${selectedDate}",
+                    //   currentFormat: "yyyy-MM-dd",
+                    //   desiredFormat: "dd-MM-yyyy",
+                    // )}", // ✅ Formatted date
                     // DateFormat("dd-MM-yy").format(selectedDate), // ✅ Formatted date
                     style: const TextStyle(color: Colors.black54, fontSize: 16),
                   ),
@@ -700,6 +706,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     if (picked != null) {
       setState(() {
+        selectedDateString = DateUtil.formatDate(
+            date: picked.toString(),
+            currentFormat: "yyyy-MM-dd HH:mm:ss.SSS",
+            desiredFormat: "yyyy-MM-dd"
+        ); // ✅ Store selected date in correct format
+        print("selectedDateString: $selectedDateString"); // Debugging output
         selectedDate = picked;
       });
     }
@@ -780,7 +792,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget buildReviewForm() {
-    final checkoutProvider = Provider.of<CheckoutProvider>(context);
     return Column(
       children: [
         Consumer<CheckoutProvider>(

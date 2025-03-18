@@ -3,30 +3,22 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:healthians/base_widgets/InstructionCard.dart';
 import 'package:healthians/base_widgets/common/health_concern_detail_page_shimmer.dart';
 import 'package:healthians/base_widgets/custom_rounded_container.dart';
-import 'package:healthians/screen/cart/cart_list_screen.dart';
 import 'package:healthians/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
-import 'package:healthians/screen/nav/nav_home/health_concern/model/HealthConcernDetailModel.dart';
-import 'package:healthians/screen/nav/nav_lab/controller/pathalogy_test_provider.dart';
+import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/app_text_styles.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/base_widgets/solid_rounded_button.dart';
+import 'package:html/parser.dart'; // Import required package
 import 'package:provider/provider.dart';
 
 import '../../../../../base_widgets/common/common_app_bar.dart';
-import '../../../../../base_widgets/common/frequently_lab_test_shimmer.dart';
 import '../../../../../base_widgets/expandable_text_widget.dart';
 import '../../../../../util/phone_call_open.dart';
 import '../../../../checkout/CheckoutScreen.dart';
 import '../../../../checkout/controller/checkout_api_provider.dart';
-import '../../../../order/controller/order_provider.dart';
 import '../../../../order/model/OrderItem.dart';
-
-import 'package:html/parser.dart'; // Import required package
 
 class ViewDetailHealthConcernScreen extends StatefulWidget {
   final String packageName, packageSlug;
-
 
   ViewDetailHealthConcernScreen(
       {required this.packageName, required this.packageSlug});
@@ -72,7 +64,8 @@ class _ViewDetailHealthConcernScreenState
                 // Main Content
                 Expanded(
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
                     child: SingleChildScrollView(
                       // padding: EdgeInsets.all(10.0),
                       child: Consumer<HealthConcernApiProvider>(
@@ -86,10 +79,9 @@ class _ViewDetailHealthConcernScreenState
                           }
 
                           final healthConcernModel =
-                          provider.healthConcernDetailModel?.data!;
+                              provider.healthConcernDetailModel?.data!;
                           print(
-                              "HealthDetail data ${healthConcernModel!
-                                  .instructionHindi}");
+                              "HealthDetail data ${healthConcernModel!.instructionHindi}");
 
                           if (healthConcernModel == null) {
                             return Center(
@@ -100,7 +92,8 @@ class _ViewDetailHealthConcernScreenState
                             children: [
                               ResponsiveHelper.sizeBoxHeightSpace(context, 1.5),
                               Padding(
-                                padding: ResponsiveHelper.padding(context, 4, 0),
+                                padding:
+                                    ResponsiveHelper.padding(context, 4, 0),
                                 child: Container(
                                   width: double.infinity,
                                   decoration: BoxDecoration(
@@ -154,58 +147,67 @@ class _ViewDetailHealthConcernScreenState
                                     padding: const EdgeInsets.all(5.0),
                                     child: Column(
                                       crossAxisAlignment:
-                                      CrossAxisAlignment.start,
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                              MainAxisAlignment.spaceBetween,
                                           crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                              CrossAxisAlignment.center,
                                           // Ensure text doesn't overflow
                                           children: [
                                             Expanded(
                                               // Ensures text wraps properly
                                               child: Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
-                                                    "${healthConcernModel
-                                                        .packageName}",
-                                                    style: AppTextStyles.heading1(
+                                                    "${healthConcernModel.packageName}",
+                                                    style:
+                                                        AppTextStyles.heading1(
                                                       context,
                                                       overrideStyle: TextStyle(
                                                         color: Colors.white,
                                                         fontWeight:
-                                                        FontWeight.bold,
-                                                        fontSize: ResponsiveHelper
-                                                            .fontSize(
-                                                            context, 16),
+                                                            FontWeight.bold,
+                                                        fontSize:
+                                                            ResponsiveHelper
+                                                                .fontSize(
+                                                                    context,
+                                                                    16),
                                                       ),
                                                     ),
                                                   ),
                                                   // Added spacing to prevent text overlap
                                                   Padding(
-                                                    padding: const EdgeInsets.only(right: 5.0,top: 2.0),
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            right: 5.0,
+                                                            top: 2.0),
                                                     child: Text(
                                                       "Shanya Scans & Theranostics – Uttar Pradesh’s No. 1 Diagnostic Centre in Lucknow for Accurate & Reliable Testing!",
-                                                      style: AppTextStyles.heading1(
+                                                      style: AppTextStyles
+                                                          .heading1(
                                                         context,
-                                                        overrideStyle: TextStyle(
+                                                        overrideStyle:
+                                                            TextStyle(
                                                           color: Colors.white
                                                               .withAlpha(500),
-                                                          fontSize: ResponsiveHelper
-                                                              .fontSize(
-                                                              context, 10),
+                                                          fontSize:
+                                                              ResponsiveHelper
+                                                                  .fontSize(
+                                                                      context,
+                                                                      10),
                                                         ),
                                                       ),
                                                       maxLines: 3,
                                                       // Prevents overflow
                                                       overflow:
-                                                      TextOverflow.ellipsis,
+                                                          TextOverflow.ellipsis,
                                                       // Adds "..." if text is too long
                                                       softWrap:
-                                                      true, // Ensures wrapping
+                                                          true, // Ensures wrapping
                                                     ),
                                                   ),
                                                 ],
@@ -213,47 +215,110 @@ class _ViewDetailHealthConcernScreenState
                                             ),
                                             Column(
                                               children: [
-                                                Text(
-                                                  "\u20B9${healthConcernModel
-                                                      .packageRate}/-",
-                                                  // "\u20B9${widget.pathalogyTestSlug}",
-                                                  style: AppTextStyles.heading1(
-                                                      context,
-                                                      overrideStyle: TextStyle(
-                                                          color: AppColors
-                                                              .whiteColor,
-                                                          fontSize:
-                                                          ResponsiveHelper
-                                                              .fontSize(
+                                                // Text(
+                                                //   "\u20B9${healthConcernModel.packageRate}/-",
+                                                //   // "\u20B9${widget.pathalogyTestSlug}",
+                                                //   style: AppTextStyles.heading1(
+                                                //       context,
+                                                //       overrideStyle: TextStyle(
+                                                //           color: AppColors
+                                                //               .whiteColor,
+                                                //           fontSize:
+                                                //               ResponsiveHelper
+                                                //                   .fontSize(
+                                                //                       context,
+                                                //                       16))),
+                                                // ),
+
+
+                                                Row(
+                                                  children: [
+                                                    /// Rupee Symbol and Amount with spacing
+                                                    RichText(
+                                                      text: TextSpan(
+                                                        children: [
+                                                          TextSpan(
+                                                            text: "\u20B9 ", // Rupee Symbol with space
+                                                            style: AppTextStyles.heading1(
                                                               context,
-                                                              16))),
+                                                              overrideStyle: TextStyle(
+                                                                color: AppColors.whiteColor,
+                                                                fontSize: ResponsiveHelper.fontSize(context, 16),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          TextSpan(
+                                                            text: "${healthConcernModel.packageRate}", // Price Amount
+                                                            style: AppTextStyles.heading1(
+                                                              context,
+                                                              overrideStyle: TextStyle(
+                                                                color: AppColors.whiteColor,
+                                                                fontSize: ResponsiveHelper.fontSize(context, 16),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          TextSpan(
+                                                            text: " /-", // Smaller "/-" Sign
+                                                            style: AppTextStyles.heading1(
+                                                              context,
+                                                              overrideStyle: TextStyle(
+                                                                color: AppColors.whiteColor,
+                                                                fontSize: ResponsiveHelper.fontSize(context, 12), // Smaller font size
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
+
+
+
+
+
+
+
+
                                                 InkWell(
                                                   onTap: () {
                                                     //  &&&&&&&&&&&&& go to the checkout page &&&&&&&&&&&&&&&&
 
                                                     /// Function to extract plain text from an HTML string
-                                                    String extractPlainText( String htmlString) {
-                                                      var document =parse(htmlString);
-                                                      return document .body?.text ?? "";
+                                                    String extractPlainText(
+                                                        String htmlString) {
+                                                      var document =
+                                                          parse(htmlString);
+                                                      return document
+                                                              .body?.text ??
+                                                          "";
                                                     }
 
                                                     final extractedText =
-                                                    extractPlainText(
-                                                        healthConcernModel
-                                                            .packageOverview
-                                                            .toString());
+                                                        extractPlainText(
+                                                            healthConcernModel
+                                                                .packageOverview
+                                                                .toString());
 
-                                                    OrderItem orderItem =
-                                                    OrderItem(
-                                                        id: healthConcernModel.sId ?? "",
-                                                        name: healthConcernModel .packageName .toString(),
-                                                        category: healthConcernModel .packageCategory .toString(),
-                                                        price:  double.parse(healthConcernModel  .packageRate .toString()),
-                                                        imageUrl: OrderItem.defaultImage,
-                                                        packageDetail: extractedText,
-                                                        quantity: 1
-                                                    );
+                                                    OrderItem orderItem = OrderItem(
+                                                        id: healthConcernModel.sId ??
+                                                            "",
+                                                        name: healthConcernModel
+                                                            .packageName
+                                                            .toString(),
+                                                        orderType: "package",
+                                                        category:healthConcernModel
+                                                                .packageName
+                                                                .toString(),
+                                                        price: double.parse(
+                                                            healthConcernModel
+                                                                .packageRate
+                                                                .toString()),
+                                                        imageUrl: OrderItem
+                                                            .defaultImage,
+                                                        packageDetail:
+                                                            extractedText,
+                                                        quantity: 1);
 
                                                     // WidgetsBinding.instance
                                                     //     .addPostFrameCallback(
@@ -266,8 +331,15 @@ class _ViewDetailHealthConcernScreenState
                                                     //           context, orderItem);
                                                     //     });
 
-                                                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                                                      Provider.of<CheckoutProvider>(context, listen: false).addToCheckout(context,orderItem);
+                                                    WidgetsBinding.instance
+                                                        .addPostFrameCallback(
+                                                            (_) {
+                                                      Provider.of<CheckoutProvider>(
+                                                              context,
+                                                              listen: false)
+                                                          .addToCheckout(
+                                                              context,
+                                                              orderItem);
                                                     });
 
                                                     // Provider.of<OrderApiProvider>(context, listen: false).notiFylistener();
@@ -276,15 +348,7 @@ class _ViewDetailHealthConcernScreenState
                                                       context,
                                                       MaterialPageRoute(
                                                         builder: (context) =>
-                                                            CheckoutScreen(
-                                                              categoryName:
-                                                              widget.packageName,
-                                                              name:healthConcernModel
-                                                                  .packageName,
-                                                              price:
-                                                              healthConcernModel
-                                                                  .packageRate,
-                                                            ),
+                                                            CheckoutScreen(),
                                                       ),
                                                     );
 
@@ -292,7 +356,15 @@ class _ViewDetailHealthConcernScreenState
                                                     //   context,
                                                     //   MaterialPageRoute(
                                                     //     builder: (context) =>
-                                                    //         CartListScreen(),
+                                                    //         CheckoutScreen(
+                                                    //           categoryName:
+                                                    //           widget.packageName,
+                                                    //           name:healthConcernModel
+                                                    //               .packageName,
+                                                    //           price:
+                                                    //           healthConcernModel
+                                                    //               .packageRate,
+                                                    //         ),
                                                     //   ),
                                                     // );
 
@@ -304,23 +376,21 @@ class _ViewDetailHealthConcernScreenState
                                                     borderWidth: 1,
                                                     elevation: 2,
                                                     backgroundColor:
-                                                    AppColors.whiteColor,
+                                                        AppColors.whiteColor,
                                                     child: Padding(
                                                       padding: ResponsiveHelper
                                                           .padding(
-                                                          context, 3, 0.2),
+                                                              context, 3, 0.2),
                                                       child: Text(
                                                         "Book Now",
                                                         // "\u20B9${widget.pathalogyTestSlug}",
-                                                        style: AppTextStyles
-                                                            .heading2(
+                                                        style: AppTextStyles.heading2(
                                                             context,
                                                             overrideStyle: TextStyle(
-                                                                fontSize:
-                                                                ResponsiveHelper
+                                                                fontSize: ResponsiveHelper
                                                                     .fontSize(
-                                                                    context,
-                                                                    12))),
+                                                                        context,
+                                                                        12))),
                                                       ),
                                                     ),
                                                   ),
@@ -336,8 +406,8 @@ class _ViewDetailHealthConcernScreenState
                               ),
                               SizedBox(height: 15),
                               Padding(
-                                padding:
-                                const EdgeInsets.symmetric(horizontal: 15.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 15.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -353,16 +423,22 @@ class _ViewDetailHealthConcernScreenState
                               // &&&&&&&&&&&&&&&&&&&&&& Required Parameter  section &&&&&&&&&&&&&&&
                               ResponsiveHelper.sizeBoxHeightSpace(context, 0.5),
                               Padding(
-                                padding: ResponsiveHelper.padding(context, 0, 0),
+                                padding:
+                                    ResponsiveHelper.padding(context, 0, 0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Wrap(
                                       spacing: 1, // Horizontal spacing
-                                      runSpacing: 10, // Vertical spacing when items wrap
+                                      runSpacing:
+                                          10, // Vertical spacing when items wrap
                                       children: [
                                         SizedBox(
-                                          width: MediaQuery.of(context).size.width / 2 - 20,
+                                          width: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  2 -
+                                              20,
                                           child: CustomRoundedContainer(
                                             borderRadius: 10.0,
                                             borderColor: Colors.black,
@@ -376,28 +452,34 @@ class _ViewDetailHealthConcernScreenState
                                               children: [
                                                 Image.asset(
                                                   "assets/images/img_pathalogytestparamter.png",
-                                                  width: ResponsiveHelper.containerWidth(context, 6),
-                                                  height:  ResponsiveHelper.containerWidth(context, 6),
+                                                  width: ResponsiveHelper
+                                                      .containerWidth(
+                                                          context, 6),
+                                                  height: ResponsiveHelper
+                                                      .containerWidth(
+                                                          context, 6),
                                                 ),
-                                                ResponsiveHelper.sizeboxWidthlSpace(
-                                                    context, 2),
+                                                ResponsiveHelper
+                                                    .sizeboxWidthlSpace(
+                                                        context, 2),
                                                 Column(
                                                   crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                      CrossAxisAlignment.start,
                                                   mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     Text(
                                                       "Parameter Included",
                                                       style: AppTextStyles.bodyText1(
                                                           context,
                                                           overrideStyle: TextStyle(
-                                                              color: Colors.black,
+                                                              color:
+                                                                  Colors.black,
                                                               fontSize:
-                                                              ResponsiveHelper
-                                                                  .fontSize(
-                                                                  context,
-                                                                  10))),
+                                                                  ResponsiveHelper
+                                                                      .fontSize(
+                                                                          context,
+                                                                          10))),
                                                     ),
                                                     Text(
                                                       healthConcernModel
@@ -407,13 +489,13 @@ class _ViewDetailHealthConcernScreenState
                                                       style: AppTextStyles.heading1(
                                                           context,
                                                           overrideStyle: TextStyle(
-                                                              color:
-                                                              AppColors.primary,
+                                                              color: AppColors
+                                                                  .primary,
                                                               fontSize:
-                                                              ResponsiveHelper
-                                                                  .fontSize(
-                                                                  context,
-                                                                  12))),
+                                                                  ResponsiveHelper
+                                                                      .fontSize(
+                                                                          context,
+                                                                          12))),
                                                     )
                                                   ],
                                                 )
@@ -424,9 +506,12 @@ class _ViewDetailHealthConcernScreenState
                                             },
                                           ),
                                         ),
-
                                         SizedBox(
-                                          width: MediaQuery.of(context).size.width / 2 - 20,
+                                          width: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  2 -
+                                              20,
                                           child: CustomRoundedContainer(
                                             borderRadius: 10.0,
                                             borderColor: Colors.black,
@@ -440,46 +525,51 @@ class _ViewDetailHealthConcernScreenState
                                               children: [
                                                 Image.asset(
                                                   "assets/images/img_pathalogytestparamter.png",
-                                                  width: ResponsiveHelper.containerWidth(context, 6),
-                                                  height:  ResponsiveHelper.containerWidth(context, 6),
+                                                  width: ResponsiveHelper
+                                                      .containerWidth(
+                                                          context, 6),
+                                                  height: ResponsiveHelper
+                                                      .containerWidth(
+                                                          context, 6),
                                                 ),
-                                                ResponsiveHelper.sizeboxWidthlSpace(
-                                                    context, 2),
+                                                ResponsiveHelper
+                                                    .sizeboxWidthlSpace(
+                                                        context, 2),
                                                 Column(
                                                   crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                      CrossAxisAlignment.start,
                                                   mainAxisAlignment:
-                                                  MainAxisAlignment.start,
+                                                      MainAxisAlignment.start,
                                                   children: [
-                                                    Wrap(
-                                                        children:[
-                                                          Text(
-                                                            "Home Collection",
-                                                            style: AppTextStyles.bodyText1(
-                                                                context,
-                                                                overrideStyle: TextStyle(
-                                                                    color: Colors.black,
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    fontSize:
-                                                                    ResponsiveHelper
-                                                                        .fontSize(
+                                                    Wrap(children: [
+                                                      Text(
+                                                        "Home Collection",
+                                                        style: AppTextStyles.bodyText1(
+                                                            context,
+                                                            overrideStyle: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                fontSize: ResponsiveHelper
+                                                                    .fontSize(
                                                                         context,
                                                                         10))),
-                                                          ),
-                                                        ]
-                                                    ),
+                                                      ),
+                                                    ]),
                                                     Text(
                                                       "Required",
                                                       style: AppTextStyles.heading1(
                                                           context,
                                                           overrideStyle: TextStyle(
-                                                              color:
-                                                              AppColors.primary,
+                                                              color: AppColors
+                                                                  .primary,
                                                               fontSize:
-                                                              ResponsiveHelper
-                                                                  .fontSize(
-                                                                  context,
-                                                                  12))),
+                                                                  ResponsiveHelper
+                                                                      .fontSize(
+                                                                          context,
+                                                                          12))),
                                                     )
                                                   ],
                                                 )
@@ -497,16 +587,22 @@ class _ViewDetailHealthConcernScreenState
                               ),
                               ResponsiveHelper.sizeBoxHeightSpace(context, 2.5),
                               Padding(
-                                padding: ResponsiveHelper.padding(context, 0, 0),
+                                padding:
+                                    ResponsiveHelper.padding(context, 0, 0),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Wrap(
                                       spacing: 1, // Horizontal spacing
-                                      runSpacing: 10, // Vertical spacing when items wrap
+                                      runSpacing:
+                                          10, // Vertical spacing when items wrap
                                       children: [
                                         SizedBox(
-                                          width: MediaQuery.of(context).size.width / 2 - 20,
+                                          width: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  2 -
+                                              20,
                                           child: CustomRoundedContainer(
                                             borderRadius: 10.0,
                                             borderColor: Colors.black,
@@ -520,41 +616,47 @@ class _ViewDetailHealthConcernScreenState
                                               children: [
                                                 Image.asset(
                                                   "assets/images/img_pathalogytestparamter.png",
-                                                  width: ResponsiveHelper.containerWidth(context, 6),
-                                                  height:  ResponsiveHelper.containerWidth(context, 6),
+                                                  width: ResponsiveHelper
+                                                      .containerWidth(
+                                                          context, 6),
+                                                  height: ResponsiveHelper
+                                                      .containerWidth(
+                                                          context, 6),
                                                 ),
-                                                ResponsiveHelper.sizeboxWidthlSpace(
-                                                    context, 2),
+                                                ResponsiveHelper
+                                                    .sizeboxWidthlSpace(
+                                                        context, 2),
                                                 Column(
                                                   crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                      CrossAxisAlignment.start,
                                                   mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                                      MainAxisAlignment.center,
                                                   children: [
                                                     Text(
                                                       "Consultation",
                                                       style: AppTextStyles.bodyText1(
                                                           context,
                                                           overrideStyle: TextStyle(
-                                                              color: Colors.black,
+                                                              color:
+                                                                  Colors.black,
                                                               fontSize:
-                                                              ResponsiveHelper
-                                                                  .fontSize(
-                                                                  context,
-                                                                  10))),
+                                                                  ResponsiveHelper
+                                                                      .fontSize(
+                                                                          context,
+                                                                          10))),
                                                     ),
                                                     Text(
                                                       "Available",
                                                       style: AppTextStyles.heading1(
                                                           context,
                                                           overrideStyle: TextStyle(
-                                                              color:
-                                                              AppColors.primary,
+                                                              color: AppColors
+                                                                  .primary,
                                                               fontSize:
-                                                              ResponsiveHelper
-                                                                  .fontSize(
-                                                                  context,
-                                                                  12))),
+                                                                  ResponsiveHelper
+                                                                      .fontSize(
+                                                                          context,
+                                                                          12))),
                                                     )
                                                   ],
                                                 )
@@ -566,7 +668,11 @@ class _ViewDetailHealthConcernScreenState
                                           ),
                                         ),
                                         SizedBox(
-                                          width: MediaQuery.of(context).size.width / 2 - 20,
+                                          width: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  2 -
+                                              20,
                                           child: CustomRoundedContainer(
                                             borderRadius: 10.0,
                                             borderColor: Colors.black,
@@ -580,46 +686,51 @@ class _ViewDetailHealthConcernScreenState
                                               children: [
                                                 Image.asset(
                                                   "assets/images/img_pathalogytestparamter.png",
-                                                  width: ResponsiveHelper.containerWidth(context, 6),
-                                                  height:  ResponsiveHelper.containerWidth(context, 6),
+                                                  width: ResponsiveHelper
+                                                      .containerWidth(
+                                                          context, 6),
+                                                  height: ResponsiveHelper
+                                                      .containerWidth(
+                                                          context, 6),
                                                 ),
-                                                ResponsiveHelper.sizeboxWidthlSpace(
-                                                    context, 2),
+                                                ResponsiveHelper
+                                                    .sizeboxWidthlSpace(
+                                                        context, 2),
                                                 Column(
                                                   crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                      CrossAxisAlignment.start,
                                                   mainAxisAlignment:
-                                                  MainAxisAlignment.start,
+                                                      MainAxisAlignment.start,
                                                   children: [
-                                                    Wrap(
-                                                        children:[
-                                                          Text(
-                                                            "Test booked so far",
-                                                            style: AppTextStyles.bodyText1(
-                                                                context,
-                                                                overrideStyle: TextStyle(
-                                                                    color: Colors.black,
-                                                                    overflow: TextOverflow.ellipsis,
-                                                                    fontSize:
-                                                                    ResponsiveHelper
-                                                                        .fontSize(
+                                                    Wrap(children: [
+                                                      Text(
+                                                        "Test booked so far",
+                                                        style: AppTextStyles.bodyText1(
+                                                            context,
+                                                            overrideStyle: TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                                fontSize: ResponsiveHelper
+                                                                    .fontSize(
                                                                         context,
                                                                         10))),
-                                                          ),
-                                                        ]
-                                                    ),
+                                                      ),
+                                                    ]),
                                                     Text(
                                                       "5820+",
                                                       style: AppTextStyles.heading1(
                                                           context,
                                                           overrideStyle: TextStyle(
-                                                              color:
-                                                              AppColors.primary,
+                                                              color: AppColors
+                                                                  .primary,
                                                               fontSize:
-                                                              ResponsiveHelper
-                                                                  .fontSize(
-                                                                  context,
-                                                                  12))),
+                                                                  ResponsiveHelper
+                                                                      .fontSize(
+                                                                          context,
+                                                                          12))),
                                                     )
                                                   ],
                                                 )
@@ -638,19 +749,24 @@ class _ViewDetailHealthConcernScreenState
                               ResponsiveHelper.sizeBoxHeightSpace(context, 1.5),
                               // &&&&&&&&&&&&&&&&&&&&&& Required Parameter  section &&&&&&&&&&&&&&&
 
-
                               // &&&&&&&&&&&&&&&&&&&&&& Parametes section  &&&&&&&&&&&&&&&
                               Padding(
-                                padding: ResponsiveHelper.padding(context, 3, 0),
+                                padding:
+                                    ResponsiveHelper.padding(context, 3, 0),
                                 // child: _buildExpandableTestSections(HealthConernData: healthConcernModel,),
                                 child: _buildExpandableTestSections(
-                                  sid:healthConcernModel.sId.toString(),
-                                  serviceName:widget.packageName,
-                                  packageName:healthConcernModel.packageName.toString(),
-                                  packageOverView:healthConcernModel.packageOverview.toString(),
-                                  packageRate:healthConcernModel.packageRate.toString(),
-                                  serviceCategory: healthConcernModel.packageCategory.toString(),
-
+                                  sid: healthConcernModel.sId.toString(),
+                                  serviceName: widget.packageName,
+                                  packageName:
+                                      healthConcernModel.packageName.toString(),
+                                  packageOverView: healthConcernModel
+                                      .packageOverview
+                                      .toString(),
+                                  packageRate:
+                                      healthConcernModel.packageRate.toString(),
+                                  serviceCategory: healthConcernModel
+                                      .packageCategory
+                                      .toString(),
                                 ),
                               ),
 
@@ -659,11 +775,13 @@ class _ViewDetailHealthConcernScreenState
                               ResponsiveHelper.sizeBoxHeightSpace(context, 1),
                               // ***************** Why Choose Use  start  ******************
                               Padding(
-                                padding: ResponsiveHelper.padding(context, 4, 1),
+                                padding:
+                                    ResponsiveHelper.padding(context, 4, 1),
                                 child: Container(
                                   // height: 200,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         "Why Choose Shanya Scans?",
@@ -692,27 +810,31 @@ class _ViewDetailHealthConcernScreenState
                                               padding: EdgeInsets.all(10.0),
                                               child: Row(
                                                 children: [
-                                                  Icon(Icons.supervised_user_circle, color: AppColors.pinkColor,
+                                                  Icon(
+                                                    Icons
+                                                        .supervised_user_circle,
+                                                    color: AppColors.pinkColor,
                                                     size: 30,
                                                   ),
                                                   ResponsiveHelper
                                                       .sizeboxWidthlSpace(
-                                                      context, 1),
+                                                          context, 1),
                                                   Flexible(
                                                     child: Text(
                                                       "1.5 lakh+ patients test with us every month",
                                                       maxLines: 2,
-                                                      style:
-                                                      AppTextStyles.heading1(
+                                                      style: AppTextStyles
+                                                          .heading1(
                                                         context,
-                                                        overrideStyle: TextStyle(
+                                                        overrideStyle:
+                                                            TextStyle(
                                                           color: AppColors
                                                               .txtGreyColor,
                                                           fontSize:
-                                                          ResponsiveHelper
-                                                              .fontSize(
-                                                              context,
-                                                              12),
+                                                              ResponsiveHelper
+                                                                  .fontSize(
+                                                                      context,
+                                                                      12),
                                                         ),
                                                       ),
                                                     ),
@@ -747,22 +869,23 @@ class _ViewDetailHealthConcernScreenState
                                                   ),
                                                   ResponsiveHelper
                                                       .sizeboxWidthlSpace(
-                                                      context, 1),
+                                                          context, 1),
                                                   Flexible(
                                                     child: Text(
                                                       "Patients save an average of ₹700 on each scan",
                                                       maxLines: 2,
-                                                      style:
-                                                      AppTextStyles.heading1(
+                                                      style: AppTextStyles
+                                                          .heading1(
                                                         context,
-                                                        overrideStyle: TextStyle(
+                                                        overrideStyle:
+                                                            TextStyle(
                                                           color: AppColors
                                                               .txtGreyColor,
                                                           fontSize:
-                                                          ResponsiveHelper
-                                                              .fontSize(
-                                                              context,
-                                                              12),
+                                                              ResponsiveHelper
+                                                                  .fontSize(
+                                                                      context,
+                                                                      12),
                                                         ),
                                                       ),
                                                     ),
@@ -797,22 +920,23 @@ class _ViewDetailHealthConcernScreenState
                                                   ),
                                                   ResponsiveHelper
                                                       .sizeboxWidthlSpace(
-                                                      context, 1),
+                                                          context, 1),
                                                   Flexible(
                                                     child: Text(
                                                       "ISO and NABH certified scan centers",
                                                       maxLines: 2,
-                                                      style:
-                                                      AppTextStyles.heading1(
+                                                      style: AppTextStyles
+                                                          .heading1(
                                                         context,
-                                                        overrideStyle: TextStyle(
+                                                        overrideStyle:
+                                                            TextStyle(
                                                           color: AppColors
                                                               .txtGreyColor,
                                                           fontSize:
-                                                          ResponsiveHelper
-                                                              .fontSize(
-                                                              context,
-                                                              12),
+                                                              ResponsiveHelper
+                                                                  .fontSize(
+                                                                      context,
+                                                                      12),
                                                         ),
                                                       ),
                                                     ),
@@ -847,22 +971,23 @@ class _ViewDetailHealthConcernScreenState
                                                   ),
                                                   ResponsiveHelper
                                                       .sizeboxWidthlSpace(
-                                                      context, 1),
+                                                          context, 1),
                                                   Flexible(
                                                     child: Text(
                                                       "100% reliable and accurate reports",
                                                       maxLines: 2,
-                                                      style:
-                                                      AppTextStyles.heading1(
+                                                      style: AppTextStyles
+                                                          .heading1(
                                                         context,
-                                                        overrideStyle: TextStyle(
+                                                        overrideStyle:
+                                                            TextStyle(
                                                           color: AppColors
                                                               .txtGreyColor,
                                                           fontSize:
-                                                          ResponsiveHelper
-                                                              .fontSize(
-                                                              context,
-                                                              12),
+                                                              ResponsiveHelper
+                                                                  .fontSize(
+                                                                      context,
+                                                                      12),
                                                         ),
                                                       ),
                                                     ),
@@ -910,14 +1035,23 @@ class _ViewDetailHealthConcernScreenState
 }
 
 class _buildExpandableTestSections extends StatelessWidget {
-
-  String serviceName,serviceCategory, sid, packageOverView, packageName, packageRate;
+  String serviceName,
+      serviceCategory,
+      sid,
+      packageOverView,
+      packageName,
+      packageRate;
 
   // _buildExpandableTestSections({required this.serviceData});
 
-
-  _buildExpandableTestSections(
-      {required this.serviceName,required this.serviceCategory, required this.sid, required this.packageOverView, required this.packageName, required this.packageRate,});
+  _buildExpandableTestSections({
+    required this.serviceName,
+    required this.serviceCategory,
+    required this.sid,
+    required this.packageOverView,
+    required this.packageName,
+    required this.packageRate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1159,9 +1293,9 @@ class _buildExpandableTestSections extends StatelessWidget {
                               backgroundColor: Colors.white,
                               child: Padding(
                                 padding:
-                                ResponsiveHelper.padding(context, 5, 1.05),
+                                    ResponsiveHelper.padding(context, 5, 1.05),
                                 child: InkWell(
-                                  onTap: (){
+                                  onTap: () {
                                     makePhoneCall(context);
                                   },
                                   child: Text(
@@ -1190,15 +1324,15 @@ class _buildExpandableTestSections extends StatelessWidget {
                                 return document.body?.text ?? "";
                               }
 
-                              final extractedText = extractPlainText(
-                                  packageOverView.toString());
+                              final extractedText =
+                                  extractPlainText(packageOverView.toString());
 
                               OrderItem orderItem = OrderItem(
                                   id: sid ?? "",
-                                  name:
-                                  packageName.toString(),
-                                  category: serviceCategory,
-                                  price:  double.parse(packageRate.toString()),
+                                  name: packageName.toString(),
+                                  category: packageName,
+                                  orderType: "package",
+                                  price: double.parse(packageRate.toString()),
                                   imageUrl: OrderItem.defaultImage,
                                   packageDetail: extractedText,
                                   quantity: 1);
@@ -1210,30 +1344,29 @@ class _buildExpandableTestSections extends StatelessWidget {
                               // });
 
                               WidgetsBinding.instance.addPostFrameCallback((_) {
-                                Provider.of<CheckoutProvider>(context, listen: false).addToCheckout(context,orderItem);
+                                Provider.of<CheckoutProvider>(context,
+                                        listen: false)
+                                    .addToCheckout(context, orderItem);
                               });
-
-
-
-                              // Provider.of<OrderApiProvider>(context, listen: false).notiFylistener();
 
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      CheckoutScreen(
-                                        categoryName: serviceName,
-                                        name: packageName,
-                                        price: packageRate,
-                                      ),
+                                  builder: (context) => CheckoutScreen(),
                                 ),
                               );
+
+                              // Provider.of<OrderApiProvider>(context, listen: false).notiFylistener();
 
                               // Navigator.push(
                               //   context,
                               //   MaterialPageRoute(
                               //     builder: (context) =>
-                              //         CartListScreen(),
+                              //         CheckoutScreen(
+                              //           categoryName: serviceName,
+                              //           name: packageName,
+                              //           price: packageRate,
+                              //         ),
                               //   ),
                               // );
 
@@ -1247,7 +1380,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                               backgroundColor: Colors.red,
                               child: Padding(
                                 padding:
-                                ResponsiveHelper.padding(context, 4, 1),
+                                    ResponsiveHelper.padding(context, 4, 1),
                                 child: Text(
                                   "Book Now",
                                   style: AppTextStyles.heading2(
@@ -1355,7 +1488,7 @@ class _buildParameterTestSections extends StatelessWidget {
                           style: AppTextStyles.heading1(context,
                               overrideStyle: TextStyle(
                                   fontSize:
-                                  ResponsiveHelper.fontSize(context, 12))),
+                                      ResponsiveHelper.fontSize(context, 12))),
                         ),
                       ),
                     ),

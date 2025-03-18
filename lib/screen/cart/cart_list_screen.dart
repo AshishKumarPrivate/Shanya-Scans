@@ -1,20 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:healthians/base_widgets/common/custom_app_bar.dart';
-import 'package:provider/provider.dart';
 import 'package:healthians/screen/cart/controller/cart_list_api_provider.dart';
+import 'package:html/parser.dart'; // Import required package
+import 'package:provider/provider.dart';
+
+import '../../base_widgets/custom_rounded_container.dart';
+import '../../base_widgets/solid_rounded_button.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../ui_helper/app_text_styles.dart';
-import '../../base_widgets/common/common_app_bar.dart';
-import '../../base_widgets/solid_rounded_button.dart';
-import '../../base_widgets/custom_rounded_container.dart';
 import '../../ui_helper/responsive_helper.dart';
 import '../checkout/CheckoutScreen.dart';
 import '../checkout/controller/checkout_api_provider.dart';
 import '../order/model/OrderItem.dart';
-
-import 'package:html/parser.dart'; // Import required package
 
 class CartListScreen extends StatefulWidget {
   @override
@@ -22,7 +20,6 @@ class CartListScreen extends StatefulWidget {
 }
 
 class _CartListScreenState extends State<CartListScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -31,15 +28,11 @@ class _CartListScreenState extends State<CartListScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: AppColors.primary,
-      appBar:
-
-      PreferredSize(
+      appBar: PreferredSize(
         preferredSize: Size.fromHeight(60), // Adjust height as needed
         child: CustomAppBar(
           activityName: "Cart",
@@ -47,7 +40,6 @@ class _CartListScreenState extends State<CartListScreen> {
           backgroundColor: AppColors.primary,
         ),
       ),
-
       body: Container(
         color: Colors.white,
         child: Column(
@@ -108,20 +100,31 @@ class _CartListScreenState extends State<CartListScreen> {
                                 final cartItem = cartProvider.cartItems[index];
 
                                 return Container(
-                                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 8, horizontal: 10),
                                   decoration: BoxDecoration(
-                                    border: Border(bottom: BorderSide(color: AppColors.lightBlueColor!, width: 5)),
+                                    border: Border(
+                                        bottom: BorderSide(
+                                            color: AppColors.lightBlueColor!,
+                                            width: 5)),
                                   ),
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       // 🟢 Image Section
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
                                         child: Container(
-                                          width: ResponsiveHelper.containerWidth(context, 20),
-                                          height: ResponsiveHelper.containerWidth(context, 20),
-                                          child: Image.network(cartItem.imageUrl, fit: BoxFit.cover),
+                                          width:
+                                              ResponsiveHelper.containerWidth(
+                                                  context, 20),
+                                          height:
+                                              ResponsiveHelper.containerWidth(
+                                                  context, 20),
+                                          child: Image.network(
+                                              cartItem.imageUrl,
+                                              fit: BoxFit.cover),
                                         ),
                                       ),
                                       SizedBox(width: 10),
@@ -129,7 +132,8 @@ class _CartListScreenState extends State<CartListScreen> {
                                       // 🟢 Details Section (Title + HTML + Price + Quantity Selector)
                                       Expanded(
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               cartItem.name,
@@ -138,7 +142,9 @@ class _CartListScreenState extends State<CartListScreen> {
                                                 context,
                                                 overrideStyle: TextStyle(
                                                   color: Colors.black,
-                                                  fontSize: ResponsiveHelper.fontSize(context, 12),
+                                                  fontSize:
+                                                      ResponsiveHelper.fontSize(
+                                                          context, 12),
                                                 ),
                                               ),
                                             ),
@@ -148,30 +154,47 @@ class _CartListScreenState extends State<CartListScreen> {
                                               data: cartItem.packageDetail,
                                               shrinkWrap: true,
                                               style: {
-                                                "body": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
+                                                "body": Style(
+                                                    margin: Margins.zero,
+                                                    padding: HtmlPaddings.zero),
                                                 "p": Style(
                                                   textAlign: TextAlign.start,
                                                   alignment: Alignment.topLeft,
                                                   maxLines: 2,
                                                   color: AppColors.txtGreyColor,
-                                                  fontSize: FontSize(ResponsiveHelper.fontSize(context, 10)),
+                                                  fontSize: FontSize(
+                                                      ResponsiveHelper.fontSize(
+                                                          context, 10)),
                                                   margin: Margins.zero,
                                                   padding: HtmlPaddings.zero,
                                                   lineHeight: LineHeight(1.4),
                                                 ),
-                                                "pre": Style(margin: Margins.zero, padding: HtmlPaddings.zero, lineHeight: LineHeight(1)),
-                                                "div": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
-                                                "span": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
-                                                "ul": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
-                                                "li": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
+                                                "pre": Style(
+                                                    margin: Margins.zero,
+                                                    padding: HtmlPaddings.zero,
+                                                    lineHeight: LineHeight(1)),
+                                                "div": Style(
+                                                    margin: Margins.zero,
+                                                    padding: HtmlPaddings.zero),
+                                                "span": Style(
+                                                    margin: Margins.zero,
+                                                    padding: HtmlPaddings.zero),
+                                                "ul": Style(
+                                                    margin: Margins.zero,
+                                                    padding: HtmlPaddings.zero),
+                                                "li": Style(
+                                                    margin: Margins.zero,
+                                                    padding: HtmlPaddings.zero),
                                               },
                                             ),
 
-                                            ResponsiveHelper.sizeBoxHeightSpace(context, 0.5),
+                                            ResponsiveHelper.sizeBoxHeightSpace(
+                                                context, 0.5),
 
                                             // 🟢 Price + Quantity Controls in Row
                                             Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween, // Moves quantity to the end
+                                              mainAxisAlignment: MainAxisAlignment
+                                                  .spaceBetween, // Moves quantity to the end
                                               children: [
                                                 // 🟢 Price Text (Left side)
                                                 Text(
@@ -188,38 +211,83 @@ class _CartListScreenState extends State<CartListScreen> {
                                                 // 🟢 Quantity Control (Moved to end)
                                                 Container(
                                                   height: 20,
-                                                  padding: EdgeInsets.symmetric(horizontal: 5),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 5),
                                                   decoration: BoxDecoration(
-                                                    borderRadius: BorderRadius.circular(10),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
                                                   ),
                                                   child: Row(
-                                                    mainAxisSize: MainAxisSize.min,
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
                                                     children: [
                                                       IconButton(
-                                                        onPressed: () => cartProvider.decreaseQuantity(context,cartItem.id),
-                                                        icon: Icon(Icons.remove, color: Colors.black, size: 16),
-                                                        padding: EdgeInsets.zero,
-                                                        constraints: BoxConstraints(minWidth: 28, minHeight: 28),
-                                                        style: IconButton.styleFrom(
-                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-                                                          backgroundColor: AppColors.lightYellowColor,
+                                                        onPressed: () =>
+                                                            cartProvider
+                                                                .decreaseQuantity(
+                                                                    context,
+                                                                    cartItem
+                                                                        .id),
+                                                        icon: Icon(Icons.remove,
+                                                            color: Colors.black,
+                                                            size: 16),
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        constraints:
+                                                            BoxConstraints(
+                                                                minWidth: 28,
+                                                                minHeight: 28),
+                                                        style: IconButton
+                                                            .styleFrom(
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          2)),
+                                                          backgroundColor: AppColors
+                                                              .lightYellowColor,
                                                         ),
                                                       ),
                                                       Padding(
-                                                        padding: const EdgeInsets.symmetric(horizontal: 6),
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal: 6),
                                                         child: Text(
                                                           "${cartItem.quantity}",
-                                                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
                                                         ),
                                                       ),
                                                       IconButton(
-                                                        onPressed: () => cartProvider.increaseQuantity(context, cartItem.id),
-                                                        icon: Icon(Icons.add, color: Colors.black, size: 16),
-                                                        padding: EdgeInsets.zero,
-                                                        constraints: BoxConstraints(minWidth: 28, minHeight: 28),
-                                                        style: IconButton.styleFrom(
-                                                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-                                                          backgroundColor: AppColors.lightYellowColor,
+                                                        onPressed: () =>
+                                                            cartProvider
+                                                                .increaseQuantity(
+                                                                    context,
+                                                                    cartItem
+                                                                        .id),
+                                                        icon: Icon(Icons.add,
+                                                            color: Colors.black,
+                                                            size: 16),
+                                                        padding:
+                                                            EdgeInsets.zero,
+                                                        constraints:
+                                                            BoxConstraints(
+                                                                minWidth: 28,
+                                                                minHeight: 28),
+                                                        style: IconButton
+                                                            .styleFrom(
+                                                          shape: RoundedRectangleBorder(
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          2)),
+                                                          backgroundColor: AppColors
+                                                              .lightYellowColor,
                                                         ),
                                                       ),
                                                     ],
@@ -235,17 +303,18 @@ class _CartListScreenState extends State<CartListScreen> {
                                       Column(
                                         children: [
                                           IconButton(
-                                            icon: Icon(Icons.delete_outline, color: Colors.red),
+                                            icon: Icon(Icons.delete_outline,
+                                                color: Colors.red),
                                             onPressed: () {
-                                              cartProvider.removeFromCart(context, cartItem.id);
+                                              cartProvider.removeFromCart(
+                                                  context, cartItem.id);
                                             },
                                           ),
                                         ],
                                       ),
                                     ],
                                   ),
-                                )
-                                ;
+                                );
                               },
                             ),
 
@@ -314,10 +383,12 @@ class _CartListScreenState extends State<CartListScreen> {
                             color: Colors.white,
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1), // Shadow color
+                                color: Colors.black
+                                    .withOpacity(0.1), // Shadow color
                                 spreadRadius: 0, // No extra spread
                                 blurRadius: 10, // Blur effect for smooth shadow
-                                offset: Offset(0, -3), // Moves shadow **above** the container
+                                offset: Offset(0,
+                                    -3), // Moves shadow **above** the container
                               ),
                             ],
                           ),
@@ -362,43 +433,59 @@ class _CartListScreenState extends State<CartListScreen> {
                                     onPressed: () {
                                       print('Proceed button clicked!');
 
-                                      final cartListPr =   Provider.of<CartProvider>(context, listen: false);
+                                      final cartListPr = Provider.of<CartProvider>(context,
+                                              listen: false);
                                       final services = cartListPr.cartItems;
 
-
                                       /// Function to extract plain text from an HTML string
-                                      String extractPlainText(String htmlString) {
+                                      String extractPlainText(
+                                          String htmlString) {
                                         var document = parse(htmlString);
                                         return document.body?.text ?? "";
                                       }
 
-                                      List<OrderItem> orderItems = services.map((cartItem) {
+                                      List<OrderItem> orderItems =
+                                          services.map((cartItem) {
                                         return OrderItem(
-                                          id: cartItem.id ?? "", // Use actual ID from cart item
+                                          id: cartItem.id ??
+                                              "", // Use actual ID from cart item
                                           name: cartItem.name,
-                                          category: cartItem.category ?? "", // Ensure category is available
-                                          price:  double.parse(cartItem.price.toString()),
-                                          imageUrl: cartItem.imageUrl ?? OrderItem.defaultImage, // Use default if missing
-                                          packageDetail: extractPlainText(cartItem.packageDetail), // Extract text from HTML
+                                          orderType: "package",
+                                          category: "package"
+                                              "", // Ensure category is available
+                                          price: double.parse(
+                                              cartItem.price.toString()),
+                                          imageUrl: cartItem.imageUrl ??
+                                              OrderItem
+                                                  .defaultImage, // Use default if missing
+                                          packageDetail: extractPlainText(cartItem
+                                              .packageDetail), // Extract text from HTML
                                           quantity: cartItem.quantity,
                                         );
                                       }).toList();
 
                                       // ✅ Add all orderItems to CheckoutProvider before navigating
-                                      Provider.of<CheckoutProvider>(context, listen: false).addMultipleToCheckout(context, orderItems);
-
+                                      Provider.of<CheckoutProvider>(context,
+                                              listen: false)
+                                          .addMultipleToCheckout( context, orderItems);
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
                                           builder: (context) =>
-                                              CheckoutScreen(
-                                                categoryName: "serviceName",
-                                                name: "packageName",
-                                                price: "packageRate",
-                                              ),
+                                              CheckoutScreen(),
                                         ),
                                       );
-
+                                      // Navigator.push(
+                                      //   context,
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) =>
+                                      //         CheckoutScreen(
+                                      //           categoryName: "serviceName",
+                                      //           name: "packageName",
+                                      //           price: "packageRate",
+                                      //         ),
+                                      //   ),
+                                      // );
                                     },
                                     textStyle: TextStyle(
                                         color: Colors.white, fontSize: 18),

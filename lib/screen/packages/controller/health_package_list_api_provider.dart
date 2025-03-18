@@ -110,6 +110,7 @@ class HealthPacakgeListApiProvider with ChangeNotifier {
       var response =  await _repository.getPackageListResponse();
 
       if (response != null && response.success == true && response.data != null) {
+        print("${response.data.toString()}");
         print("✅ Package list  Fetched Successfully");
         _navPackageListlModel = response;
         _setLoadingState(false);

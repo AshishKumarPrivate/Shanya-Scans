@@ -1,13 +1,15 @@
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:healthians/screen/order/model/OrderItem.dart';
 import 'package:healthians/ui_helper/snack_bar.dart';
+import 'package:healthians/util/StringUtils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../network_manager/api_error_handler.dart';
 import '../../../network_manager/repository.dart';
-import '../../order/model/CreateOrderModelResponse.dart';
+import '../../order/model/CreateOrder2ModelResponse.dart';
 import '../../order/screen/OrderSuccessScreen.dart';
 
 class CheckoutProvider with ChangeNotifier {
@@ -17,10 +19,12 @@ class CheckoutProvider with ChangeNotifier {
   bool _isLoading = false;
   String _errorMessage = "";
 
-  CreateOrderModelResponse? _createOrderModelResponse;
+  CreateOrder2ModelResponse? _createOrderModelResponse;
+  // CreateOrderModelResponse? _createOrderModelResponse;
 
-
-  CreateOrderModelResponse? get createOrderModelResponse => _createOrderModelResponse;
+  CreateOrder2ModelResponse? get createOrderModelResponse =>
+      _createOrderModelResponse;
+  // CreateOrderModelResponse? get createOrderModelResponse => _createOrderModelResponse;
   List<OrderItem> get checkoutItems => _checkoutItems;
   bool get isCheckoutEmpty => _checkoutItems.isEmpty;
   bool get isLoading => _isLoading;
@@ -46,7 +50,6 @@ class CheckoutProvider with ChangeNotifier {
     notifyListeners();
   }
 
-
   // 🟢 Increase Quantity of an Item
   void increaseQuantity(BuildContext context, String id) {
     int index = _checkoutItems.indexWhere((item) => item.id == id);
@@ -59,6 +62,7 @@ class CheckoutProvider with ChangeNotifier {
           category: _checkoutItems[index].category,
           price: _checkoutItems[index].price,
           imageUrl: _checkoutItems[index].imageUrl,
+          orderType: _checkoutItems[index].orderType,
           packageDetail: _checkoutItems[index].packageDetail,
           quantity: _checkoutItems[index].quantity + 1,
         );
@@ -89,6 +93,7 @@ class CheckoutProvider with ChangeNotifier {
         category: _checkoutItems[index].category,
         price: _checkoutItems[index].price,
         imageUrl: _checkoutItems[index].imageUrl,
+        orderType: _checkoutItems[index].orderType,
         packageDetail: _checkoutItems[index].packageDetail,
         quantity: _checkoutItems[index].quantity - 1,
       );
@@ -121,8 +126,7 @@ class CheckoutProvider with ChangeNotifier {
 
     if (cartData != null) {
       final List<dynamic> decodedData = jsonDecode(cartData);
-      _checkoutItems =
-          decodedData.map((item) => OrderItem.fromJson(item)).toList();
+      _checkoutItems = decodedData.map((item) => OrderItem.fromJson(item)).toList();
       notifyListeners();
     }
   }
@@ -138,10 +142,12 @@ class CheckoutProvider with ChangeNotifier {
         category: item.category,
         price: item.price,
         imageUrl: item.imageUrl,
+        orderType: item.orderType,
         packageDetail: item.packageDetail,
         quantity: _checkoutItems[index].quantity + 1,
       );
     } else {
+      _checkoutItems.clear(); // Clear previous checkout items
       _checkoutItems.add(item);
     }
 
@@ -154,6 +160,7 @@ class CheckoutProvider with ChangeNotifier {
     //   duration: Duration(seconds: 2),
     // );
   }
+
   // 🟢 Add Multiple Items to Cart in CheckoutProvider
   void addMultipleToCheckout(BuildContext context, List<OrderItem> items) {
     for (var item in items) {
@@ -166,6 +173,7 @@ class CheckoutProvider with ChangeNotifier {
           category: item.category,
           price: item.price,
           imageUrl: item.imageUrl,
+          orderType: item.orderType,
           packageDetail: item.packageDetail,
           quantity: _checkoutItems[index].quantity + item.quantity,
         );
@@ -185,8 +193,6 @@ class CheckoutProvider with ChangeNotifier {
     );
   }
 
-
-
   // 🟢 Remove Item from Cart
   void removeFromCart(BuildContext context, String id) {
     OrderItem? removedItem = _checkoutItems.firstWhere((item) => item.id == id,
@@ -205,58 +211,103 @@ class CheckoutProvider with ChangeNotifier {
     }
   }
 
-
   Future<bool> createOrder(
       BuildContext context,
-      String testName,
       String bookingDate,
       String bookingTime,
-      String category,
-      String rate,
       String email,
       String name,
       String age,
       String phone,
       String altPhone,
       String gender,
-      String cityState) async {
+      String cityState
+
+      ) async {
     _setLoadingState(true);
     _errorMessage = "";
     _createOrderModelResponse = null;
 
     try {
+      // Convert order details list to JSON format
+      // List<Map<String, dynamic>> orderDetailsJson = _checkoutItems.map((orderDetail) {
+      //   return {
+      //     "patientName": name,
+      //     "patientAge": age,
+      //     "patientGender": gender,
+      //     "tests": _checkoutItems.map((test) {
+      //       return {
+      //         // "id": test.id,
+      //         "name": test.name,
+      //         "price": test.price,
+      //         "category": test.category,
+      //         "orderType": test.orderType,
+      //         "quantity": test.quantity,
+      //         "bookingDate": bookingDate,
+      //         "bookingTime": bookingTime,
+      //       };
+      //     }).toList(),
+      //   };
+      // }).toList();
+
+      // Convert checkout items into structured order details
+      // Collect all tests for the single patient
+      List<Map<String, dynamic>> tests = _checkoutItems.map((test) {
+        return {
+          "orderName": test.name, // Test Name
+          "quantity": test.quantity,
+          "category": test.category,
+          "orderType": test.orderType,
+          "orderPrice": test.price,
+          "bookingDate": bookingDate,
+          "bookingTime": bookingTime,
+        };
+      }).toList();
+
+      // Construct order details with patient info only once
+      List<Map<String, dynamic>> orderDetailsJson = [
+        {
+          "patientName": name,
+          "patientAge": age,
+          "patientGender": StringUtils.toLowerCase(gender),
+          "tests": tests, // All tests for the patient
+        }
+      ];
+
+      // Construct request body
       Map<String, dynamic> requestBody = {
-        "testName": testName,
-        "bookingDate": bookingDate,
-        "bookingTime": bookingTime,
-        "category": category,
-        "rate": rate,
         "email": email,
-        "name": name,
-        "age": age,
-        "phone": phone,
-        "altPhone": altPhone,
-        "gender": gender,
-        "cityState": cityState
+        "address": cityState,
+        "phoneNumber": phone,
+        "altPhoneNumber": altPhone,
+        "orderDetails": orderDetailsJson,
       };
+
+      // Debugging log
+      print("bodyRequest => ${requestBody.toString()}");
+
+      // Map<String, dynamic> requestBody = {
+      //   "testName": testName,
+      //   "bookingDate": bookingDate,
+      //   "bookingTime": bookingTime,
+      //   "category": category,
+      //   "rate": rate,
+      //   "email": email,
+      //   "name": name,
+      //   "age": age,
+      //   "phone": phone,
+      //   "altPhone": altPhone,
+      //   "gender": gender,
+      //   "cityState": cityState
+      // };
 
       var response = await _repository.createOrderResponse(requestBody);
 
+      print("bodyRequest=>${requestBody.toString()}");
       if (response.success == true && response.data != null) {
         print("✅ Order created successfully!");
         _createOrderModelResponse = response;
         _setLoadingState(false);
-
-        // OrderItem orderItem = OrderItem(
-        //   id: response.data!.sId ?? "",
-        //   name: testName,
-        //   price: rate,
-        //   imageUrl: "",
-        //   packageDetail: "",
-        // );
-        //
-        // saveSingleTestScanItem(orderItem);
-        // notifyListeners();
 
         Navigator.pushReplacement(
           context,

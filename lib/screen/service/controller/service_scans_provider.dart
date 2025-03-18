@@ -234,7 +234,7 @@ class ServiceApiProvider with ChangeNotifier {
 
     try {
       var response = await _repository
-          .getServiceDetailRateList({"serviceName": serviceName});
+          .getServiceDetailRateList(serviceName);
 
       if (response != null &&
           response.success == true &&

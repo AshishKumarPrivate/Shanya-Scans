@@ -5,11 +5,9 @@ import 'package:healthians/screen/service/service_detail_list_detail_buy_now.dar
 import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:healthians/ui_helper/app_text_styles.dart';
 import 'package:healthians/util/dimensions.dart';
-import 'package:provider/provider.dart';
 import '../../base_widgets/common/common_app_bar.dart';
 import '../../base_widgets/expandable_text_widget.dart';
 import '../../ui_helper/app_colors.dart';
-import 'controller/service_scans_provider.dart';
 
 class AllServicesDetailListScreen extends StatefulWidget {
   final String serviceName, serviceSlug, serviceDescription,servicePhoto;
@@ -35,9 +33,6 @@ class _AllServicesDetailListScreenState
     // Fetch API data when the widget is initialized
     print( " serviceslug ${widget.serviceName} serviceName ${widget.serviceSlug}");
 
-    Future.microtask(() =>
-        Provider.of<ServiceApiProvider>(context, listen: false)
-            .getHomeServiceListDetail(context, widget.serviceSlug));
   }
 
   @override
@@ -115,6 +110,7 @@ class _AllServicesDetailListScreenState
                             ),
                             // Replace the previous container with this code
                             CellServiceListItem(
+                              serviceSlug: "${widget.serviceSlug.toString()}",
                               serviceName: "${widget.serviceName.toString()}",
                               borderRadius: 10.0,
                               borderColor: AppColors.txtLightGreyColor,

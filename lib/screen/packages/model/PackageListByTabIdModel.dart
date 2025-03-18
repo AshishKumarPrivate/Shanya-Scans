@@ -34,9 +34,9 @@ class PackageListByTabIdModel {
   String? packageOverview;
   String? packageCategory;
   int? packageRate;
-  int? packageDiscount;
-  int? parameterInclude;
-  int? report;
+  String? packageDiscount;
+  String? parameterInclude;
+  String? report;
   List<PackagesParamter>? packagesParamter;
   String? packageParamterDetails;
   String? createdAt;

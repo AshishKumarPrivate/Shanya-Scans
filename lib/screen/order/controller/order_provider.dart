@@ -1,24 +1,24 @@
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/screen/order/model/CreateOrderModelResponse.dart';
 import 'package:healthians/screen/order/model/MyOrderHistoryListModel.dart';
 import 'package:healthians/screen/order/model/OrderItem.dart';
 import 'package:healthians/screen/order/screen/OrderSuccessScreen.dart';
 import 'package:healthians/ui_helper/storage_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../bottom_navigation_screen.dart';
+
 import '../../../network_manager/api_error_handler.dart';
 import '../../../ui_helper/snack_bar.dart';
-import '../../auth/model/OtpVerifyModel.dart';
+import '../model/CreateOrder2ModelResponse.dart';
 
 class OrderApiProvider with ChangeNotifier {
   final Repository _repository = Repository();
   bool _isLoading = false;
   String _errorMessage = "";
-  CreateOrderModelResponse? _createOrderModelResponse;
+  CreateOrder2ModelResponse? _createOrderModelResponse;
+  // CreateOrderModelResponse? _createOrderModelResponse;
   MyOrderHistoryListModel? _myOrderHistoryListModel;
 
   List<OrderItem> _orderItems = [];
@@ -27,8 +27,11 @@ class OrderApiProvider with ChangeNotifier {
   bool get isOrderEmpty => _orderItems.isEmpty;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
-  CreateOrderModelResponse? get createOrderModelResponse => _createOrderModelResponse;
-  MyOrderHistoryListModel? get myOrderHistoryListModel => _myOrderHistoryListModel;
+  CreateOrder2ModelResponse? get createOrderModelResponse =>
+      _createOrderModelResponse;
+  // CreateOrderModelResponse? get createOrderModelResponse => _createOrderModelResponse;
+  MyOrderHistoryListModel? get myOrderHistoryListModel =>
+      _myOrderHistoryListModel;
 
   void reset() {
     _isLoading = false;
@@ -55,7 +58,6 @@ class OrderApiProvider with ChangeNotifier {
   void increaseQuantity(BuildContext context, String id) {
     int index = _orderItems.indexWhere((item) => item.id == id);
 
-
     if (index != -1) {
       if (_orderItems[index].quantity < 5) {
         _orderItems[index] = OrderItem(
@@ -64,6 +66,7 @@ class OrderApiProvider with ChangeNotifier {
           category: _orderItems[index].category,
           price: _orderItems[index].price,
           imageUrl: _orderItems[index].imageUrl,
+          orderType: _orderItems[index].orderType,
           packageDetail: _orderItems[index].packageDetail,
           quantity: _orderItems[index].quantity + 1,
         );
@@ -75,8 +78,7 @@ class OrderApiProvider with ChangeNotifier {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text("You can't add more than 5 items."),
-              duration: Duration(seconds: 2)
-          ),
+              duration: Duration(seconds: 2)),
         );
       }
 
@@ -86,7 +88,7 @@ class OrderApiProvider with ChangeNotifier {
   }
 
   // 🟢 Decrease Quantity of an Item
-  void decreaseQuantity(BuildContext context,String id) {
+  void decreaseQuantity(BuildContext context, String id) {
     int index = _orderItems.indexWhere((item) => item.id == id);
     if (index != -1 && _orderItems[index].quantity > 1) {
       _orderItems[index] = OrderItem(
@@ -95,6 +97,7 @@ class OrderApiProvider with ChangeNotifier {
         category: _orderItems[index].category,
         price: _orderItems[index].price,
         imageUrl: _orderItems[index].imageUrl,
+        orderType: _orderItems[index].orderType,
         packageDetail: _orderItems[index].packageDetail,
         quantity: _orderItems[index].quantity - 1,
       );
@@ -104,17 +107,18 @@ class OrderApiProvider with ChangeNotifier {
     } else if (index != -1 && _orderItems[index].quantity == 1) {
       // Remove item if quantity reaches 0
       // removeFromCart(null, id);
-      OrderItem? removedItem = _orderItems.firstWhere((item) => item.id == id, orElse: () => OrderItem.empty());
+      OrderItem? removedItem = _orderItems.firstWhere((item) => item.id == id,
+          orElse: () => OrderItem.empty());
       _orderItems.removeWhere((item) => item.id == id);
       saveSingleTestScanItem(); // Save updated cart
       notifyListeners();
-
-
     }
   }
+
   // 🟢 Remove Item from Cart
-  void removeFromCart(BuildContext context,String id) {
-    OrderItem? removedItem = _orderItems.firstWhere((item) => item.id == id, orElse: () => OrderItem.empty());
+  void removeFromCart(BuildContext context, String id) {
+    OrderItem? removedItem = _orderItems.firstWhere((item) => item.id == id,
+        orElse: () => OrderItem.empty());
     _orderItems.removeWhere((item) => item.id == id);
     saveSingleTestScanItem(); // Save updated cart
     notifyListeners();
@@ -132,7 +136,8 @@ class OrderApiProvider with ChangeNotifier {
   Future<void> saveSingleTestScanItem() async {
     final prefs = await SharedPreferences.getInstance();
     // final String encodedItem = jsonEncode(item.toJson());
-    final String encodedList = jsonEncode(_orderItems.map((item) => item.toJson()).toList());
+    final String encodedList =
+        jsonEncode(_orderItems.map((item) => item.toJson()).toList());
     await prefs.setString('single_test_scan_item', encodedList);
   }
 
@@ -156,11 +161,12 @@ class OrderApiProvider with ChangeNotifier {
         name: item.name,
         category: item.category,
         price: item.price,
-        imageUrl: item.imageUrl ?? OrderItem.defaultImage, // ✅ Ensure default image
+        imageUrl:
+            item.imageUrl ?? OrderItem.defaultImage, // ✅ Ensure default image
         // imageUrl: item.imageUrl,
         packageDetail: item.packageDetail,
+        orderType: _orderItems[index].orderType,
         quantity: _orderItems[index].quantity + 1,
-
       );
     } else {
       _orderItems.add(item);
@@ -253,6 +259,8 @@ class OrderApiProvider with ChangeNotifier {
     return false;
   }
 
+
+
   // &&&&&&&&&&& order history &&&&&&&&&&&&&&&&&
   /// **Fetch Home Service List API**
   Future<bool> getOrderHistory(BuildContext context) async {
@@ -261,12 +269,14 @@ class OrderApiProvider with ChangeNotifier {
     _myOrderHistoryListModel = null;
 
     try {
-    var userId = StorageHelper().getUserId();
+      var userId = StorageHelper().getUserId();
 
       // Map<String, dynamic> requestBody = {"id": userId};
-      var response =  await _repository.getOrderHistoryResponse(userId);
+      var response = await _repository.getOrderHistoryResponse(userId);
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response != null &&
+          response.success == true &&
+          response.data != null) {
         print("✅ Package list By Tab  Fetched Successfully");
         _myOrderHistoryListModel = response;
         _setLoadingState(false);
@@ -282,5 +292,4 @@ class OrderApiProvider with ChangeNotifier {
 
     return false;
   }
-
 }

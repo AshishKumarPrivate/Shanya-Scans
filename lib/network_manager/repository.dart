@@ -5,7 +5,7 @@ import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/model/Fr
 import 'package:healthians/screen/nav/nav_home/health_concern/model/HealthConcernPacakageTagModel.dart';
 import 'package:healthians/screen/nav/nav_home/slider/mdel/HomeBanner1ModelResponse.dart';
 import 'package:healthians/screen/nav/nav_home/slider/mdel/HomeBanner2ModelResponse.dart';
-import 'package:healthians/screen/order/model/CreateOrderModelResponse.dart';
+import 'package:healthians/screen/order/model/CreateOrder2ModelResponse.dart';
 import 'package:healthians/screen/order/model/MyOrderHistoryListModel.dart';
 import 'package:healthians/screen/packages/model/PackageListByTabIdModel.dart';
 import 'package:healthians/screen/packages/model/TopSellingPackagesListModel.dart';
@@ -23,7 +23,6 @@ import '../screen/auth/model/SignUpModel.dart';
 import '../screen/nav/nav_home/health_concern/model/HealthConcernDetailModel.dart';
 import '../screen/nav/nav_lab/model/PathalogyTestListDetailModel.dart';
 import '../screen/nav/nav_lab/model/PathalogyTestListModel.dart';
-import 'api_error_handler.dart';
 import 'dio_helper.dart';
 
 class Repository {
@@ -168,7 +167,8 @@ class Repository {
     } on DioException catch (e) {
       if (e.response != null) {
         print("❌ API Error: ${e.response?.data}");
-        String errorMessage = e.response?.data["message"] ?? "Something went wrong";
+        String errorMessage =
+            e.response?.data["message"] ?? "Something went wrong";
 
         return SignUpModel(success: false, message: errorMessage);
       } else {
@@ -181,12 +181,13 @@ class Repository {
     }
   }
 
-
   // user login
   Future<LoginModel> userLogin(Map<String, dynamic> requestBody) async {
     try {
       // ✅ API Call
-      Map<String, dynamic>? response = await _dioHelper.post( url: '$baseUrl/api/v1/user/login',  requestBody: requestBody,
+      Map<String, dynamic>? response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/user/login',
+        requestBody: requestBody,
       );
 
       // ✅ Debug Response
@@ -205,7 +206,6 @@ class Repository {
 
       // ✅ Return Parsed Model
       return LoginModel.fromJson(response);
-
     } on DioException catch (e) {
       if (e.response != null) {
         print("❌ Login API Error: ${e.response?.data}");
@@ -227,7 +227,9 @@ class Repository {
   Future<LoginModel> forgetPassword(Map<String, dynamic> requestBody) async {
     try {
       // ✅ API Call
-      Map<String, dynamic>? response = await _dioHelper.post( url: '$baseUrl/api/v1/user/login',  requestBody: requestBody,
+      Map<String, dynamic>? response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/user/login',
+        requestBody: requestBody,
       );
 
       // ✅ Debug Response
@@ -240,13 +242,13 @@ class Repository {
 
       // ✅ Check if API returns success: false
       if (response["success"] == false) {
-        String errorMessage = response["message"] ?? "Failed to reset your password!";
+        String errorMessage =
+            response["message"] ?? "Failed to reset your password!";
         return LoginModel(success: false, message: errorMessage);
       }
 
       // ✅ Return Parsed Model
       return LoginModel.fromJson(response);
-
     } on DioException catch (e) {
       if (e.response != null) {
         print("❌ Forget Password API Error: ${e.response?.data}");
@@ -265,14 +267,14 @@ class Repository {
   }
 
   // order history
-  Future<UpdateProfileModel> updateProfile( String userId,Object requestBody) async {
+  Future<UpdateProfileModel> updateProfile(
+      String userId, Object requestBody) async {
     // var response =
     //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
-    Map<String, dynamic> response =
-    await _dioHelper.put(url: '$baseUrl/api/v1/user/profile/$userId',requestBody:requestBody );
+    Map<String, dynamic> response = await _dioHelper.put(
+        url: '$baseUrl/api/v1/user/profile/$userId', requestBody: requestBody);
     return UpdateProfileModel.fromJson(response);
   }
-
 
   // user otp verification
   Future<OtpVerifyModel> verifyOtp(Object requestBody) async {
@@ -286,14 +288,13 @@ class Repository {
 
   Future<String> resendOtp(Object requestBody) async {
     Map<String, dynamic> response = await _dioHelper.post(
-        url: '$baseUrl/api/v1/user/resend-verification', requestBody: requestBody);
+        url: '$baseUrl/api/v1/user/resend-verification',
+        requestBody: requestBody);
 
     print("resendOtp Api Response: ${response}"); // Debugging
     return response["message"];
     // return LogInModel.fromJson(response);
   }
-
-
 
   //GET API
   Future<HomeServiceListModel> getHomeServiceModelResponse() async {
@@ -316,9 +317,10 @@ class Repository {
 
   // POST API
   Future<ServiceDetailRateListModel> getServiceDetailRateList(
-      Object requestBody) async {
-    Map<String, dynamic> response = await _dioHelper.post(
-        url: '$baseUrl/api/v1/test/single/name', requestBody: requestBody);
+      String slug) async {
+    Map<String, dynamic> response = await _dioHelper.get(
+        url: '$baseUrl/api/v1/test/service/scan/${slug}');
+        // url: '$baseUrl/api/v1/test/single/name', requestBody: requestBody);
 
     print("ServiceDetailRateListModel Api Response: ${response}"); // Debugging
     return ServiceDetailRateListModel.fromJson(response);
@@ -391,6 +393,7 @@ class Repository {
     return PackageListByTabIdModel.fromJson(response);
     // return LogInModel.fromJson(response);
   }
+
   Future<TopSellingPackagesListModel> getTopSellingPackageListResponse(
       Object requestBody) async {
     Map<String, dynamic> response = await _dioHelper.post(
@@ -431,14 +434,14 @@ class Repository {
         await _dioHelper.get(url: '$baseUrl/api/v1/banner/banner2');
     return HomeBanner2ModelResponse.fromJson(response);
   }
+
   Future<HomeBanner1ModelResponse> getHomeBanner1ModelResponse() async {
     // var response =
     //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
     Map<String, dynamic> response =
-    await _dioHelper.get(url: '$baseUrl/api/v1/banner/banner1');
+        await _dioHelper.get(url: '$baseUrl/api/v1/banner/banner1');
     return HomeBanner1ModelResponse.fromJson(response);
   }
-
 
 // &&&&&&&&&&& Terms &b condition , privacy policy , refund polciy   &&&&&&&&&
 
@@ -447,7 +450,7 @@ class Repository {
     // var response =
     //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
     Map<String, dynamic> response =
-    await _dioHelper.get(url: '$baseUrl/api/v1/utlis/term-condition');
+        await _dioHelper.get(url: '$baseUrl/api/v1/utlis/term-condition');
     return TermsConditionsPrivacyRefundPolicyModel.fromJson(response);
   }
 
@@ -456,7 +459,7 @@ class Repository {
     // var response =
     //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
     Map<String, dynamic> response =
-    await _dioHelper.get(url: '$baseUrl/api/v1/utlis/privacy-policy');
+        await _dioHelper.get(url: '$baseUrl/api/v1/utlis/privacy-policy');
     return TermsConditionsPrivacyRefundPolicyModel.fromJson(response);
   }
 
@@ -465,25 +468,26 @@ class Repository {
     // var response =
     //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
     Map<String, dynamic> response =
-    await _dioHelper.get(url: '$baseUrl/api/v1/utlis/refund-cancellation');
+        await _dioHelper.get(url: '$baseUrl/api/v1/utlis/refund-cancellation');
     return TermsConditionsPrivacyRefundPolicyModel.fromJson(response);
   }
 
-
   // &&&&&&&&&&&&&&&& ORDER API &&&&&&&&&&&&&&&&&&&&&&&&&&
-  Future<CreateOrderModelResponse> createOrderResponse(Object requestBody) async {
+  Future<CreateOrder2ModelResponse> createOrderResponse(
+      Object requestBody) async {
     Map<String, dynamic> response = await _dioHelper.post(
         url: '$baseUrl/api/v1/order', requestBody: requestBody);
 
-    return CreateOrderModelResponse.fromJson(response);
+    return CreateOrder2ModelResponse.fromJson(response);
     // return LogInModel.fromJson(response);
   }
+
   // order history
-  Future<MyOrderHistoryListModel> getOrderHistoryResponse( String userId) async {
+  Future<MyOrderHistoryListModel> getOrderHistoryResponse(String userId) async {
     // var response =
     //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
     Map<String, dynamic> response =
-    await _dioHelper.get(url: '$baseUrl/api/v1/user/order/${userId}');
+        await _dioHelper.get(url: '$baseUrl/api/v1/user/order/${userId}');
     return MyOrderHistoryListModel.fromJson(response);
   }
 
@@ -496,16 +500,6 @@ class Repository {
     return EnquiryNeedHelpModel.fromJson(response);
     // return LogInModel.fromJson(response);
   }
-
-
-
-
-
-
-
-
-
-
 
 //
 // //GET API

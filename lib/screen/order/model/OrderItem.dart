@@ -5,6 +5,7 @@ class OrderItem {
   final double price;
   final String imageUrl;
   final String packageDetail;
+  final String orderType;
   final int quantity;
 
   static String defaultImage = "assets/images/common_scan_image.png";
@@ -16,6 +17,7 @@ class OrderItem {
     required this.price,
     String? imageUrl, // Nullable to handle default value
     required this.packageDetail,
+    required this.orderType,
     this.quantity = 1,
   }) : imageUrl = imageUrl ?? defaultImage; // Assign default image if null
 
@@ -28,6 +30,7 @@ class OrderItem {
       price: 0.00,
       imageUrl: defaultImage, // Ensuring default image
       packageDetail: '',
+      orderType: '',
       quantity: 0,
     );
   }
@@ -41,6 +44,7 @@ class OrderItem {
       'price': price,
       'imageUrl': imageUrl,
       'packageDetail': packageDetail,
+      'orderType': orderType,
       'quantity': quantity,
     };
   }
@@ -55,6 +59,7 @@ class OrderItem {
           ? OrderItem.defaultImage  // ✅ Use default image if missing
           : json['imageUrl'],
       packageDetail: json['packageDetail'] ?? '',
+      orderType: json['orderType'] ?? '',
       quantity: json['quantity'] ?? 1,
     );
   }

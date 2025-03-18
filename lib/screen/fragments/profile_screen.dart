@@ -63,16 +63,14 @@ class ProfileScreen extends StatelessWidget {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  SizedBox(
-                                    height: 20,
-                                  ),
+
                                   SizedBox(
                                     width: ResponsiveHelper.containerWidth(
-                                        context, 10),
+                                        context, 15),
                                     height: ResponsiveHelper.containerWidth(
-                                        context, 10),
+                                        context, 15),
                                     child: CircleAvatar(
-                                      radius: 20, // Image radius
+                                      radius: 15, // Image radius
                                       backgroundImage:
                                           AssetImage('assets/images/user.png'),
                                     ),
@@ -214,8 +212,7 @@ class ProfileScreen extends StatelessWidget {
                                       isRefundPolicy: false,
                                       isTermAndConditions: false,
                                       aciviyName: "Privacy Policy",
-                                      url:
-                                          "https://ayush.webakash1806.com/privacy-policy"),
+                                      url: "https://ayush.webakash1806.com/privacy-policy"),
                                 ),
                               );
                             },

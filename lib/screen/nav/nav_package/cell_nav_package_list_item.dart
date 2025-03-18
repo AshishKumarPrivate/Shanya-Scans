@@ -89,15 +89,6 @@ class CellNavPackageListItem extends StatelessWidget {
                            Row(
                              children: [
                                Text(
-                                 "\u20B9${item.packageRate}",
-                                 style: AppTextStyles.heading1(context,
-                                     overrideStyle: TextStyle(
-                                         color: AppColors.primary,
-                                         fontSize: ResponsiveHelper.fontSize(
-                                             context, 14))),
-                               ),
-                               SizedBox(width: 8),
-                               Text(
                                  "\u20B9${item.packageDiscount}",
                                  //   style: AppTextStyles.heading2.copyWith(
                                  //   fontSize: 12,
@@ -111,6 +102,66 @@ class CellNavPackageListItem extends StatelessWidget {
                                          fontSize: ResponsiveHelper.fontSize(
                                              context, 12))),
                                ),
+
+                               SizedBox(width: 8),
+
+                               // Text(
+                               //   "\u20B9${item.packageRate}",
+                               //   style: AppTextStyles.heading1(context,
+                               //       overrideStyle: TextStyle(
+                               //           color: AppColors.primary,
+                               //           fontSize: ResponsiveHelper.fontSize(
+                               //               context, 14))),
+                               // ),
+
+                               Row(
+                                 children: [
+                                   /// Rupee Symbol and Amount with spacing
+                                   RichText(
+                                     text: TextSpan(
+                                       children: [
+                                         TextSpan(
+                                           text: "\u20B9 ", // Rupee Symbol with space
+                                           style: AppTextStyles.heading1(
+                                             context,
+                                             overrideStyle: TextStyle(
+                                               color: AppColors.primary,
+                                               fontSize: ResponsiveHelper.fontSize(context, 14),
+                                             ),
+                                           ),
+                                         ),
+                                         TextSpan(
+                                           text: item.packageRate.toString(), // Price Amount
+                                           style: AppTextStyles.heading1(
+                                             context,
+                                             overrideStyle: TextStyle(
+                                               color: AppColors.primary,
+                                               fontSize: ResponsiveHelper.fontSize(context, 14),
+                                             ),
+                                           ),
+                                         ),
+                                         TextSpan(
+                                           text: " /-", // Smaller "/-" Sign
+                                           style: AppTextStyles.heading1(
+                                             context,
+                                             overrideStyle: TextStyle(
+                                               color: AppColors.primary,
+                                               fontSize: ResponsiveHelper.fontSize(context, 11), // Smaller font size
+                                             ),
+                                           ),
+                                         ),
+                                       ],
+                                     ),
+                                   ),
+                                 ],
+                               )
+
+
+
+
+
+
+
                              ],
                            ),
                            // Text(

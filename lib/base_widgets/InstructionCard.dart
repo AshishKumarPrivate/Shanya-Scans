@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:healthians/ui_helper/app_colors.dart';
 
 import '../ui_helper/app_text_styles.dart';
 import '../ui_helper/responsive_helper.dart';
@@ -34,7 +35,7 @@ class _InstructionCardState extends State<InstructionCard> {
             Container(
               padding: ResponsiveHelper.padding(context, 2, 1),
               decoration: BoxDecoration(
-                color: Colors.blue,
+                color: AppColors.primary,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(

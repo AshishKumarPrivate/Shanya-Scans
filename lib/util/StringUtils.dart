@@ -34,4 +34,14 @@ class StringUtils {
   static bool isNullOrEmpty(String? text) {
     return text == null || text.trim().isEmpty;
   }
+
+  static String type = "scan"; // Default order type
+
+  static void setOrderType(String newType) {
+    type = newType;
+  }
+
+  static String getOrderType() {
+    return type;
+  }
 }

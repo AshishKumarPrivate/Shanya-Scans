@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:healthians/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
-import 'package:healthians/screen/nav/nav_lab/nav_pathalogy_test_detail.dart';
+import 'package:healthians/screen/order/model/OrderItem.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
 
@@ -8,21 +8,16 @@ import '../../../base_widgets/card_body.dart';
 import '../../../base_widgets/product_card_bottom.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
-import '../../../ui_helper/snack_bar.dart';
 import '../../cart/controller/cart_list_api_provider.dart';
 import '../../cart/model/CartItem.dart';
-import '../../order/controller/order_provider.dart';
-import '../../order/model/OrderItem.dart';
 import '../../packages/controller/health_package_list_api_provider.dart';
 import '../../packages/widget/home_health_pacakge_shimmer.dart';
 import '../../packages/widget/home_health_pacakge_tab_list_shimmer.dart';
 import '../nav_package/nav_package_detail.dart';
-import 'package:html/parser.dart'; // Import required package
 
 class HomeHealthPackageSection extends StatefulWidget {
   @override
-  State<HomeHealthPackageSection> createState() =>
-      _HomeHealthPackageSectionState();
+  State<HomeHealthPackageSection> createState() =>  _HomeHealthPackageSectionState();
 }
 
 class _HomeHealthPackageSectionState extends State<HomeHealthPackageSection> {
@@ -242,7 +237,8 @@ class _HomeHealthPackageSectionState extends State<HomeHealthPackageSection> {
                             builder: (context) =>
                                 ViewDetailBottomNavPackageScreen(
                               packageSlug: packageListItem.slug.toString(),
-                              packagetName:packageListItem.packageName.toString(),
+                              packagetName:
+                                  packageListItem.packageName.toString(),
                             ),
                           ),
                         );
@@ -374,14 +370,59 @@ class _HomeHealthPackageSectionState extends State<HomeHealthPackageSection> {
                                         ),
                                       ),
                                       SizedBox(width: 5),
-                                      Text(
-                                        '\u20B9${packageListItem.packageRate}',
-                                        style: AppTextStyles.heading1(context,
-                                            overrideStyle: TextStyle(
-                                                fontSize:
-                                                    ResponsiveHelper.fontSize(
-                                                        context, 12))),
-                                      ),
+
+                                      // Text(
+                                      //   '\u20B9${packageListItem.packageRate}',
+                                      //   style: AppTextStyles.heading1(context,
+                                      //       overrideStyle: TextStyle(
+                                      //           fontSize:
+                                      //               ResponsiveHelper.fontSize(
+                                      //                   context, 12))),
+                                      // ),
+
+                                      Row(
+                                        children: [
+                                          /// Rupee Symbol and Amount with spacing
+                                          RichText(
+                                            text: TextSpan(
+                                              children: [
+                                                TextSpan(
+                                                  text: "\u20B9 ", // Rupee Symbol with space
+                                                  style: AppTextStyles.heading1(
+                                                    context,
+                                                    overrideStyle: TextStyle(
+                                                      fontSize: ResponsiveHelper.fontSize(context, 12),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: packageListItem.packageRate.toString(), // Price Amount
+                                                  style: AppTextStyles.heading1(
+                                                    context,
+                                                    overrideStyle: TextStyle(
+                                                      fontSize: ResponsiveHelper.fontSize(context, 12),
+                                                    ),
+                                                  ),
+                                                ),
+                                                TextSpan(
+                                                  text: " /-", // Smaller "/-" Sign
+                                                  style: AppTextStyles.heading1(
+                                                    context,
+                                                    overrideStyle: TextStyle(
+                                                      fontSize: ResponsiveHelper.fontSize(context, 9), // Smaller font size
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      )
+
+
+
+
+
                                     ],
                                   ),
                                 ],
@@ -394,13 +435,19 @@ class _HomeHealthPackageSectionState extends State<HomeHealthPackageSection> {
                               onTap: () {
                                 cart.addToCart(
                                   context,
-                                  CartItem(
+                                  OrderItem(
                                     id: packageListItem.sId.toString(),
                                     name: packageListItem.packageName.toString(),
-                                    category: packageListItem.packageCategory.toString(),
-                                    price: double.parse( packageListItem.packageRate.toString()),
-                                    imageUrl: packageListItem.packagePhoto!.secureUrl.toString(),
-                                    packageDetail: packageListItem.packageOverview!..toString(),
+                                    category: "package",
+                                    price: double.parse(
+                                        packageListItem.packageRate.toString()),
+                                    imageUrl: packageListItem
+                                        .packagePhoto!.secureUrl
+                                        .toString(),
+                                    packageDetail:
+                                        packageListItem.packageOverview!
+                                          ..toString(),
+                                    orderType: "package",
                                   ),
                                 );
                                 // /// Function to extract plain text from an HTML string
@@ -424,7 +471,6 @@ class _HomeHealthPackageSectionState extends State<HomeHealthPackageSection> {
                                 //     });
 
                                 ///////////////////////////////////
-
                               },
                             ),
                           )

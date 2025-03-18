@@ -5,6 +5,7 @@ class CartItem {
   final double price;
   final String imageUrl;
   final String packageDetail;
+  final String orderType;
   final int quantity;
 
   CartItem({
@@ -14,6 +15,7 @@ class CartItem {
     required this.price,
     required this.imageUrl,
     required this.packageDetail,
+    required this.orderType,
     this.quantity = 1,
   });
 
@@ -26,6 +28,7 @@ class CartItem {
       price: 0.0,
       imageUrl: '',
       packageDetail: '',
+      orderType: '',
       quantity: 0,
     );
   }
@@ -39,6 +42,7 @@ class CartItem {
       'price': price,
       'imageUrl': imageUrl,
       'packageDetail': packageDetail,
+      'orderType': orderType,
       'quantity': quantity,
     };
   }
@@ -52,6 +56,7 @@ class CartItem {
       price: json['price'],
       imageUrl: json['imageUrl'],
       packageDetail: json['packageDetail'],
+      orderType: json['orderType'],
       quantity: json['quantity'],
     );
   }

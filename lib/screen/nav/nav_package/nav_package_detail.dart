@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:healthians/base_widgets/custom_rounded_container.dart';
-import 'package:healthians/screen/cart/cart_list_screen.dart';
-import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/model/FrequentlyLabTestDetailModel.dart';
-import 'package:healthians/screen/nav/nav_lab/controller/pathalogy_test_provider.dart';
+import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/app_text_styles.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/base_widgets/solid_rounded_button.dart';
+import 'package:html/parser.dart'; // Import required package
 import 'package:provider/provider.dart';
 
 import '../../../base_widgets/InstructionCard.dart';
 import '../../../base_widgets/common/common_app_bar.dart';
-import '../../../base_widgets/common/frequently_lab_test_shimmer.dart';
 import '../../../base_widgets/common/health_concern_detail_page_shimmer.dart';
 import '../../../base_widgets/expandable_text_widget.dart';
+import '../../../util/StringUtils.dart';
 import '../../../util/phone_call_open.dart';
 import '../../checkout/CheckoutScreen.dart';
 import '../../checkout/controller/checkout_api_provider.dart';
-import '../../order/controller/order_provider.dart';
 import '../../order/model/OrderItem.dart';
 import '../nav_home/health_concern/controller/health_concern_provider.dart';
-import 'package:html/parser.dart'; // Import required package
 
 class ViewDetailBottomNavPackageScreen extends StatefulWidget {
   final String packagetName, packageSlug;
@@ -33,7 +28,8 @@ class ViewDetailBottomNavPackageScreen extends StatefulWidget {
       _ViewDetailBottomNavPackageScreenState();
 }
 
-class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPackageScreen> {
+class _ViewDetailBottomNavPackageScreenState
+    extends State<ViewDetailBottomNavPackageScreen> {
   bool isEnglish = false;
   @override
   void initState() {
@@ -56,8 +52,10 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // AppBar
-              CommonAppBar(aciviyName: widget.packagetName,
-                backgroundColor: AppColors.primary,),
+              CommonAppBar(
+                aciviyName: "Health Packages",
+                backgroundColor: AppColors.primary,
+              ),
               // Main Content
               Expanded(
                 child: Padding(
@@ -84,7 +82,6 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-
                             ResponsiveHelper.sizeBoxHeightSpace(context, 1.5),
                             Padding(
                               padding: ResponsiveHelper.padding(context, 4, 0),
@@ -138,16 +135,21 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                                 ),
                                                 // Added spacing to prevent text overlap
                                                 Padding(
-                                                  padding: const EdgeInsets.only(right: 5.0,top: 2.0),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 5.0, top: 2.0),
                                                   child: Text(
                                                     "Shanya Scans & Theranostics – Uttar Pradesh’s No. 1 Diagnostic Centre in Lucknow for Accurate & Reliable Testing!",
-                                                    style: AppTextStyles.heading2(
+                                                    style:
+                                                        AppTextStyles.heading2(
                                                       context,
                                                       overrideStyle: TextStyle(
                                                         color: Colors.white,
-                                                        fontSize: ResponsiveHelper
-                                                            .fontSize(
-                                                                context, 10),
+                                                        fontSize:
+                                                            ResponsiveHelper
+                                                                .fontSize(
+                                                                    context,
+                                                                    10),
                                                       ),
                                                     ),
                                                     maxLines: 3,
@@ -164,20 +166,71 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                           ),
                                           Column(
                                             children: [
-                                              Text(
-                                                "\u20B9${packageList.packageRate}/-",
-                                                // "\u20B9${widget.pathalogyTestSlug}",
-                                                style: AppTextStyles.heading1(
-                                                    context,
-                                                    overrideStyle: TextStyle(
-                                                        color: AppColors
-                                                            .whiteColor,
-                                                        fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                    context,
-                                                                    16))),
+
+                                              // Text(
+                                              //   "\u20B9${packageList.packageRate}/-",
+                                              //   // "\u20B9${widget.pathalogyTestSlug}",
+                                              //   style: AppTextStyles.heading1(
+                                              //       context,
+                                              //       overrideStyle: TextStyle(
+                                              //           color: AppColors
+                                              //               .whiteColor,
+                                              //           fontSize:
+                                              //               ResponsiveHelper
+                                              //                   .fontSize(
+                                              //                       context,
+                                              //                       16))),
+                                              // ),
+
+
+                                              Row(
+                                                children: [
+                                                  /// Rupee Symbol and Amount with spacing
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: "\u20B9 ", // Rupee Symbol with space
+                                                          style: AppTextStyles.heading1(
+                                                            context,
+                                                            overrideStyle: TextStyle(
+                                                              color: AppColors.whiteColor,
+                                                              fontSize: ResponsiveHelper.fontSize(context, 16),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: packageList.packageRate.toString(), // Price Amount
+                                                          style: AppTextStyles.heading1(
+                                                            context,
+                                                            overrideStyle: TextStyle(
+                                                              color: AppColors.whiteColor,
+                                                              fontSize: ResponsiveHelper.fontSize(context, 16),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: " /-", // Smaller "/-" Sign
+                                                          style: AppTextStyles.heading1(
+                                                            context,
+                                                            overrideStyle: TextStyle(
+                                                              color: AppColors.whiteColor,
+                                                              fontSize: ResponsiveHelper.fontSize(context, 12), // Smaller font size
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
+
+
+
+
+
+
+
                                               InkWell(
                                                 onTap: () {
                                                   //  &&&&&&&&&&&&& go to the checkout page &&&&&&&&&&&&&&&&
@@ -186,39 +239,44 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                                   String extractPlainText(
                                                       String htmlString) {
                                                     var document =
-                                                    parse(htmlString);
+                                                        parse(htmlString);
                                                     return document
-                                                        .body?.text ??
+                                                            .body?.text ??
                                                         "";
                                                   }
 
                                                   final extractedText =
-                                                  extractPlainText(
-                                                      packageList
-                                                          .packageOverview
-                                                          .toString());
+                                                      extractPlainText(
+                                                          packageList
+                                                              .packageOverview
+                                                              .toString());
+                                                  // set order type
+                                                  StringUtils.setOrderType(
+                                                      "package");
 
                                                   OrderItem orderItem =
-                                                  OrderItem(
-                                                      id:
-                                                      packageList
-                                                          .sId ??
-                                                          "",
-                                                      name: packageList
-                                                          .packageName
-                                                          .toString(),
-                                                      category: packageList
-                                                          .packageCategory
-                                                          .toString() ,
-                                                      price:
-                                                      double.parse(packageList
-                                                          .packageRate
-                                                          .toString()),
-                                                      imageUrl: OrderItem
-                                                          .defaultImage,
-                                                      packageDetail:
-                                                      extractedText,
-                                                      quantity: 1);
+                                                      OrderItem(
+                                                          id:
+                                                              packageList
+                                                                      .sId ??
+                                                                  "",
+                                                          name:
+                                                              packageList
+                                                                  .packageName
+                                                                  .toString(),
+                                                          category: packageList
+                                                              .packageCategory
+                                                              .toString(),
+                                                          orderType: "package",
+                                                          price: double
+                                                              .parse(packageList
+                                                                  .packageRate
+                                                                  .toString()),
+                                                          imageUrl: OrderItem
+                                                              .defaultImage,
+                                                          packageDetail:
+                                                              extractedText,
+                                                          quantity: 1);
 
                                                   // WidgetsBinding.instance
                                                   //     .addPostFrameCallback(
@@ -231,10 +289,15 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                                   //           context, orderItem);
                                                   //     });
 
-                                                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                                                    Provider.of<CheckoutProvider>(context, listen: false).addToCheckout(context,orderItem);
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    Provider.of<CheckoutProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .addToCheckout(
+                                                            context, orderItem);
                                                   });
-
 
                                                   // Provider.of<OrderApiProvider>(context, listen: false).notiFylistener();
 
@@ -242,18 +305,24 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                                     context,
                                                     MaterialPageRoute(
                                                       builder: (context) =>
-                                                          CheckoutScreen(
-                                                            categoryName:
-                                                            widget.packagetName,
-                                                            name:
-                                                            packageList
-                                                                .packageName,
-                                                            price:
-                                                            packageList
-                                                                .packageRate,
-                                                          ),
+                                                          CheckoutScreen(),
                                                     ),
                                                   );
+
+                                                  // Navigator.push(
+                                                  //   context,
+                                                  //   MaterialPageRoute(
+                                                  //     builder: (context) =>
+                                                  //         CheckoutScreen(
+                                                  //       categoryName:
+                                                  //           widget.packagetName,
+                                                  //       name: packageList
+                                                  //           .packageName,
+                                                  //       price: packageList
+                                                  //           .packageRate,
+                                                  //     ),
+                                                  //   ),
+                                                  // );
 
                                                   // Navigator.push(
                                                   //   context,
@@ -308,8 +377,8 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   ExpandableTextWidget(
-                                    text: packageList.packageOverview
-                                        .toString(),
+                                    text:
+                                        packageList.packageOverview.toString(),
                                     // "Pathology tests are essential diagnostic tools that analyze blood, urine, tissues, and other body fluids to detect diseases, monitor health conditions, and assess overall well-being. These tests help in identifying infections, organ function abnormalities, nutritional deficiencies, and chronic diseases like diabetes and thyroid disorders.",
                                   ),
                                 ],
@@ -325,10 +394,14 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                 children: [
                                   Wrap(
                                     spacing: 1, // Horizontal spacing
-                                    runSpacing: 10, // Vertical spacing when items wrap
+                                    runSpacing:
+                                        10, // Vertical spacing when items wrap
                                     children: [
                                       SizedBox(
-                                        width: MediaQuery.of(context).size.width / 2 - 20,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                    2 -
+                                                20,
                                         child: CustomRoundedContainer(
                                           borderRadius: 10.0,
                                           borderColor: Colors.black,
@@ -342,16 +415,19 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                             children: [
                                               Image.asset(
                                                 "assets/images/img_pathalogytestparamter.png",
-                                                width: ResponsiveHelper.containerWidth(context, 6),
-                                                height:  ResponsiveHelper.containerWidth(context, 6),
+                                                width: ResponsiveHelper
+                                                    .containerWidth(context, 6),
+                                                height: ResponsiveHelper
+                                                    .containerWidth(context, 6),
                                               ),
-                                              ResponsiveHelper.sizeboxWidthlSpace(
-                                                  context, 2),
+                                              ResponsiveHelper
+                                                  .sizeboxWidthlSpace(
+                                                      context, 2),
                                               Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Text(
                                                     "Parameter Included",
@@ -360,26 +436,25 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                                         overrideStyle: TextStyle(
                                                             color: Colors.black,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                10))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        10))),
                                                   ),
                                                   Text(
-                                                    packageList
-                                                        .parameterInclude
+                                                    packageList.parameterInclude
                                                         .toString(),
                                                     // "On Type",
                                                     style: AppTextStyles.heading1(
                                                         context,
                                                         overrideStyle: TextStyle(
-                                                            color:
-                                                            AppColors.primary,
+                                                            color: AppColors
+                                                                .primary,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                12))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        12))),
                                                   )
                                                 ],
                                               )
@@ -390,9 +465,11 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                           },
                                         ),
                                       ),
-
                                       SizedBox(
-                                        width: MediaQuery.of(context).size.width / 2 - 20,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                    2 -
+                                                20,
                                         child: CustomRoundedContainer(
                                           borderRadius: 10.0,
                                           borderColor: Colors.black,
@@ -406,46 +483,50 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                             children: [
                                               Image.asset(
                                                 "assets/images/img_pathalogytestparamter.png",
-                                                width: ResponsiveHelper.containerWidth(context, 6),
-                                                height:  ResponsiveHelper.containerWidth(context, 6),
+                                                width: ResponsiveHelper
+                                                    .containerWidth(context, 6),
+                                                height: ResponsiveHelper
+                                                    .containerWidth(context, 6),
                                               ),
-                                              ResponsiveHelper.sizeboxWidthlSpace(
-                                                  context, 2),
+                                              ResponsiveHelper
+                                                  .sizeboxWidthlSpace(
+                                                      context, 2),
                                               Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.start,
+                                                    MainAxisAlignment.start,
                                                 children: [
-                                                  Wrap(
-                                                      children:[
-                                                        Text(
-                                                          "Home Collection",
-                                                          style: AppTextStyles.bodyText1(
-                                                              context,
-                                                              overrideStyle: TextStyle(
-                                                                  color: Colors.black,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                  fontSize:
+                                                  Wrap(children: [
+                                                    Text(
+                                                      "Home Collection",
+                                                      style: AppTextStyles.bodyText1(
+                                                          context,
+                                                          overrideStyle: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              fontSize:
                                                                   ResponsiveHelper
                                                                       .fontSize(
-                                                                      context,
-                                                                      10))),
-                                                        ),
-                                                      ]
-                                                  ),
+                                                                          context,
+                                                                          10))),
+                                                    ),
+                                                  ]),
                                                   Text(
                                                     "Required",
                                                     style: AppTextStyles.heading1(
                                                         context,
                                                         overrideStyle: TextStyle(
-                                                            color:
-                                                            AppColors.primary,
+                                                            color: AppColors
+                                                                .primary,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                12))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        12))),
                                                   )
                                                 ],
                                               )
@@ -469,10 +550,14 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                 children: [
                                   Wrap(
                                     spacing: 1, // Horizontal spacing
-                                    runSpacing: 10, // Vertical spacing when items wrap
+                                    runSpacing:
+                                        10, // Vertical spacing when items wrap
                                     children: [
                                       SizedBox(
-                                        width: MediaQuery.of(context).size.width / 2 - 20,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                    2 -
+                                                20,
                                         child: CustomRoundedContainer(
                                           borderRadius: 10.0,
                                           borderColor: Colors.black,
@@ -486,16 +571,19 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                             children: [
                                               Image.asset(
                                                 "assets/images/img_pathalogytestparamter.png",
-                                                width: ResponsiveHelper.containerWidth(context, 6),
-                                                height:  ResponsiveHelper.containerWidth(context, 6),
+                                                width: ResponsiveHelper
+                                                    .containerWidth(context, 6),
+                                                height: ResponsiveHelper
+                                                    .containerWidth(context, 6),
                                               ),
-                                              ResponsiveHelper.sizeboxWidthlSpace(
-                                                  context, 2),
+                                              ResponsiveHelper
+                                                  .sizeboxWidthlSpace(
+                                                      context, 2),
                                               Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Text(
                                                     "Consultation",
@@ -504,23 +592,23 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                                         overrideStyle: TextStyle(
                                                             color: Colors.black,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                10))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        10))),
                                                   ),
                                                   Text(
                                                     "Available",
                                                     style: AppTextStyles.heading1(
                                                         context,
                                                         overrideStyle: TextStyle(
-                                                            color:
-                                                            AppColors.primary,
+                                                            color: AppColors
+                                                                .primary,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                12))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        12))),
                                                   )
                                                 ],
                                               )
@@ -532,7 +620,10 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                         ),
                                       ),
                                       SizedBox(
-                                        width: MediaQuery.of(context).size.width / 2 - 20,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                    2 -
+                                                20,
                                         child: CustomRoundedContainer(
                                           borderRadius: 10.0,
                                           borderColor: Colors.black,
@@ -546,46 +637,50 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                                             children: [
                                               Image.asset(
                                                 "assets/images/img_pathalogytestparamter.png",
-                                                width: ResponsiveHelper.containerWidth(context, 6),
-                                                height:  ResponsiveHelper.containerWidth(context, 6),
+                                                width: ResponsiveHelper
+                                                    .containerWidth(context, 6),
+                                                height: ResponsiveHelper
+                                                    .containerWidth(context, 6),
                                               ),
-                                              ResponsiveHelper.sizeboxWidthlSpace(
-                                                  context, 2),
+                                              ResponsiveHelper
+                                                  .sizeboxWidthlSpace(
+                                                      context, 2),
                                               Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.start,
+                                                    MainAxisAlignment.start,
                                                 children: [
-                                                  Wrap(
-                                                      children:[
-                                                        Text(
-                                                          "Test booked so far",
-                                                          style: AppTextStyles.bodyText1(
-                                                              context,
-                                                              overrideStyle: TextStyle(
-                                                                  color: Colors.black,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                  fontSize:
+                                                  Wrap(children: [
+                                                    Text(
+                                                      "Test booked so far",
+                                                      style: AppTextStyles.bodyText1(
+                                                          context,
+                                                          overrideStyle: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              fontSize:
                                                                   ResponsiveHelper
                                                                       .fontSize(
-                                                                      context,
-                                                                      10))),
-                                                        ),
-                                                      ]
-                                                  ),
+                                                                          context,
+                                                                          10))),
+                                                    ),
+                                                  ]),
                                                   Text(
                                                     "5820+",
                                                     style: AppTextStyles.heading1(
                                                         context,
                                                         overrideStyle: TextStyle(
-                                                            color:
-                                                            AppColors.primary,
+                                                            color: AppColors
+                                                                .primary,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                12))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        12))),
                                                   )
                                                 ],
                                               )
@@ -610,18 +705,24 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                             Padding(
                               padding: ResponsiveHelper.padding(context, 3, 0),
                               child: _buildExpandableTestSections(
-                                sid:packageList.sId.toString(),
-                                serviceName:widget.packagetName,
-                                packageName:packageList.packageName.toString(),
-                                packageOverView:packageList.packageOverview.toString(),
-                                packageRate:packageList.packageRate.toString(),
-                                packageCategory:packageList.packageCategory.toString() ,),
+                                sid: packageList.sId.toString(),
+                                serviceName: widget.packagetName,
+                                packageName: packageList.packageName.toString(),
+                                packageOverView:
+                                    packageList.packageOverview.toString(),
+                                packageRate: packageList.packageRate.toString(),
+                                packageCategory:
+                                    packageList.packageCategory.toString(),
+                              ),
                             ),
 
                             // &&&&&&&&&&&&&&&&&&&&&& Parametes section  &&&&&&&&&&&&&&&
                             ResponsiveHelper.sizeBoxHeightSpace(context, 1),
 
-                            _buildParameterTestSections(parameters: packageList.packageParamterDetails.toString(),),
+                            _buildParameterTestSections(
+                              parameters:
+                                  packageList.packageParamterDetails.toString(),
+                            ),
                             ResponsiveHelper.sizeBoxHeightSpace(context, 1),
 
                             // ***************** Why Choose Use  start  ******************
@@ -851,12 +952,13 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
                             ),
                             // ***************** Why Choose Use  end ******************
 
-
                             // ***************** instruction tabs  start ******************
                             InstructionCard(
                               // isEnglish: isEnglish,
-                              instructionEnglish: packageList.instructionEnglish.toString(),
-                              instructionHindi:  packageList.instructionHindi.toString(),
+                              instructionEnglish:
+                                  packageList.instructionEnglish.toString(),
+                              instructionHindi:
+                                  packageList.instructionHindi.toString(),
                             ),
                             // ***************** instruction tabs  end ******************
                           ],
@@ -875,16 +977,23 @@ class _ViewDetailBottomNavPackageScreenState extends State<ViewDetailBottomNavPa
 }
 
 class _buildExpandableTestSections extends StatelessWidget {
-
-  String serviceName, sid,packageCategory, packageOverView, packageName, packageRate;
+  String serviceName,
+      sid,
+      packageCategory,
+      packageOverView,
+      packageName,
+      packageRate;
 
   // _buildExpandableTestSections({required this.serviceData});
 
-
-  _buildExpandableTestSections(
-      {required this.serviceName, required this.sid, required this.packageCategory, required this.packageOverView, required this.packageName, required this.packageRate,});
-
-
+  _buildExpandableTestSections({
+    required this.serviceName,
+    required this.sid,
+    required this.packageCategory,
+    required this.packageOverView,
+    required this.packageName,
+    required this.packageRate,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1127,7 +1236,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                                 padding:
                                     ResponsiveHelper.padding(context, 5, 1.05),
                                 child: InkWell(
-                                  onTap: (){
+                                  onTap: () {
                                     makePhoneCall(context);
                                   },
                                   child: Text(
@@ -1147,7 +1256,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                           ),
                           ResponsiveHelper.sizeboxWidthlSpace(context, 5),
                           InkWell(
-                            onTap: (){
+                            onTap: () {
                               //  &&&&&&&&&&&&& go to the checkout page &&&&&&&&&&&&&&&&
 
                               /// Function to extract plain text from an HTML string
@@ -1156,15 +1265,19 @@ class _buildExpandableTestSections extends StatelessWidget {
                                 return document.body?.text ?? "";
                               }
 
-                              final extractedText = extractPlainText(
-                                  packageOverView.toString());
+                              final extractedText =
+                                  extractPlainText(packageOverView.toString());
+
+                              // set order type
+                              StringUtils.setOrderType("package");
 
                               OrderItem orderItem = OrderItem(
                                   id: sid ?? "",
-                                  name:   packageName.toString(),
-                                  price: double.parse( packageRate.toString()),
+                                  name: packageName.toString(),
+                                  price: double.parse(packageRate.toString()),
                                   category: packageCategory,
                                   imageUrl: OrderItem.defaultImage,
+                                  orderType: "package",
                                   packageDetail: extractedText,
                                   quantity: 1);
 
@@ -1174,9 +1287,10 @@ class _buildExpandableTestSections extends StatelessWidget {
                               //       .addToOrderReview(context, orderItem);
                               // });
 
-
                               WidgetsBinding.instance.addPostFrameCallback((_) {
-                                Provider.of<CheckoutProvider>(context, listen: false).addToCheckout(context,orderItem);
+                                Provider.of<CheckoutProvider>(context,
+                                        listen: false)
+                                    .addToCheckout(context, orderItem);
                               });
 
                               // Provider.of<OrderApiProvider>(context, listen: false).notiFylistener();
@@ -1184,14 +1298,20 @@ class _buildExpandableTestSections extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      CheckoutScreen(
-                                        categoryName: serviceName,
-                                        name: packageName,
-                                        price: packageRate,
-                                      ),
+                                  builder: (context) => CheckoutScreen(),
                                 ),
                               );
+
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => CheckoutScreen(
+                              //       categoryName: serviceName,
+                              //       name: packageName,
+                              //       price: packageRate,
+                              //     ),
+                              //   ),
+                              // );
 
                               // Navigator.push(
                               //   context,
@@ -1210,15 +1330,16 @@ class _buildExpandableTestSections extends StatelessWidget {
                               elevation: 2,
                               backgroundColor: Colors.red,
                               child: Padding(
-                                padding: ResponsiveHelper.padding(context, 4, 1),
+                                padding:
+                                    ResponsiveHelper.padding(context, 4, 1),
                                 child: Text(
                                   "Book Now",
                                   style: AppTextStyles.heading2(
                                     context,
                                     overrideStyle: TextStyle(
                                       color: Colors.white,
-                                      fontSize:
-                                          ResponsiveHelper.fontSize(context, 12),
+                                      fontSize: ResponsiveHelper.fontSize(
+                                          context, 12),
                                     ),
                                   ),
                                 ),

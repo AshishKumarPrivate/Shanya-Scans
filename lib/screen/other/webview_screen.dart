@@ -103,6 +103,8 @@ class _WebViewScreenState extends State<WebViewScreen> {
                       fontWeight: FontWeight.w700, // Make bold text even heavier
                       // color: Colors.black, // Change bold text color
                     ),
+                    "h1": Style(fontSize: FontSize(15.0), fontWeight: FontWeight.bold, ),
+                    "h2": Style(fontSize: FontSize(15.0), fontWeight: FontWeight.bold,),
                   },
                 ),
                 SizedBox(height: 20), // Add some spacing at the bottom

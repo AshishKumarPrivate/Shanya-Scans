@@ -1,28 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:healthians/base_widgets/custom_rounded_container.dart';
-import 'package:healthians/screen/cart/cart_list_screen.dart';
 import 'package:healthians/screen/nav/nav_lab/controller/pathalogy_test_provider.dart';
+import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/app_text_styles.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/base_widgets/solid_rounded_button.dart';
+import 'package:html/parser.dart'; // Import required package
 import 'package:provider/provider.dart';
 
 import '../../../base_widgets/InstructionCard.dart';
 import '../../../base_widgets/common/common_app_bar.dart';
 import '../../../base_widgets/common/frequently_lab_test_detail_shimmer.dart';
-import '../../../base_widgets/common/frequently_lab_test_shimmer.dart';
 import '../../../base_widgets/expandable_text_widget.dart';
+import '../../../util/StringUtils.dart';
 import '../../../util/phone_call_open.dart';
 import '../../checkout/CheckoutScreen.dart';
 import '../../checkout/controller/checkout_api_provider.dart';
-import '../../order/controller/order_provider.dart';
 import '../../order/model/OrderItem.dart';
-import 'package:html/parser.dart'; // Import required package
 
 class ViewDetailPathalogyTestScreen extends StatefulWidget {
   final String patahlogyTestName, pathalogyTestSlug;
-
 
   ViewDetailPathalogyTestScreen(
       {required this.patahlogyTestName, required this.pathalogyTestSlug});
@@ -32,8 +28,8 @@ class ViewDetailPathalogyTestScreen extends StatefulWidget {
       _ViewDetailPathalogyTestScreenState();
 }
 
-class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestScreen> {
-
+class _ViewDetailPathalogyTestScreenState
+    extends State<ViewDetailPathalogyTestScreen> {
   bool isEnglish = false;
   @override
   void initState() {
@@ -57,8 +53,10 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // AppBar
-              CommonAppBar(aciviyName: widget.patahlogyTestName,
-                backgroundColor: AppColors.primary,),
+              CommonAppBar(
+                aciviyName: "Pathology Test",
+                backgroundColor: AppColors.primary,
+              ),
               // Main Content
               Expanded(
                 child: Padding(
@@ -107,57 +105,64 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                   padding: const EdgeInsets.all(8.0),
                                   child: Column(
                                     crossAxisAlignment:
-                                    CrossAxisAlignment.start,
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
                                         mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                            MainAxisAlignment.spaceBetween,
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                            CrossAxisAlignment.center,
                                         // Ensure text doesn't overflow
                                         children: [
                                           Expanded(
                                             // Ensures text wraps properly
                                             child: Column(
                                               crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.start,
                                               children: [
                                                 Text(
-                                                  pathologyTestList.testDetailName.toString(),
+                                                  pathologyTestList
+                                                      .testDetailName
+                                                      .toString(),
                                                   // widget.patahlogyTestName,
                                                   style: AppTextStyles.heading1(
                                                     context,
                                                     overrideStyle: TextStyle(
                                                       color: Colors.white,
                                                       fontWeight:
-                                                      FontWeight.bold,
+                                                          FontWeight.bold,
                                                       fontSize: ResponsiveHelper
                                                           .fontSize(
-                                                          context, 14),
+                                                              context, 14),
                                                     ),
                                                   ),
                                                 ),
                                                 // Added spacing to prevent text overlap
                                                 Padding(
-                                                  padding: const EdgeInsets.only(right: 5.0,top: 2.0),
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          right: 5.0, top: 2.0),
                                                   child: Text(
                                                     "Shanya Scans & Theranostics – Uttar Pradesh’s No. 1 Diagnostic Centre in Lucknow for Accurate & Reliable Testing!",
-                                                    style: AppTextStyles.heading2(
+                                                    style:
+                                                        AppTextStyles.heading2(
                                                       context,
                                                       overrideStyle: TextStyle(
                                                         color: Colors.white,
-                                                        fontSize: ResponsiveHelper
-                                                            .fontSize(
-                                                            context, 10),
+                                                        fontSize:
+                                                            ResponsiveHelper
+                                                                .fontSize(
+                                                                    context,
+                                                                    10),
                                                       ),
                                                     ),
                                                     maxLines: 3,
                                                     // Prevents overflow
                                                     overflow:
-                                                    TextOverflow.ellipsis,
+                                                        TextOverflow.ellipsis,
                                                     // Adds "..." if text is too long
                                                     softWrap:
-                                                    true, // Ensures wrapping
+                                                        true, // Ensures wrapping
                                                   ),
                                                 ),
                                               ],
@@ -165,20 +170,79 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                           ),
                                           Column(
                                             children: [
-                                              Text(
-                                                "\u20B9${pathologyTestList.testPrice}/-",
-                                                // "\u20B9${widget.pathalogyTestSlug}",
-                                                style: AppTextStyles.heading1(
-                                                    context,
-                                                    overrideStyle: TextStyle(
-                                                        color: AppColors
-                                                            .whiteColor,
-                                                        fontSize:
-                                                        ResponsiveHelper
-                                                            .fontSize(
+                                              // Text(
+                                              //   "\u20B9${pathologyTestList.testPrice}/-",
+                                              //   // "\u20B9${widget.pathalogyTestSlug}",
+                                              //   style: AppTextStyles.heading1(
+                                              //       context,
+                                              //       overrideStyle: TextStyle(
+                                              //           color: AppColors
+                                              //               .whiteColor,
+                                              //           fontSize:
+                                              //               ResponsiveHelper
+                                              //                   .fontSize(
+                                              //                       context,
+                                              //                       16))),
+                                              // ),
+
+
+
+                                              Row(
+                                                children: [
+                                                  /// Rupee Symbol and Amount with spacing
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      children: [
+                                                        TextSpan(
+                                                          text: "\u20B9 ", // Rupee Symbol with space
+                                                          style: AppTextStyles.heading1(
                                                             context,
-                                                            16))),
+                                                            overrideStyle: TextStyle(
+                                                              color: AppColors.whiteColor,
+                                                              fontSize: ResponsiveHelper.fontSize(context, 16),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: "${pathologyTestList.testPrice}", // Price Amount
+                                                          style: AppTextStyles.heading1(
+                                                            context,
+                                                            overrideStyle: TextStyle(
+                                                              color: AppColors.whiteColor,
+                                                              fontSize: ResponsiveHelper.fontSize(context, 16),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        TextSpan(
+                                                          text: " /-", // Smaller "/-" Sign
+                                                          style: AppTextStyles.heading1(
+                                                            context,
+                                                            overrideStyle: TextStyle(
+                                                              color: AppColors.whiteColor,
+                                                              fontSize: ResponsiveHelper.fontSize(context, 12), // Smaller font size
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
                                               ),
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                                               InkWell(
                                                 onTap: () {
                                                   //  &&&&&&&&&&&&& go to the checkout page &&&&&&&&&&&&&&&&
@@ -187,35 +251,43 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                                   String extractPlainText(
                                                       String htmlString) {
                                                     var document =
-                                                    parse(htmlString);
+                                                        parse(htmlString);
                                                     return document
-                                                        .body?.text ??
+                                                            .body?.text ??
                                                         "";
                                                   }
 
                                                   final extractedText =
-                                                  extractPlainText(
-                                                      pathologyTestList
-                                                          .testDetails1
-                                                          .toString());
+                                                      extractPlainText(
+                                                          pathologyTestList
+                                                              .testDetails1
+                                                              .toString());
+                                                  // set order type
+                                                  StringUtils.setOrderType(
+                                                      "pathology");
 
-                                                  OrderItem orderItem =
-                                                  OrderItem(
-                                                      id:
-                                                      pathologyTestList
-                                                          .sId ??
+                                                  OrderItem orderItem = OrderItem(
+                                                      id: pathologyTestList
+                                                              .sId ??
                                                           "",
                                                       name: pathologyTestList
                                                           .testDetailName
                                                           .toString(),
-                                                      category:pathologyTestList
-                                                          .category
-                                                          .toString() ,
-                                                      price: double.parse(pathologyTestList.testPrice.toString()),
-                                                      imageUrl: OrderItem
-                                                          .defaultImage,
+                                                      orderType: "pathology",
+                                                      category:
+                                                          pathologyTestList
+                                                              .category
+                                                              .toString(),
+                                                      price: double
+                                                          .parse(
+                                                              pathologyTestList
+                                                                  .testPrice
+                                                                  .toString()),
+                                                      imageUrl:
+                                                          OrderItem
+                                                              .defaultImage,
                                                       packageDetail:
-                                                      extractedText,
+                                                          extractedText,
                                                       quantity: 1);
 
                                                   // WidgetsBinding.instance
@@ -229,40 +301,42 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                                   //           context, orderItem);
                                                   //     });
 
-
-                                                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                                                    Provider.of<CheckoutProvider>(context, listen: false).addToCheckout(context,orderItem);
+                                                  WidgetsBinding.instance
+                                                      .addPostFrameCallback(
+                                                          (_) {
+                                                    Provider.of<CheckoutProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .addToCheckout(
+                                                            context, orderItem);
                                                   });
-
-                                                  // Provider.of<OrderApiProvider>(context, listen: false).notiFylistener();
 
                                                   Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
                                                       builder: (context) =>
-                                                          CheckoutScreen(
-                                                            categoryName:
-                                                            widget.patahlogyTestName,
-                                                            name:
-                                                            pathologyTestList
-                                                                .testDetailName,
-                                                            price:
-                                                            pathologyTestList
-                                                                .testPrice,
-                                                          ),
+                                                          CheckoutScreen(),
                                                     ),
                                                   );
+
+                                                  // Provider.of<OrderApiProvider>(context, listen: false).notiFylistener();
 
                                                   // Navigator.push(
                                                   //   context,
                                                   //   MaterialPageRoute(
                                                   //     builder: (context) =>
-                                                  //         CartListScreen(),
+                                                  //         CheckoutScreen(
+                                                  //       categoryName: widget
+                                                  //           .patahlogyTestName,
+                                                  //       name: pathologyTestList
+                                                  //           .testDetailName,
+                                                  //       price: pathologyTestList
+                                                  //           .testPrice,
+                                                  //     ),
                                                   //   ),
                                                   // );
 
                                                   //  &&&&&&&&&&&&& go to the checkout page &&&&&&&&&&&&&&&&
-
                                                 },
                                                 child: CustomRoundedContainer(
                                                   borderRadius: 5,
@@ -270,23 +344,22 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                                   borderWidth: 1,
                                                   elevation: 2,
                                                   backgroundColor:
-                                                  AppColors.whiteColor,
+                                                      AppColors.whiteColor,
                                                   child: Padding(
                                                     padding: ResponsiveHelper
                                                         .padding(
-                                                        context, 3, 0.2),
+                                                            context, 3, 0.2),
                                                     child: Text(
                                                       "Book Now",
                                                       // "\u20B9${widget.pathalogyTestSlug}",
-                                                      style: AppTextStyles
-                                                          .heading2(
+                                                      style: AppTextStyles.heading2(
                                                           context,
                                                           overrideStyle: TextStyle(
                                                               fontSize:
-                                                              ResponsiveHelper
-                                                                  .fontSize(
-                                                                  context,
-                                                                  12))),
+                                                                  ResponsiveHelper
+                                                                      .fontSize(
+                                                                          context,
+                                                                          12))),
                                                     ),
                                                   ),
                                                 ),
@@ -303,7 +376,7 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                             SizedBox(height: 15),
                             Padding(
                               padding:
-                              const EdgeInsets.symmetric(horizontal: 15.0),
+                                  const EdgeInsets.symmetric(horizontal: 15.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -325,10 +398,14 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                 children: [
                                   Wrap(
                                     spacing: 1, // Horizontal spacing
-                                    runSpacing: 10, // Vertical spacing when items wrap
+                                    runSpacing:
+                                        10, // Vertical spacing when items wrap
                                     children: [
                                       SizedBox(
-                                        width: MediaQuery.of(context).size.width / 2 - 20,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                    2 -
+                                                20,
                                         child: CustomRoundedContainer(
                                           borderRadius: 10.0,
                                           borderColor: Colors.black,
@@ -342,16 +419,19 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                             children: [
                                               Image.asset(
                                                 "assets/images/img_pathalogytestparamter.png",
-                                                width: ResponsiveHelper.containerWidth(context, 6),
-                                                height:  ResponsiveHelper.containerWidth(context, 6),
+                                                width: ResponsiveHelper
+                                                    .containerWidth(context, 6),
+                                                height: ResponsiveHelper
+                                                    .containerWidth(context, 6),
                                               ),
-                                              ResponsiveHelper.sizeboxWidthlSpace(
-                                                  context, 2),
+                                              ResponsiveHelper
+                                                  .sizeboxWidthlSpace(
+                                                      context, 2),
                                               Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Text(
                                                     "Parameter Included",
@@ -360,26 +440,26 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                                         overrideStyle: TextStyle(
                                                             color: Colors.black,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                10))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        10))),
                                                   ),
                                                   Text(
-                                                  pathologyTestList
+                                                    pathologyTestList
                                                         .paramterInclude
                                                         .toString(),
                                                     // "On Type",
                                                     style: AppTextStyles.heading1(
                                                         context,
                                                         overrideStyle: TextStyle(
-                                                            color:
-                                                            AppColors.primary,
+                                                            color: AppColors
+                                                                .primary,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                12))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        12))),
                                                   )
                                                 ],
                                               )
@@ -390,9 +470,11 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                           },
                                         ),
                                       ),
-
                                       SizedBox(
-                                        width: MediaQuery.of(context).size.width / 2 - 20,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                    2 -
+                                                20,
                                         child: CustomRoundedContainer(
                                           borderRadius: 10.0,
                                           borderColor: Colors.black,
@@ -406,46 +488,50 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                             children: [
                                               Image.asset(
                                                 "assets/images/img_pathalogytestparamter.png",
-                                                width: ResponsiveHelper.containerWidth(context, 6),
-                                                height:  ResponsiveHelper.containerWidth(context, 6),
+                                                width: ResponsiveHelper
+                                                    .containerWidth(context, 6),
+                                                height: ResponsiveHelper
+                                                    .containerWidth(context, 6),
                                               ),
-                                              ResponsiveHelper.sizeboxWidthlSpace(
-                                                  context, 2),
+                                              ResponsiveHelper
+                                                  .sizeboxWidthlSpace(
+                                                      context, 2),
                                               Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.start,
+                                                    MainAxisAlignment.start,
                                                 children: [
-                                                  Wrap(
-                                                      children:[
-                                                        Text(
-                                                          "Home Collection",
-                                                          style: AppTextStyles.bodyText1(
-                                                              context,
-                                                              overrideStyle: TextStyle(
-                                                                  color: Colors.black,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                  fontSize:
+                                                  Wrap(children: [
+                                                    Text(
+                                                      "Home Collection",
+                                                      style: AppTextStyles.bodyText1(
+                                                          context,
+                                                          overrideStyle: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              fontSize:
                                                                   ResponsiveHelper
                                                                       .fontSize(
-                                                                      context,
-                                                                      10))),
-                                                        ),
-                                                      ]
-                                                  ),
+                                                                          context,
+                                                                          10))),
+                                                    ),
+                                                  ]),
                                                   Text(
                                                     "Required",
                                                     style: AppTextStyles.heading1(
                                                         context,
                                                         overrideStyle: TextStyle(
-                                                            color:
-                                                            AppColors.primary,
+                                                            color: AppColors
+                                                                .primary,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                12))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        12))),
                                                   )
                                                 ],
                                               )
@@ -469,10 +555,14 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                 children: [
                                   Wrap(
                                     spacing: 1, // Horizontal spacing
-                                    runSpacing: 10, // Vertical spacing when items wrap
+                                    runSpacing:
+                                        10, // Vertical spacing when items wrap
                                     children: [
                                       SizedBox(
-                                        width: MediaQuery.of(context).size.width / 2 - 20,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                    2 -
+                                                20,
                                         child: CustomRoundedContainer(
                                           borderRadius: 10.0,
                                           borderColor: Colors.black,
@@ -486,16 +576,19 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                             children: [
                                               Image.asset(
                                                 "assets/images/img_pathalogytestparamter.png",
-                                                width: ResponsiveHelper.containerWidth(context, 6),
-                                                height:  ResponsiveHelper.containerWidth(context, 6),
+                                                width: ResponsiveHelper
+                                                    .containerWidth(context, 6),
+                                                height: ResponsiveHelper
+                                                    .containerWidth(context, 6),
                                               ),
-                                              ResponsiveHelper.sizeboxWidthlSpace(
-                                                  context, 2),
+                                              ResponsiveHelper
+                                                  .sizeboxWidthlSpace(
+                                                      context, 2),
                                               Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.center,
+                                                    MainAxisAlignment.center,
                                                 children: [
                                                   Text(
                                                     "Consultation",
@@ -504,23 +597,23 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                                         overrideStyle: TextStyle(
                                                             color: Colors.black,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                10))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        10))),
                                                   ),
                                                   Text(
                                                     "Available",
                                                     style: AppTextStyles.heading1(
                                                         context,
                                                         overrideStyle: TextStyle(
-                                                            color:
-                                                            AppColors.primary,
+                                                            color: AppColors
+                                                                .primary,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                12))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        12))),
                                                   )
                                                 ],
                                               )
@@ -532,7 +625,10 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                         ),
                                       ),
                                       SizedBox(
-                                        width: MediaQuery.of(context).size.width / 2 - 20,
+                                        width:
+                                            MediaQuery.of(context).size.width /
+                                                    2 -
+                                                20,
                                         child: CustomRoundedContainer(
                                           borderRadius: 10.0,
                                           borderColor: Colors.black,
@@ -546,46 +642,50 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                             children: [
                                               Image.asset(
                                                 "assets/images/img_pathalogytestparamter.png",
-                                                width: ResponsiveHelper.containerWidth(context, 6),
-                                                height:  ResponsiveHelper.containerWidth(context, 6),
+                                                width: ResponsiveHelper
+                                                    .containerWidth(context, 6),
+                                                height: ResponsiveHelper
+                                                    .containerWidth(context, 6),
                                               ),
-                                              ResponsiveHelper.sizeboxWidthlSpace(
-                                                  context, 2),
+                                              ResponsiveHelper
+                                                  .sizeboxWidthlSpace(
+                                                      context, 2),
                                               Column(
                                                 crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                                    CrossAxisAlignment.start,
                                                 mainAxisAlignment:
-                                                MainAxisAlignment.start,
+                                                    MainAxisAlignment.start,
                                                 children: [
-                                                  Wrap(
-                                                      children:[
-                                                        Text(
-                                                          "Test booked so far",
-                                                          style: AppTextStyles.bodyText1(
-                                                              context,
-                                                              overrideStyle: TextStyle(
-                                                                  color: Colors.black,
-                                                                  overflow: TextOverflow.ellipsis,
-                                                                  fontSize:
+                                                  Wrap(children: [
+                                                    Text(
+                                                      "Test booked so far",
+                                                      style: AppTextStyles.bodyText1(
+                                                          context,
+                                                          overrideStyle: TextStyle(
+                                                              color:
+                                                                  Colors.black,
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                              fontSize:
                                                                   ResponsiveHelper
                                                                       .fontSize(
-                                                                      context,
-                                                                      10))),
-                                                        ),
-                                                      ]
-                                                  ),
+                                                                          context,
+                                                                          10))),
+                                                    ),
+                                                  ]),
                                                   Text(
                                                     "5820+",
                                                     style: AppTextStyles.heading1(
                                                         context,
                                                         overrideStyle: TextStyle(
-                                                            color:
-                                                            AppColors.primary,
+                                                            color: AppColors
+                                                                .primary,
                                                             fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                context,
-                                                                12))),
+                                                                ResponsiveHelper
+                                                                    .fontSize(
+                                                                        context,
+                                                                        12))),
                                                   )
                                                 ],
                                               )
@@ -610,19 +710,21 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                             Padding(
                               padding: ResponsiveHelper.padding(context, 3, 0),
                               child: _buildExpandableTestSections(
-                                sid:pathologyTestList.sId.toString(),
-                                pathalogyTestCategory:widget.patahlogyTestName,
-                                pathalogyTestName:pathologyTestList.testDetailName.toString(),
-                                pathalogyTestDetail:pathologyTestList.testRequirement1.toString(),
-                                pathalogyTestPrice:pathologyTestList.testPrice.toString(),
-
+                                sid: pathologyTestList.sId.toString(),
+                                pathalogyTestCategory: widget.patahlogyTestName,
+                                pathalogyTestName:
+                                    pathologyTestList.testDetailName.toString(),
+                                pathalogyTestDetail: pathologyTestList
+                                    .testRequirement1
+                                    .toString(),
+                                pathalogyTestPrice:
+                                    pathologyTestList.testPrice.toString(),
                               ),
                             ),
 
                             // &&&&&&&&&&&&&&&&&&&&&& Parametes section  &&&&&&&&&&&&&&&
 
                             ResponsiveHelper.sizeBoxHeightSpace(context, 1),
-
 
                             // ***************** Why Choose Use  start  ******************
                             Padding(
@@ -666,22 +768,22 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                                 ),
                                                 ResponsiveHelper
                                                     .sizeboxWidthlSpace(
-                                                    context, 1),
+                                                        context, 1),
                                                 Flexible(
                                                   child: Text(
                                                     "1.5 lakh+ patients test with us every month",
                                                     maxLines: 2,
                                                     style:
-                                                    AppTextStyles.heading1(
+                                                        AppTextStyles.heading1(
                                                       context,
                                                       overrideStyle: TextStyle(
                                                         color: AppColors
                                                             .txtGreyColor,
                                                         fontSize:
-                                                        ResponsiveHelper
-                                                            .fontSize(
-                                                            context,
-                                                            12),
+                                                            ResponsiveHelper
+                                                                .fontSize(
+                                                                    context,
+                                                                    12),
                                                       ),
                                                     ),
                                                   ),
@@ -716,22 +818,22 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                                 ),
                                                 ResponsiveHelper
                                                     .sizeboxWidthlSpace(
-                                                    context, 1),
+                                                        context, 1),
                                                 Flexible(
                                                   child: Text(
                                                     "Patients save an average of ₹700 on each scan",
                                                     maxLines: 2,
                                                     style:
-                                                    AppTextStyles.heading1(
+                                                        AppTextStyles.heading1(
                                                       context,
                                                       overrideStyle: TextStyle(
                                                         color: AppColors
                                                             .txtGreyColor,
                                                         fontSize:
-                                                        ResponsiveHelper
-                                                            .fontSize(
-                                                            context,
-                                                            12),
+                                                            ResponsiveHelper
+                                                                .fontSize(
+                                                                    context,
+                                                                    12),
                                                       ),
                                                     ),
                                                   ),
@@ -766,22 +868,22 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                                 ),
                                                 ResponsiveHelper
                                                     .sizeboxWidthlSpace(
-                                                    context, 1),
+                                                        context, 1),
                                                 Flexible(
                                                   child: Text(
                                                     "ISO and NABH certified scan centers",
                                                     maxLines: 2,
                                                     style:
-                                                    AppTextStyles.heading1(
+                                                        AppTextStyles.heading1(
                                                       context,
                                                       overrideStyle: TextStyle(
                                                         color: AppColors
                                                             .txtGreyColor,
                                                         fontSize:
-                                                        ResponsiveHelper
-                                                            .fontSize(
-                                                            context,
-                                                            12),
+                                                            ResponsiveHelper
+                                                                .fontSize(
+                                                                    context,
+                                                                    12),
                                                       ),
                                                     ),
                                                   ),
@@ -816,22 +918,22 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                                                 ),
                                                 ResponsiveHelper
                                                     .sizeboxWidthlSpace(
-                                                    context, 1),
+                                                        context, 1),
                                                 Flexible(
                                                   child: Text(
                                                     "100% reliable and accurate reports",
                                                     maxLines: 2,
                                                     style:
-                                                    AppTextStyles.heading1(
+                                                        AppTextStyles.heading1(
                                                       context,
                                                       overrideStyle: TextStyle(
                                                         color: AppColors
                                                             .txtGreyColor,
                                                         fontSize:
-                                                        ResponsiveHelper
-                                                            .fontSize(
-                                                            context,
-                                                            12),
+                                                            ResponsiveHelper
+                                                                .fontSize(
+                                                                    context,
+                                                                    12),
                                                       ),
                                                     ),
                                                   ),
@@ -854,12 +956,10 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
                             // ***************** instruction tabs  start ******************
                             InstructionCard(
                               // isEnglish: isEnglish,
-                              instructionEnglish: pathologyTestList
-                                  .testDetails1
-                                  .toString(),
-                              instructionHindi: pathologyTestList
-                                  .testDetails2
-                                  .toString(),
+                              instructionEnglish:
+                                  pathologyTestList.testDetails1.toString(),
+                              instructionHindi:
+                                  pathologyTestList.testDetails2.toString(),
                             ),
                             // ***************** instruction tabs  end ******************
                           ],
@@ -878,13 +978,18 @@ class _ViewDetailPathalogyTestScreenState extends State<ViewDetailPathalogyTestS
 }
 
 class _buildExpandableTestSections extends StatelessWidget {
-
-  String sid, pathalogyTestCategory, pathalogyTestName, pathalogyTestDetail,pathalogyTestPrice;
+  String sid,
+      pathalogyTestCategory,
+      pathalogyTestName,
+      pathalogyTestDetail,
+      pathalogyTestPrice;
 
   _buildExpandableTestSections(
-      {required this.sid, required this.pathalogyTestCategory, required this.pathalogyTestName, required this.pathalogyTestDetail,
-   required this.pathalogyTestPrice});
-
+      {required this.sid,
+      required this.pathalogyTestCategory,
+      required this.pathalogyTestName,
+      required this.pathalogyTestDetail,
+      required this.pathalogyTestPrice});
 
   @override
   Widget build(BuildContext context) {
@@ -1125,9 +1230,9 @@ class _buildExpandableTestSections extends StatelessWidget {
                               backgroundColor: Colors.white,
                               child: Padding(
                                 padding:
-                                ResponsiveHelper.padding(context, 5, 1.05),
+                                    ResponsiveHelper.padding(context, 5, 1.05),
                                 child: InkWell(
-                                  onTap: (){
+                                  onTap: () {
                                     makePhoneCall(context);
                                   },
                                   child: Text(
@@ -1147,7 +1252,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                           ),
                           ResponsiveHelper.sizeboxWidthlSpace(context, 5),
                           InkWell(
-                            onTap: (){
+                            onTap: () {
                               //  &&&&&&&&&&&&& go to the checkout page &&&&&&&&&&&&&&&&
 
                               /// Function to extract plain text from an HTML string
@@ -1159,12 +1264,15 @@ class _buildExpandableTestSections extends StatelessWidget {
                               final extractedText = extractPlainText(
                                   pathalogyTestDetail.toString());
 
+                              // set order type
+                              StringUtils.setOrderType("pathology");
                               OrderItem orderItem = OrderItem(
                                   id: sid ?? "",
-                                  name:
-                                  pathalogyTestName.toString(),
+                                  name: pathalogyTestName.toString(),
                                   category: pathalogyTestCategory.toString(),
-                                  price: double.parse( pathalogyTestPrice.toString()),
+                                  orderType: "pathology",
+                                  price: double.parse(
+                                      pathalogyTestPrice.toString()),
                                   imageUrl: OrderItem.defaultImage,
                                   packageDetail: extractedText,
                                   quantity: 1);
@@ -1175,31 +1283,29 @@ class _buildExpandableTestSections extends StatelessWidget {
                               //       .addToOrderReview(context, orderItem);
                               // });
 
-
                               WidgetsBinding.instance.addPostFrameCallback((_) {
-                                Provider.of<CheckoutProvider>(context, listen: false).addToCheckout(context,orderItem);
+                                Provider.of<CheckoutProvider>(context,
+                                        listen: false)
+                                    .addToCheckout(context, orderItem);
                               });
-
 
                               // Provider.of<OrderApiProvider>(context, listen: false).notiFylistener();
 
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      CheckoutScreen(
-                                        categoryName: pathalogyTestCategory,
-                                        name: pathalogyTestName,
-                                        price: pathalogyTestPrice,
-                                      ),
+                                  builder: (context) => CheckoutScreen(),
                                 ),
                               );
 
                               // Navigator.push(
                               //   context,
                               //   MaterialPageRoute(
-                              //     builder: (context) =>
-                              //         CartListScreen(),
+                              //     builder: (context) => CheckoutScreen(
+                              //       categoryName: pathalogyTestCategory,
+                              //       name: pathalogyTestName,
+                              //       price: pathalogyTestPrice,
+                              //     ),
                               //   ),
                               // );
 
@@ -1212,15 +1318,16 @@ class _buildExpandableTestSections extends StatelessWidget {
                               elevation: 2,
                               backgroundColor: Colors.red,
                               child: Padding(
-                                padding: ResponsiveHelper.padding(context, 4, 1),
+                                padding:
+                                    ResponsiveHelper.padding(context, 4, 1),
                                 child: Text(
                                   "Book Now",
                                   style: AppTextStyles.heading2(
                                     context,
                                     overrideStyle: TextStyle(
                                       color: Colors.white,
-                                      fontSize:
-                                      ResponsiveHelper.fontSize(context, 12),
+                                      fontSize: ResponsiveHelper.fontSize(
+                                          context, 12),
                                     ),
                                   ),
                                 ),
@@ -1243,10 +1350,9 @@ class _buildExpandableTestSections extends StatelessWidget {
 }
 
 class buildInstructions extends StatelessWidget {
-  String type,instructions;
+  String type, instructions;
 
-  buildInstructions(
-      {required this.type,required this.instructions});
+  buildInstructions({required this.type, required this.instructions});
 
   @override
   Widget build(BuildContext context) {
@@ -1269,12 +1375,12 @@ class buildInstructions extends StatelessWidget {
             // SizedBox(height: 10),
             Expanded(
               // Makes the ListView scrollable within the fixed height
-                child: SingleChildScrollView(
-                  child: ExpandableTextWidget(
-                    text: "${instructions.toString()}",
-                    // "Pathology tests are essential diagnostic tools that analyze blood, urine, tissues, and other body fluids to detect diseases, monitor health conditions, and assess overall well-being. These tests help in identifying infections, organ function abnormalities, nutritional deficiencies, and chronic diseases like diabetes and thyroid disorders.",
-                  ),
+              child: SingleChildScrollView(
+                child: ExpandableTextWidget(
+                  text: "${instructions.toString()}",
+                  // "Pathology tests are essential diagnostic tools that analyze blood, urine, tissues, and other body fluids to detect diseases, monitor health conditions, and assess overall well-being. These tests help in identifying infections, organ function abnormalities, nutritional deficiencies, and chronic diseases like diabetes and thyroid disorders.",
                 ),
+              ),
             ),
           ],
         ),
@@ -1286,8 +1392,7 @@ class buildInstructions extends StatelessWidget {
 class _buildParameterTestSections extends StatelessWidget {
   String parameters;
 
-  _buildParameterTestSections(
-      {required this.parameters});
+  _buildParameterTestSections({required this.parameters});
 
   @override
   Widget build(BuildContext context) {
@@ -1358,7 +1463,7 @@ class _buildParameterTestSections extends StatelessWidget {
                           style: AppTextStyles.heading1(context,
                               overrideStyle: TextStyle(
                                   fontSize:
-                                  ResponsiveHelper.fontSize(context, 12))),
+                                      ResponsiveHelper.fontSize(context, 12))),
                         ),
                       ),
                     ),
