@@ -162,206 +162,197 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // AppBar
-              CustomAppBar(
-                activityName: "Home Collections",
-                isCartScreen: true,
-                backgroundColor: AppColors.primary,
-              ), // Main Content
-              Expanded(
-                child: Container(
-                  color: AppColors.whiteColor,
-                  child: SingleChildScrollView(
-                    // padding: EdgeInsets.all(10.0),
-                    child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
-                      child: Container(
-                        color: AppColors.whiteColor,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Package Title
-                            SizedBox(height: 15),
-                            Text(
-                              'Book Home Collection',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // AppBar
+            CustomAppBar(
+              activityName: "Home Collections",
+              isCartScreen: true,
+              backgroundColor: AppColors.primary,
+            ), // Main Content
+            Expanded(
+              child: Container(
+                color: AppColors.whiteColor,
+                child: SingleChildScrollView(
+                  // padding: EdgeInsets.all(10.0),
+                  child: Padding(
+                    padding:
+                        EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
+                    child: Container(
+                      color: AppColors.whiteColor,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Package Title
+                          SizedBox(height: 15),
+                          Text(
+                            'Book Home Collection',
+                            style: AppTextStyles.heading1(context,
+                                overrideStyle: TextStyle(
+                                    fontSize: ResponsiveHelper.fontSize(
+                                        context, 16))),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            '(Applicable for pathology test only)',
+                            style: AppTextStyles.bodyText1(
+                              context,
+                              overrideStyle: AppTextStyles.heading2(context,
+                                  overrideStyle: TextStyle(
+                                      color: AppColors.txtLightGreyColor,
+                                      fontSize: ResponsiveHelper.fontSize(
+                                          context, 12))),
+                            ),
+                          ),
+                          SizedBox(height: 15),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                isFormVisible = false;
+                              });
+                            },
+                            child: Text(
+                              'Step 1: Search and Select Tests',
                               style: AppTextStyles.heading1(context,
                                   overrideStyle: TextStyle(
+                                      color: isFormVisible
+                                          ? AppColors.txtGreyColor
+                                          : AppColors.primary,
                                       fontSize: ResponsiveHelper.fontSize(
-                                          context, 16))),
+                                          context, 12))),
                             ),
-                            SizedBox(height: 4),
-                            Text(
-                              '(Applicable for pathology test only)',
-                              style: AppTextStyles.bodyText1(
-                                context,
-                                overrideStyle: AppTextStyles.heading2(context,
-                                    overrideStyle: TextStyle(
-                                        color: AppColors.txtLightGreyColor,
-                                        fontSize: ResponsiveHelper.fontSize(
-                                            context, 12))),
-                              ),
-                            ),
-                            SizedBox(height: 15),
-                            InkWell(
-                              onTap: () {
-                                setState(() {
-                                  isFormVisible = false;
-                                });
-                              },
+                          ),
+                          SizedBox(height: 8),
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                isFormVisible = true;
+                              });
+                            },
+                            child: Visibility(
+                              visible: isFormVisible ? true : false,
                               child: Text(
-                                'Step 1: Search and Select Tests',
+                                'Step 2: Fill Booking Details',
                                 style: AppTextStyles.heading1(context,
                                     overrideStyle: TextStyle(
-                                        color: isFormVisible
-                                            ? AppColors.txtGreyColor
-                                            : AppColors.primary,
+                                        color: AppColors.primary,
                                         fontSize: ResponsiveHelper.fontSize(
                                             context, 12))),
                               ),
                             ),
-                            SizedBox(height: 8),
-                            InkWell(
-                              onTap: () {
-                                setState(() {
-                                  isFormVisible = true;
-                                });
-                              },
-                              child: Visibility(
-                                visible: isFormVisible ? true : false,
-                                child: Text(
-                                  'Step 2: Fill Booking Details',
-                                  style: AppTextStyles.heading1(context,
+                          ),
+                          SizedBox(height: 8),
+                          Visibility(
+                            visible: isFormVisible ? false : true,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 8.0),
+                                  child: Text(
+                                    "Search for tests",
+                                    style: AppTextStyles.heading2(
+                                      context,
                                       overrideStyle: TextStyle(
-                                          color: AppColors.primary,
                                           fontSize: ResponsiveHelper.fontSize(
-                                              context, 12))),
+                                              context, 14)),
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Visibility(
-                              visible: isFormVisible ? false : true,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: Text(
-                                      "Search for tests",
-                                      style: AppTextStyles.heading2(
-                                        context,
-                                        overrideStyle: TextStyle(
-                                            fontSize: ResponsiveHelper.fontSize(
-                                                context, 14)),
-                                      ),
-                                    ),
-                                  ),
-                                  CustomRoundedContainer(
-                                    borderRadius: 5.0,
-                                    borderColor: Colors.black,
-                                    borderWidth: 0.1,
-                                    elevation: 3.0,
-                                    backgroundColor: Colors.white,
-                                    padding: EdgeInsets.all(10.0),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        GestureDetector(
-                                          onTap: _toggleTestList,
-                                          child: CustomTransparentTextField(
-                                            controller: _searchController,
-                                            hintText:
-                                                "Enter tests eg CBC, Fever profile etc",
-                                            keyboardType: TextInputType.name,
-                                            // controller: mobileController,
-                                          ),
+                                CustomRoundedContainer(
+                                  borderRadius: 5.0,
+                                  borderColor: Colors.black,
+                                  borderWidth: 0.1,
+                                  elevation: 3.0,
+                                  backgroundColor: Colors.white,
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      GestureDetector(
+                                        onTap: _toggleTestList,
+                                        child: CustomTransparentTextField(
+                                          controller: _searchController,
+                                          hintText:
+                                              "Enter tests eg CBC, Fever profile etc",
+                                          keyboardType: TextInputType.name,
+                                          // controller: mobileController,
                                         ),
-                                      ],
-                                    ),
-                                    onTap: () {
-                                      print("Container tapped!");
-                                    },
+                                      ),
+                                    ],
                                   ),
-                                  SizedBox(
-                                    height: 5,
+                                  onTap: () {
+                                    print("Container tapped!");
+                                  },
+                                ),
+                                SizedBox(height: 10),
+                                // Show test list if the flag is true
+                                if (_isTestListVisible)
+                                  Container(
+                                    height: 260,
+                                    child: Consumer<PathalogyTestApiProvider>(
+                                        builder: (context, provider, child) {
+                                      // Check if the loading state is true
+                                      if (provider.isLoading &&
+                                          provider.filteredPathalogyTest
+                                              .isEmpty) {
+                                        return loadingIndicator(); // Show shimmer effect while loading
+                                      }
+                                      // Check if there was an error
+                                      if (provider.errorMessage.isNotEmpty) {
+                                        return _buildErrorWidget(); // Show error widget if there's an error
+                                      }
+                                      // Check if the data is null or empty
+                                      if (provider.pathalogyTestListModel
+                                                  ?.data ==
+                                              null ||
+                                          provider.pathalogyTestListModel!
+                                              .data!.isEmpty) {
+                                        return _buildEmptyListWidget(); // Show empty list widget if data is null or empty
+                                      }
+                                      // If data is loaded, display the rate list
+                                      return _buildPathalogyList(
+                                          provider.filteredPathalogyTest,
+                                          provider);
+                                    }),
                                   ),
+                                SizedBox(height: 20),
 
-                                  SizedBox(height: 20),
-
-                                  // Show test list if the flag is true
-                                  if (_isTestListVisible)
-                                    Container(
-                                      height: 260,
-                                      child: Consumer<PathalogyTestApiProvider>(
-                                          builder: (context, provider, child) {
-                                        // Check if the loading state is true
-                                        if (provider.isLoading &&
-                                            provider.filteredPathalogyTest
-                                                .isEmpty) {
-                                          return loadingIndicator(); // Show shimmer effect while loading
-                                        }
-                                        // Check if there was an error
-                                        if (provider.errorMessage.isNotEmpty) {
-                                          return _buildErrorWidget(); // Show error widget if there's an error
-                                        }
-                                        // Check if the data is null or empty
-                                        if (provider.pathalogyTestListModel
-                                                    ?.data ==
-                                                null ||
-                                            provider.pathalogyTestListModel!
-                                                .data!.isEmpty) {
-                                          return _buildEmptyListWidget(); // Show empty list widget if data is null or empty
-                                        }
-                                        // If data is loaded, display the rate list
-                                        return _buildPathalogyList(
-                                            provider.filteredPathalogyTest,
-                                            provider);
-                                      }),
-                                    ),
-                                  SizedBox(height: 20),
-
-                                  // Display the selected tests below with the remove option
-                                  if (_selectedTests.isNotEmpty)
-                                    _buildSelectedTestsList(),
-                                ],
-                              ),
+                                // Display the selected tests below with the remove option
+                                if (_selectedTests.isNotEmpty)
+                                  _buildSelectedTestsList(),
+                              ],
                             ),
-                            // &&&&&&&&&&&&&&&&&&&&& Form for book a test now  start here  &&&&&&&&&&
-                            Visibility(
-                              visible: isFormVisible ? true : false,
-                              child: _buildTestSelectionForm(),
-                            ),
-                            // &&&&&&&&&&&&&&&&&&&&& Form for book a test now  end here  &&&&&&&&&&
-                            SizedBox(
-                              height: 15,
-                            ),
+                          ),
+                          // &&&&&&&&&&&&&&&&&&&&& Form for book a test now  start here  &&&&&&&&&&
+                          Visibility(
+                            visible: isFormVisible ? true : false,
+                            child: _buildTestSelectionForm(),
+                          ),
+                          // &&&&&&&&&&&&&&&&&&&&& Form for book a test now  end here  &&&&&&&&&&
+                          SizedBox(
+                            height: 15,
+                          ),
 
-                            // ***************** SOLID ROUNDED SUBMIT BUTTON START HERE ******************
-                            SolidRoundedButton(
+                          // ***************** SOLID ROUNDED SUBMIT BUTTON START HERE ******************
+                        if(_selectedTests.length!=0)
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                            child: SolidRoundedButton(
                               text: 'Proceed to Payment',
                               color: AppColors.primary,
                               borderRadius: 10.0,
                               onPressed: () async {
                                 /// Function to extract plain text from an HTML string
+                                /// Function to extract plain text from an HTML string
                                 String extractPlainText(
                                     String htmlString) {
-                                  var document =
-                                  parse(htmlString);
-                                  return document
-                                      .body?.text ??
-                                      "";
+                                  var document = parse(htmlString);
+                                  return document.body?.text ?? "";
                                 }
-
-                                var htmlContent = " " "<p class=\"ql-align-justify\">Pathology tests are essential diagnostic tools that analyze blood, urine, tissues, and other body fluids to detect diseases, monitor health conditions, and assess overall well-being. These tests help in identifying infections, organ function abnormalities, nutritional deficiencies, and chronic diseases like diabetes and thyroid disorders.</p>" " ";
-                                final extractedText =extractPlainText(htmlContent);
 
                                 List<OrderItem> orderItems =
                                 _selectedTests.map((testItem) {
@@ -372,7 +363,7 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
                                     category: testItem.testDetailName ?? "",
                                     price: double.parse( testItem.testPrice.toString()),
                                     imageUrl:OrderItem.defaultImage,
-                                    packageDetail: extractedText, // Extract text from HTML
+                                    packageDetail: extractPlainText(testItem.testRequirement1.toString()), // Extract text from HTML
                                     quantity: 1,
                                   );
                                 }).toList();
@@ -392,17 +383,21 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
                                   color: Colors.white, fontSize: 18),
                               // icon: Icon(Icons.touch_app, color: Colors.white),
                             ),
-                            // ***************** SOLID ROUNDED SUBMIT BUTTON END HERE ******************
-                          ],
-                        ),
+                          ),
+
+                          SizedBox(
+                            height: 15,
+                          ),
+                          // ***************** SOLID ROUNDED SUBMIT BUTTON END HERE ******************
+                        ],
                       ),
                     ),
                   ),
                 ),
               ),
-              // Footer Section
-            ],
-          ),
+            ),
+            // Footer Section
+          ],
         ),
       ),
     );
@@ -438,34 +433,50 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
 
   Widget _buildPathalogyList(
       List<Data> pathalogyTestList, PathalogyTestApiProvider provider) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 5.0),
-      child: ListView.builder(
-        itemCount:
-        provider.filteredPathalogyTest.length + (provider.isFetchingMore ? 1 : 0),
-        itemBuilder: (context, index) {
-          final test = pathalogyTestList[index];
-
-          return ListTile(
-            title: Text(
-              "${test.testDetailName ?? ''}  -  ₹${test.testPrice ?? 0}",
-              style: AppTextStyles.heading1(context,
-                  overrideStyle: TextStyle(
-                      fontSize: ResponsiveHelper.fontSize(context, 12))),
-            ),
-
-            // FIXED: Now checks if the test object exists in `_selectedTests`
-            trailing: Checkbox(
-              value: _selectedTests.contains(test), // Compare full object, not name
-              onChanged: (bool? value) {
-                _toggleSelection(test);
-              },
-            ),
-            onTap: () {
-              _toggleSelection(test);
+    return Container(
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 4,
+            spreadRadius: 1,
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 0.0),
+        child: Scrollbar(
+          thumbVisibility: true, // Ensures the scrollbar is always visible when scrolling
+          child: ListView.builder(
+            itemCount:provider.filteredPathalogyTest.length + (provider.isFetchingMore ? 1 : 0),
+            itemBuilder: (context, index) {
+              final test = pathalogyTestList[index];
+          
+              return ListTile(
+                title: Text(
+                  "${test.testDetailName ?? ''}  -  ₹${test.testPrice ?? 0}",
+                  style: AppTextStyles.heading1(context,
+                      overrideStyle: TextStyle(
+                          fontSize: ResponsiveHelper.fontSize(context, 12))),
+                ),
+          
+                // FIXED: Now checks if the test object exists in `_selectedTests`
+                trailing: Checkbox(
+                  value: _selectedTests.contains(test), // Compare full object, not name
+                  onChanged: (bool? value) {
+                    _toggleSelection(test);
+                  },
+                ),
+                onTap: () {
+                  _toggleSelection(test);
+                },
+              );
             },
-          );
-        },
+          ),
+        ),
       ),
     );
   }
@@ -474,90 +485,93 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
   Widget _buildSelectedTestsList() {
     List<Data> selectedTests = _selectedTests; // Use your actual selected tests list
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Selected Tests:",
-          style: AppTextStyles.heading1(
-            context,
-            overrideStyle: TextStyle(fontSize: ResponsiveHelper.fontSize(context, 12)),
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Selected Tests:",
+            style: AppTextStyles.heading1(
+              context,
+              overrideStyle: TextStyle(fontSize: ResponsiveHelper.fontSize(context, 12)),
+            ),
           ),
-        ),
-        if (selectedTests.isEmpty)
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Text("No tests selected"),
-          ),
-        ...selectedTests.map((test) {
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 5),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    test.testDetailName ?? "",
+          if (selectedTests.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Text("No tests selected"),
+            ),
+          ...selectedTests.map((test) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 0,horizontal: 10),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      test.testDetailName ?? "",
+                      style: AppTextStyles.bodyText1(
+                        context,
+                        overrideStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: ResponsiveHelper.fontSize(context, 12),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Text(
+                    "₹${test.testPrice?.toStringAsFixed(2) ?? '0.00'}",
                     style: AppTextStyles.bodyText1(
                       context,
                       overrideStyle: TextStyle(
-                        color: Colors.black,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
                         fontSize: ResponsiveHelper.fontSize(context, 12),
                       ),
                     ),
                   ),
+                  IconButton(
+                    icon: Icon(Icons.delete_outline, color: Colors.red),
+                    onPressed: () {
+                      _removeSelectedTest(test); // Remove test from selected list
+                    },
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+          Divider(thickness: 1),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Total Price:",
+                  style: AppTextStyles.heading1(
+                    context,
+                    overrideStyle: TextStyle(
+                      fontSize: ResponsiveHelper.fontSize(context, 14),
+                    ),
+                  ),
                 ),
                 Text(
-                  "₹${test.testPrice?.toStringAsFixed(2) ?? '0.00'}",
-                  style: AppTextStyles.bodyText1(
+                  "₹${getTotalPrice().toStringAsFixed(2)}",
+                  style: AppTextStyles.heading1(
                     context,
                     overrideStyle: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: AppColors.primary,
-                      fontSize: ResponsiveHelper.fontSize(context, 12),
+                      fontSize: ResponsiveHelper.fontSize(context, 14),
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: Icon(Icons.delete_outline, color: Colors.red),
-                  onPressed: () {
-                    _removeSelectedTest(test); // Remove test from selected list
-                  },
-                ),
               ],
             ),
-          );
-        }).toList(),
-        Divider(thickness: 1),
-        Padding(
-          padding: const EdgeInsets.only(top: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "Total Price:",
-                style: AppTextStyles.heading1(
-                  context,
-                  overrideStyle: TextStyle(
-                    fontSize: ResponsiveHelper.fontSize(context, 14),
-                  ),
-                ),
-              ),
-              Text(
-                "₹${getTotalPrice().toStringAsFixed(2)}",
-                style: AppTextStyles.heading1(
-                  context,
-                  overrideStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                    fontSize: ResponsiveHelper.fontSize(context, 14),
-                  ),
-                ),
-              ),
-            ],
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -607,15 +621,6 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
             ),
           ),
           SizedBox(height: 10),
-          SolidRoundedButton(
-            text: 'Proceed to Payment',
-            color: AppColors.primary,
-            borderRadius: 10.0,
-            onPressed: () {
-              print('Proceed to payment button clicked!');
-            },
-            textStyle: TextStyle(color: Colors.white, fontSize: 18),
-          ),
         ],
       ),
     );

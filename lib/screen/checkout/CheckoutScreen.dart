@@ -191,7 +191,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         return shouldExit; // Allow exit only if the user confirms
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.primary,
         resizeToAvoidBottomInset: true, // Prevents button from moving
         appBar: AppBar(
           backgroundColor: AppColors.primary,

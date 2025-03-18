@@ -72,8 +72,7 @@ class _PathalogyNavSectionState extends State<PathalogyNavSection> {
                 child: Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
-                  child: CellNavLabListItem(
-                   ),
+                  child: CellNavLabListItem( ),
                 ),
               ),
             ],

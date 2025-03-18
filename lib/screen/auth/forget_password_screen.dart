@@ -58,7 +58,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   // Implement Reset Password logic
-                  print("Reset Password for: ${_emailController.text}");
+                  print("Reset Password for:"
+                      " ${_emailController.text}");
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.indigo, // Adjusted button color
