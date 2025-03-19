@@ -49,7 +49,8 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
       print("🔴 Validation Failed: Fields are empty");
       return;
     }
-    loginProvider.loginUser( context, emailController.text,  passwordController.text);
+    loginProvider.loginUser(
+        context, emailController.text, passwordController.text);
   }
 
   @override
@@ -103,14 +104,14 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                     return loginProvider.isLoading
                         ? loadingIndicator() // Show loader
                         : SolidRoundedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                handleSubmit(); // Call submit only if valid
+                              }
+                            },
                             text: 'Login',
                             color: AppColors.primary,
                             borderRadius: 10.0,
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                               handleSubmit(); // Call submit only if valid
-                              }
-                            },
                             textStyle: const TextStyle(
                                 color: Colors.white, fontSize: 18),
                           );

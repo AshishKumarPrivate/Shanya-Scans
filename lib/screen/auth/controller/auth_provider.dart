@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:healthians/network_manager/repository.dart';
 import 'package:healthians/screen/auth/otp_screen.dart';
+import 'package:healthians/screen/other/screen/user_selection_screen.dart';
 import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/storage_helper.dart';
 import '../../../bottom_navigation_screen.dart';
@@ -174,7 +175,7 @@ class AuthApiProvider with ChangeNotifier {
       StorageHelper().logout();
       _setLoading(false);
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => UserSelectionScreen()),
         (route) => false,
       );
     });

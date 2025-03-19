@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:healthians/deliveryBoy/screen/widget/DelliveryOrderCard.dart';
 import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:provider/provider.dart';
@@ -20,12 +21,34 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
   @override
   void initState() {
     super.initState();
+    // Set status bar color correctly
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: AppColors.deliveryPrimary,
+      statusBarIconBrightness: Brightness.light, // Ensure icons are visible
+    ));
+
     _tabController = TabController(length: 3, vsync: this);
     Provider.of<DeliveryOrdersProvider>(context, listen: false).fetchOrders();
+  }
+  @override
+  void dispose() {
+    // ✅ Reset Status Bar Color when leaving the screen
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: AppColors.primary, // Restore default color
+      statusBarIconBrightness: Brightness.light, // Restore default icon brightness
+    ));
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    Future.microtask(() {
+      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+        statusBarColor: AppColors.deliveryPrimary,
+        statusBarIconBrightness: Brightness.light, // Ensure light icons
+      ));
+    });
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -64,7 +87,7 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
             "Delivery Dashboard",
             style: TextStyle(fontSize: 16, color: Colors.white),
           ),
-          backgroundColor: AppColors.primary,
+          backgroundColor: AppColors.deliveryPrimary,
         ),
         _buildOrderSummary(),
         TabBar(

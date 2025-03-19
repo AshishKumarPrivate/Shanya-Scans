@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:healthians/bottom_navigation_screen.dart';
 import 'package:healthians/deliveryBoy/controller/DeliveryOrdersProvider.dart';
+import 'package:healthians/deliveryBoy/controller/delivery_boy_auth_provider.dart';
 import 'package:healthians/screen/auth/controller/auth_provider.dart';
 import 'package:healthians/screen/auth/login_screen.dart';
 import 'package:healthians/screen/cart/controller/cart_list_api_provider.dart';
@@ -55,6 +56,7 @@ Future<void> main() async {
 
         /// &&&&&&&&&&& Dellivery BOy ***********
         ChangeNotifierProvider(create: (context) => DeliveryOrdersProvider()),
+        ChangeNotifierProvider(create: (context) => DeliveryBoyAuthApiProvider()),
 
 
       ],

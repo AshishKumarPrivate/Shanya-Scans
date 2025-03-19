@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: SingleChildScrollView(
                     child: MediaQuery.removePadding(
                       context: context,
-                      removeBottom: true,
+                      // removeBottom: true,
                       // 👈 Keyboard open hone par rebuild prevent karega
                       child: Column(
                         children: [

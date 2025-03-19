@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:healthians/deliveryBoy/screen/deleivery_boy_dashboard.dart';
+import 'package:healthians/screen/other/screen/user_selection_screen.dart';
 import 'package:healthians/screen/splash/screen/NoInternetScreen.dart';
 import 'package:provider/provider.dart';
 
@@ -49,19 +50,49 @@ class _SplashScreenState extends State<SplashScreen> {
 
   /// ✅ **Check if the user email is stored, then navigate accordingly**
   Future<void> _navigateToNextScreen() async {
+
+
     await Provider.of<CartProvider>(context, listen: false).loadCartItems(); // ✅ Load cart
     await Future.delayed(Duration(seconds: 3)); // Splash delay
     String userEmail = StorageHelper().getEmail(); // Fetch stored email
     String userToken = StorageHelper().getUserAccessToken(); // Get stored token
+    String? userRole = StorageHelper().getRole(); // Get stored role
     if (userEmail.isNotEmpty) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => BottomNavigationScreen()), // Replace with your home screen
-      );
+      // Navigator.of(context).pushReplacement(
+      //   MaterialPageRoute(builder: (context) => BottomNavigationScreen()), // Replace with your home screen
+      // );
+
+
+      if (userRole == "user") {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => BottomNavigationScreen()),
+        );
+
+      } else if (userRole == "delivery_boy") {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => DeliveryBoyDashboardScreen()),
+        );
+
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => UserSelectionScreen()),
+        );
+      }
+
+
+
+
+
     } else {
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => UserSelectionScreen()),
+        // MaterialPageRoute(builder: (context) => LoginScreen()),
       );
     }
+
+
+
   }
 
   @override

@@ -7,6 +7,7 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final IconData icon;
+  final Color? iconColor;
   final String hintText;
   final String title;
   final String errorMessage;
@@ -14,6 +15,7 @@ class CustomTextField extends StatelessWidget {
   final double? elevation;
   final double? borderWidth;
   final Color? borderColor;
+  final Color? shadowColor;
   final bool enableShadow; // New optional parameter
 
   const CustomTextField({
@@ -21,6 +23,7 @@ class CustomTextField extends StatelessWidget {
     required this.controller,
     required this.focusNode,
     required this.icon,
+    this.iconColor,
     required this.hintText,
     required this.title,
     required this.errorMessage,
@@ -28,6 +31,7 @@ class CustomTextField extends StatelessWidget {
     this.elevation,
     this.borderWidth,
     this.borderColor,
+    this.shadowColor,
     this.enableShadow = true, // Default value set to true
   }) : super(key: key);
 
@@ -52,10 +56,9 @@ class CustomTextField extends StatelessWidget {
                   padding: ResponsiveHelper.padding(context, 2, 0.52),
                   child: Text(
                     title,
-                    style: AppTextStyles.bodyText1(
+                    style: AppTextStyles.heading2(
                       context,
                       overrideStyle: TextStyle(
-                        color: Colors.black,
                         fontSize: ResponsiveHelper.fontSize(context, 14),
                       ),
                     ),
@@ -72,7 +75,8 @@ class CustomTextField extends StatelessWidget {
                           ? [
                         BoxShadow(
                           color: isFocused
-                              ? AppColors.primary.withAlpha(70)
+                              ? shadowColor ?? AppColors.primary.withAlpha(70)
+
                               : Colors.black12,
                           blurRadius: isFocused ? 0 : 0,
                           offset: const Offset(0, 3),
@@ -94,7 +98,7 @@ class CustomTextField extends StatelessWidget {
                             icon,
                             size: ResponsiveHelper.fontSize(context, 20),
                             color: isFocused
-                                ? AppColors.primary
+                                ? (iconColor ?? AppColors.primary)
                                 : AppColors.txtLightGreyColor,
                           ),
                         ),

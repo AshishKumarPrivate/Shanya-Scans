@@ -10,6 +10,7 @@ import 'package:healthians/screen/nav/nav_home/home_toolbar_setion.dart';
 import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:healthians/ui_helper/app_text_styles.dart';
+import 'package:healthians/ui_helper/storage_helper.dart';
 
 import '../../base_widgets/common/custom_offer_dialog_popup.dart';
 import '../nav/nav_home/home_checkups_organs_setion.dart';
@@ -55,11 +56,19 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // _checkAndShowDialog();
+    _checkAndShowDialog();
   }
   Future<void> _checkAndShowDialog() async {
-    await Future.delayed(Duration(milliseconds: 500)); // Small delay
-    showSpecialOfferDialog(context); // Show dialog only if it hasn't been shown
+    bool isDialogShown = StorageHelper().getDialogShown();
+    if (!isDialogShown) {
+      if (mounted) {
+        await Future.delayed(Duration(milliseconds: 500)); // Delay to allow UI rendering
+        showSpecialOfferDialog(context); // Show dialog only if it hasn't been shown
+        StorageHelper().setDialogShown(true); // Mark dialog as shown
+      }
+    }
+    // await Future.delayed(Duration(milliseconds: 500)); // Small delay
+    // showSpecialOfferDialog(context); // Show dialog only if it hasn't been shown
   }
 
   @override

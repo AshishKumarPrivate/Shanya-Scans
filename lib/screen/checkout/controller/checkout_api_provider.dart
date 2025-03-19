@@ -329,8 +329,7 @@ class CheckoutProvider with ChangeNotifier {
       );
     }
 
-    _isLoading = false;
-    notifyListeners();
+    _setLoadingState(false);
     return false;
   }
 

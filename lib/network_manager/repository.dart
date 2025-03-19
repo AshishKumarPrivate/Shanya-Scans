@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:healthians/deliveryBoy/model/DeliveryLoginModelResponse.dart';
 import 'package:healthians/screen/auth/model/LoginModel.dart';
 import 'package:healthians/screen/auth/model/UpdateProfileModel.dart';
 import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/model/FrequentlyPathalogyTagListModel.dart';
@@ -28,8 +29,13 @@ import 'dio_helper.dart';
 class Repository {
   static final DioHelper _dioHelper = DioHelper();
 
-  static const String baseUrl = "https://dbsanya.drmanasaggarwal.com";
-  // static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
+  // static const String baseUrl = "https://dbsanya.drmanasaggarwal.com";
+  static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
+
+
+  //&&&&& Delivery boy url &&&&&&&&&
+
+
 
   // &&&&&&&&&&& testing api Start here &&&&&&&&&&&&&&&&
 
@@ -61,85 +67,6 @@ class Repository {
   }
 
   // ******************************  Shanya Scans API  **************************************
-
-  // user signup
-  // Future<SignUpModel> userSignUp(Map<String, dynamic> requestBody) async {
-  //   try {
-  //     Map<String, dynamic>? response = await _dioHelper.post( url: '$baseUrl/api/v1/user/register',
-  //       requestBody: requestBody,
-  //     );
-  //
-  //
-  //     if (response == null) {
-  //       print("❌ SignUp API returned null response!");
-  //       return SignUpModel(success: false, message: "Something we!");
-  //     }
-  //
-  //     print("✅ SignUp API Response: $response");
-  //
-  //     // If API returns `success: false`, handle it properly
-  //     if (response["success"] == false) {
-  //       String errorMessage = response["message"] ?? "User already exists!";
-  //       return SignUpModel(success: false, message: errorMessage);
-  //     }
-  //
-  //     return SignUpModel.fromJson(response);
-  //   } on DioException catch (e) {
-  //     if (e.response != null) {
-  //       print("❌ SignUp API Error: ${e.response?.data}");
-  //       String errorMessage = e.response?.data["message"];
-  //
-  //       return SignUpModel(success: false, message: errorMessage);
-  //     } else {
-  //       print("❌ Network Error: ${e.message}");
-  //       return SignUpModel(success: false, message: "No Internet Connection");
-  //     }
-  //   } catch (e) {
-  //     print("❌ Unexpected Error: $e");
-  //     return SignUpModel(success: false, message: "Unexpected error occurred");
-  //   }
-  // }
-
-  // Future<SignUpModel> userSignUp(Map<String, dynamic> requestBody) async {
-  //   try {
-  //     print("📤 Sending Signup Request: $requestBody");
-  //
-  //     Map<String, dynamic>? response = await _dioHelper.post(
-  //       url: '$baseUrl/api/v1/user/register',
-  //       requestBody: requestBody,
-  //     );
-  //
-  //     if (response == null) {
-  //       print("❌ API returned null response!");
-  //       return SignUpModel(success: false, message: "No response from server");
-  //     }
-  //
-  //     print("✅ Signup API Response: $response");
-  //
-  //     // ✅ Handle API returning `success: false`
-  //     if (response["success"] == false) {
-  //       String errorMessage = response["message"] ?? "User already exists!";
-  //       return SignUpModel(success: false, message: errorMessage);
-  //     }
-  //
-  //     // ✅ Convert API response into Model
-  //     return SignUpModel.fromJson(response);
-  //   } on DioException catch (e) {
-  //     if (e.response != null) {
-  //       print("❌ API Error: ${e.response?.data}");
-  //       String errorMessage = e.response?.data["message"] ?? "Something went wrong";
-  //
-  //       return SignUpModel(success: false, message: errorMessage);
-  //     } else {
-  //       print("❌ Network Error: ${e.message}");
-  //       return SignUpModel(success: false, message: "No Internet Connection");
-  //     }
-  //   } catch (e) {
-  //     print("❌ Unexpected Error: $e");
-  //     return SignUpModel(success: false, message: "Unexpected error occurred");
-  //   }
-  // }
-
   Future<SignUpModel> userSignUp(Map<String, dynamic> requestBody) async {
     try {
       print("📤 Sending Signup Request: $requestBody");
@@ -534,4 +461,52 @@ class Repository {
 //   Map<String, dynamic> response = await _dioHelper.get(url: 'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&current_weather=true');
 //   return CurrentWeatherModel.fromJson(response);
 // }
+
+
+
+// ******************************  Shanya Scans Delivery Boy API  **************************************
+
+  // user login
+  Future<DeliveryLoginModelResponse> deliveryBoyLogin(Map<String, dynamic> requestBody) async {
+    try {
+      // ✅ API Call
+      Map<String, dynamic>? response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/collection/login',
+        requestBody: requestBody,
+      );
+
+      // ✅ Debug Response
+      print("✅ Login API Raw Response: $response");
+
+      if (response == null) {
+        print("❌ Login API returned null response!");
+        return DeliveryLoginModelResponse(success: false, message: "No response from server");
+      }
+
+      // ✅ Check if API returns success: false
+      if (response["success"] == false) {
+        String errorMessage = response["message"] ?? "Login failed!";
+        return DeliveryLoginModelResponse(success: false, message: errorMessage);
+      }
+
+      // ✅ Return Parsed Model
+      return DeliveryLoginModelResponse.fromJson(response);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        print("❌ Login API Error: ${e.response?.data}");
+        return DeliveryLoginModelResponse(
+          success: false,
+          message: e.response?.data["message"] ?? "Something went wrong",
+        );
+      } else {
+        print("❌ Network Error: ${e.message}");
+        return DeliveryLoginModelResponse(success: false, message: "No Internet Connection");
+      }
+    } catch (e) {
+      print("❌ Unexpected Error: $e");
+      return DeliveryLoginModelResponse(success: false, message: "Unexpected error occurred");
+    }
+  }
+
+
 }

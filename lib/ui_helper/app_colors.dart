@@ -4,6 +4,7 @@ class AppColors {
 
   static final whiteColor = Color(0xFFFFFFFF);
   static final primary = Color(0xFF58a9c7);
+  static final deliveryPrimary = Color(0xFFFF5963);
   // static final primary = Color(0xFF2f6678);
   // static final primary = Color(0xFF00A0A8);
   static final pinkColor = Color(0xffFD6E87);

@@ -62,8 +62,8 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
       columns = screenWidth > 300 && screenWidth < 600
           ? 3
           : ResponsiveHelper.isDesktop(context)
-          ? 2
-          : 6;
+              ? 2
+              : 6;
     }
 
     // Responsive childAspectRatio adjustment
@@ -98,181 +98,182 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
               builder: (context, provider, child) {
                 final services = provider.scanList;
 
-                return   SizedBox(
+                return SizedBox(
                   // this is the sizebox for the service main height
                   width: ResponsiveHelper.containerHeight(context, 100),
                   height: 360,
                   // height: ResponsiveHelper.containerHeight(context, 40),
                   child: provider.isLoading && services.isEmpty
                       ? HomeServiceShimmer(
-                      itemCount: 10) // ✅ Show shimmer only when no cache
+                          itemCount: 10) // ✅ Show shimmer only when no cache
                       : provider.errorMessage.isNotEmpty // ✅ Error condition
-                      ? Center(
-                    child: SizedBox(
-                      width:
-                      ResponsiveHelper.containerWidth(context, 50),
-                      height:
-                      ResponsiveHelper.containerWidth(context, 50),
-                      child: Image.asset(
-                        "assets/images/img_error.jpg",
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  )
-                  // : services.isEmpty // ✅ Handle empty list separately
-                  //     ? Center(
-                  //         child: SizedBox(
-                  //           width: ResponsiveHelper.containerWidth(
-                  //               context, 50),
-                  //           height: ResponsiveHelper.containerWidth(
-                  //               context, 50),
-                  //           child: Image.asset(
-                  //             "assets/images/img_error.jpg",
-                  //             fit: BoxFit.cover,
-                  //           ),
-                  //         ),
-                  //       )
-                      : GridView.builder(
-                    scrollDirection: Axis.horizontal,
-                    gridDelegate:
-                    SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: columns,
-                      crossAxisSpacing: 8.0,
-                      mainAxisSpacing:8.0,
-                      childAspectRatio: childAspectRatio,
-                    ),
-                    itemCount: services.length,
-                    itemBuilder: (context, index) {
-                      final item = services[index];
-                      return Stack(
-                        alignment: Alignment.topCenter,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(
-                                top: circleRadius / 2.0),
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  bottom: 8.0),
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          AllServicesDetailListScreen(
-                                            serviceName: item .serviceDetailName!.toString(),
-                                            serviceSlug:item.slug! ?? "",
-                                            serviceDescription: item.serviceDetail! ?? "",
-                                            servicePhoto: item .servicePhoto!.secureUrl! ?? "",
-                                          ),
-                                    ),
-                                  );
-                                },
-                                splashColor: AppColors.primary
-                                    .withOpacity(0.2),
-                                highlightColor: AppColors.primary
-                                    .withOpacity(0.1),
-                                borderRadius:
-                                BorderRadius.circular(10),
-                                child: Container(
-                                  width: screenWidth * 0.5,
-                                  height: screenWidth * 0.25,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.whiteColor,
-                                    borderRadius:
-                                    BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Colors.white,
-                                      width: 0,
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black
-                                            .withOpacity(0.1),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 2),
+                          ? Center(
+                              child: SizedBox(
+                                width: ResponsiveHelper.containerWidth(
+                                    context, 50),
+                                height: ResponsiveHelper.containerWidth(
+                                    context, 50),
+                                child: Image.asset(
+                                  "assets/images/img_error.jpg",
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            )
+                          // : services.isEmpty // ✅ Handle empty list separately
+                          //     ? Center(
+                          //         child: SizedBox(
+                          //           width: ResponsiveHelper.containerWidth(
+                          //               context, 50),
+                          //           height: ResponsiveHelper.containerWidth(
+                          //               context, 50),
+                          //           child: Image.asset(
+                          //             "assets/images/img_error.jpg",
+                          //             fit: BoxFit.cover,
+                          //           ),
+                          //         ),
+                          //       )
+                          : GridView.builder(
+                              scrollDirection: Axis.horizontal,
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: columns,
+                                crossAxisSpacing: 8.0,
+                                mainAxisSpacing: 8.0,
+                                childAspectRatio: childAspectRatio,
+                              ),
+                              itemCount: services.length,
+                              itemBuilder: (context, index) {
+                                final item = services[index];
+                                return InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            AllServicesDetailListScreen(
+                                          serviceName: item.serviceDetailName!
+                                              .toString(),
+                                          serviceSlug: item.slug! ?? "",
+                                          serviceDescription:
+                                              item.serviceDetail! ?? "",
+                                          servicePhoto:
+                                              item.servicePhoto!.secureUrl! ??
+                                                  "",
+                                        ),
                                       ),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      // SizedBox( height: ResponsiveHelper .containerHeight( context, 4.2)),
-                                      SizedBox( height: 35),
+                                    );
+                                  },
+                                  splashColor: AppColors.primary.withAlpha(50),
+                                  highlightColor:
+                                      AppColors.primary.withAlpha(50),
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Stack(
+                                    alignment: Alignment.topCenter,
+                                    children: <Widget>[
                                       Padding(
-                                        padding: const EdgeInsets
-                                            .symmetric(
-                                            horizontal: 5.0),
-                                        child: Text(
-                                          "${item.serviceDetailName.toString()}",
-                                          style: AppTextStyles
-                                              .heading2(
-                                            context,
-                                            overrideStyle:
-                                            TextStyle(
-                                              fontSize:
-                                              ResponsiveHelper
-                                                  .fontSize(
-                                                  context,
-                                                  11),
-                                              color: Colors.black,
+                                        padding: EdgeInsets.only(
+                                            top: circleRadius / 2.0),
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              bottom: 8.0),
+                                          child: Container(
+                                            width: screenWidth * 0.5,
+                                            height: screenWidth * 0.25,
+                                            decoration: BoxDecoration(
+                                              color: AppColors.whiteColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              border: Border.all(
+                                                color: Colors.white,
+                                                width: 0,
+                                              ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.1),
+                                                  blurRadius: 10,
+                                                  offset: const Offset(0, 2),
+                                                ),
+                                              ],
+                                            ),
+                                            child: Column(
+                                              children: [
+                                                // SizedBox( height: ResponsiveHelper .containerHeight( context, 4.2)),
+                                                SizedBox(height: 35),
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      horizontal: 5.0),
+                                                  child: Text(
+                                                    "${item.serviceDetailName.toString()}",
+                                                    style:
+                                                        AppTextStyles.heading2(
+                                                      context,
+                                                      overrideStyle: TextStyle(
+                                                        fontSize:
+                                                            ResponsiveHelper
+                                                                .fontSize(
+                                                                    context,
+                                                                    11),
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                    maxLines: 2,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          maxLines: 2,
-                                          overflow:TextOverflow.ellipsis,
-                                          textAlign:
-                                          TextAlign.center,
+                                        ),
+                                      ),
+                                      Material(
+                                        elevation: 2,
+                                        shape: const CircleBorder(),
+                                        child: Container(
+                                          width: circleRadius,
+                                          height: circleRadius,
+                                          decoration: const ShapeDecoration(
+                                            shape: CircleBorder(),
+                                            color: Colors.white,
+                                          ),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(3),
+                                            child: ClipOval(
+                                              child: CachedNetworkImage(
+                                                imageUrl: item
+                                                    .iconPhoto!.secureUrl
+                                                    .toString(),
+                                                fit: BoxFit.cover,
+                                                placeholder: (context, url) =>
+                                                    Center(
+                                                  child: Image.asset(
+                                                      "assets/images/img_placeholder.jpeg"), // Placeholder while loading
+                                                ),
+                                                errorWidget:
+                                                    (context, url, error) =>
+                                                        const Icon(
+                                                  Icons.error,
+                                                  color: Colors
+                                                      .red, // Show error icon if image fails
+                                                ),
+                                                fadeInDuration: const Duration(
+                                                    milliseconds: 500),
+                                                // Smooth fade-in effect
+                                                fadeOutDuration: const Duration(
+                                                    milliseconds: 300),
+                                              ),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                ),
-                              ),
+                                );
+                              },
                             ),
-                          ),
-                          Material(
-                            elevation: 2,
-                            shape: const CircleBorder(),
-                            child: Container(
-                              width: circleRadius,
-                              height: circleRadius,
-                              decoration: const ShapeDecoration(
-                                shape: CircleBorder(),
-                                color: Colors.white,
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(3),
-                                child: ClipOval(
-                                  child: CachedNetworkImage(
-                                    imageUrl: item
-                                        .iconPhoto!.secureUrl
-                                        .toString(),
-                                    fit: BoxFit.cover,
-                                    placeholder: (context, url) =>
-                                        Center(
-                                          child: Image.asset(
-                                              "assets/images/img_placeholder.jpeg"), // Placeholder while loading
-                                        ),
-                                    errorWidget:
-                                        (context, url, error) =>
-                                    const Icon(
-                                      Icons.error,
-                                      color: Colors
-                                          .red, // Show error icon if image fails
-                                    ),
-                                    fadeInDuration: const Duration(
-                                        milliseconds: 500),
-                                    // Smooth fade-in effect
-                                    fadeOutDuration: const Duration(
-                                        milliseconds: 300),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
                 );
               },
             ),

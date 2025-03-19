@@ -33,7 +33,7 @@ class StorageHelper {
   /// ✅ Reusable Logout Method
   Future<void> logout() async {
     await _ensureInitialized(); // Ensure SharedPreferences is initialized
-
+    clearUserRole();
     List<String> keysToRemove = [
       'user_access_token',
       'user_id',
@@ -53,6 +53,19 @@ class StorageHelper {
 
     print("✅ User logged out successfully!");
   }
+
+  void setRole(String role) {
+    sp.setString('role', role);
+  }
+
+  String getRole() {
+    return sp.getString('role') ?? "";
+  }
+  static Future<void> clearUserRole() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove("role");
+  }
+
 
   void setUserAccessToken(String token) {
     sp.setString('user_access_token', token);
@@ -171,6 +184,14 @@ class StorageHelper {
     return sp.getString('user_profile_image') ?? "";
   }
 
+
+  void setDialogShown(bool isDialogShown) {
+    sp.setBool('isDialogShown', isDialogShown);
+  }
+
+  bool getDialogShown() {
+    return sp.getBool('isDialogShown') ?? false;
+  }
 
   //&&&&&&&&&&&&&&&&&&&&&&
 

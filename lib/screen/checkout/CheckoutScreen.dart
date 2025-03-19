@@ -191,7 +191,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         return shouldExit; // Allow exit only if the user confirms
       },
       child: Scaffold(
-        backgroundColor: AppColors.primary,
+        backgroundColor: Colors.white,
         resizeToAvoidBottomInset: true, // Prevents button from moving
         appBar: AppBar(
           backgroundColor: AppColors.primary,
@@ -345,7 +345,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
 
           //
-          Consumer<OrderApiProvider>(builder: (context, provider, child) {
+          Consumer<CheckoutProvider>(builder: (context, provider, child) {
             // Check if the loading state is true
             if (provider.isLoading) {
               return loadingIndicator(); // Show shimmer effect while loading
