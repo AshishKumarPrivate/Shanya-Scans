@@ -9,6 +9,7 @@ import '../../../network_manager/api_error_handler.dart';
 import '../../../ui_helper/snack_bar.dart';
 import '../../screen/auth/login_screen.dart';
 import '../../screen/other/screen/user_selection_screen.dart';
+import '../model/DeliveryLoginModelResponse.dart';
 
 class DeliveryBoyAuthApiProvider with ChangeNotifier {
   final Repository _repository = Repository();
@@ -32,6 +33,9 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier {
       var response = await _repository.deliveryBoyLogin(requestBody);
 
       if (response.success == true) {
+
+        await _storeDeliveryBoyData(response);
+
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => DeliveryBoyDashboardScreen()));
         showCustomSnackbarHelper.showSnackbar(
@@ -69,15 +73,13 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier {
     });
   }
 
-  Future<void> _storeUserData(response) async {
+  Future<void> _storeDeliveryBoyData(DeliveryLoginModelResponse response) async {
     if (response.data != null) {
-      StorageHelper().setUserId(response.data!.sId.toString());
-      StorageHelper().setUserName(response.data!.name.toString());
-      StorageHelper().setEmail(response.data!.email.toString());
-      StorageHelper().setPassword(response.data!.password.toString());
-      StorageHelper().setPhoneNumber(response.data!.phoneNumber.toString());
-      StorageHelper() .setWhatsappNumber(response.data!.whatsappNumber.toString());
-      await StorageHelper().saveOrderListFromApi(response);
+      StorageHelper().setDeliveryBoyId(response.data!.sId.toString());
+      StorageHelper().setDeliveryBoyName(response.data!.name.toString());
+      StorageHelper().setDeliveryBoyEmail(response.data!.email.toString());
+      StorageHelper().setDeliveryBoyPassword(response.data!.password.toString());
+
     } else {
       await StorageHelper().clearOrderList();
     }

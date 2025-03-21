@@ -14,6 +14,7 @@ class PathalogyTestApiProvider with ChangeNotifier {
   bool _isLoading = false;
   String _errorMessage = "";
   bool _isFetchingMore = false; // To track pagination state
+  bool _isLastPage = false;
   pathalogyTestList.PathalogyTestListModel? _pathalogyTestListModel;
   PathalogyScansListDetailModel? _pathalogyTestListDetailModel;
 
@@ -24,6 +25,7 @@ class PathalogyTestApiProvider with ChangeNotifier {
 
   // Getters for UI
   bool get isFetchingMore => _isFetchingMore;
+  bool get isLastPage => _isLastPage;
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
   pathalogyTestList.PathalogyTestListModel? get pathalogyTestListModel => _pathalogyTestListModel;
@@ -49,16 +51,18 @@ class PathalogyTestApiProvider with ChangeNotifier {
   }
 
 
+  /// **Load Cached Data Before API Call**
   Future<void> loadCachedNavPathalogyTests(BuildContext context) async {
-    _setLoadingState(true);
+    // _setLoadingState(true);
     final prefs = await SharedPreferences.getInstance();
     final cachedData = prefs.getString('cached_pathalogy_tests');
 
-    if (cachedData != null) {
+    if (cachedData != null && _filteredPathalogyTest.isEmpty) {
       try {
         print("✅ Loading cached pathology test data...");
         _pathalogyTestListModel = pathalogyTestList.PathalogyTestListModel.fromJson(json.decode(cachedData));
         _filteredPathalogyTest = _pathalogyTestListModel?.data ?? [];
+        notifyListeners();
         print("✅ Cache Loaded Successfully!");
       } catch (e) {
         print("⚠️ Cache Parsing Error: $e");
@@ -66,39 +70,49 @@ class PathalogyTestApiProvider with ChangeNotifier {
     } else {
       print("⚠️ No Cached Data Found!");
     }
-
-    await getPathalogyTestList(context);
+    if (_filteredPathalogyTest.isEmpty)
+      await getPathalogyTestList(context);
   }
 
+  /// **Clear Cache**
   Future<void> clearCache() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('cached_pathalogy_tests');
     print("🗑 Cache Cleared!");
   }
 
+  /// **Fetch Pathology Test List from API**
+  Future<bool> getPathalogyTestList(BuildContext context ,{bool loadMore = false,bool forceRefresh = false}) async {
 
-  /// **Fetch Home Service List API**
-  Future<bool> getPathalogyTestList(BuildContext context, {bool loadMore = false}) async {
+  // &&&&&& just add below code for loading more data &&&&&&&&&&
+    // if (_isFetchingMore || _isLastPage) return true;
 
-    if (loadMore) {
-      _setFetchingMoreState(true);
-    } else {
-      _setLoadingState(true);
-      _errorMessage = "";
-      _filteredPathalogyTest.clear();
-      _currentPage = 1;
-    }
-    // _setLoadingState(true);
-    // _errorMessage = "";
+    // if (loadMore) {
+    //   _setFetchingMoreState(true);
+    // } else {
+    //   _setLoadingState(true);
+    //   _errorMessage = "";
+    //   _filteredPathalogyTest.clear();
+    //   _currentPage = 1;
+    //   _isLastPage = false;
+    // }
+
+    // &&&&&& just add below code for loading more data &&&&&&&&&&
+
+    _setLoadingState(true);
+    _errorMessage = "";
+    _filteredPathalogyTest.clear();
+    _currentPage = 1;
+    _isLastPage = false;
+
     final prefs = await SharedPreferences.getInstance();
     final cachedData = prefs.getString('cached_pathalogy_tests');
-    _pathalogyTestListModel = null;
 
     try {
       var response = await _repository.getNavLabScanResponse();
 
       if (response != null && response.success == true && response.data != null) {
-        print("✅ Home Service List Fetched Successfully");
+        print("✅ Pathology Test List Fetched Successfully");
 
         String newData = json.encode(response.toJson());
         if (cachedData == null || cachedData != newData) {
@@ -110,27 +124,27 @@ class PathalogyTestApiProvider with ChangeNotifier {
         _pathalogyTestListModel = response;
         _filteredPathalogyTest = loadMore ? [..._filteredPathalogyTest, ...response.data!] : response.data!;
         _currentPage++;
+
         _setLoadingState(false);
         return true;
       } else {
-        _pathalogyTestListModel = null;
-        _setErrorState(response.message ?? "Failed to fetch service list");
+        _setErrorState(response.message ?? "Failed to fetch pathology test list");
       }
     } catch (error) {
-      _pathalogyTestListModel = null;
       _setErrorState("⚠️ API Error: $error");
     }
 
     return false;
   }
+
   /// **Filter Packages by Search Query**
   void filterPathologyTestList(String query) {
     if (_pathalogyTestListModel?.data == null || query.isEmpty) {
       _filteredPathalogyTest = _pathalogyTestListModel?.data ?? [];
     } else {
       _filteredPathalogyTest = _pathalogyTestListModel!.data!
-          .where((package) =>
-      package.testDetailName?.toLowerCase().contains(query.toLowerCase()) ?? false)
+          .where((test) =>
+      test.testDetailName?.toLowerCase().contains(query.toLowerCase()) ?? false)
           .toList();
     }
     notifyListeners();
@@ -161,5 +175,8 @@ class PathalogyTestApiProvider with ChangeNotifier {
     return false;
   }
 
+  Future<void> refreshgetPathalogyTestList(BuildContext context) async {
+    await getPathalogyTestList(context, forceRefresh: true);
+  }
 
 }

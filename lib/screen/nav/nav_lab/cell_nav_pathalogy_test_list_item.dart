@@ -45,22 +45,37 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
 
   @override
   void initState() {
+    super.initState();
     Future.microtask(() {
       // Clear old data and fetch new service details
       Provider.of<PathalogyTestApiProvider>(context, listen: false)
           .loadCachedNavPathalogyTests(context);
     });
+    // Scroll listener for pagination
     _scrollController.addListener(() {
+      final provider =
+      Provider.of<PathalogyTestApiProvider>(context, listen: false);
       if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 50) {
-        final provider =
-            Provider.of<PathalogyTestApiProvider>(context, listen: false);
-        if (!provider.isFetchingMore) {
-          provider.getPathalogyTestList(context, loadMore: true);
-        }
+          _scrollController.position.maxScrollExtent - 100 &&
+          !provider.isFetchingMore &&
+          !provider.isLastPage) {
+        provider.getPathalogyTestList(context, loadMore: true);
       }
     });
-    super.initState();
+  }
+
+  Future<void> _refreshData() async {
+    await  Provider.of<PathalogyTestApiProvider>(context, listen: false)
+        .refreshgetPathalogyTestList(context);
+
+    print("refresh data is loaded");
+
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -124,92 +139,100 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
     print("BuildRateList ");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
-      child: ListView.builder(
-        scrollDirection: Axis.vertical,
-        itemCount: provider.filteredPathalogyTest.length +
-            (provider.isFetchingMore ? 1 : 0),
-        // itemCount: pathalogyTestList.length,
-        itemBuilder: (context, index) {
-          final item = pathalogyTestList[index];
-          // ✅ Calculate dynamic padding
-          EdgeInsets itemPadding = EdgeInsets.only(
-            top: index == 0 ? 8.0 : 0.0,
-            // Extra padding for first item
-            bottom: index == pathalogyTestList.length - 1 ? 8.0 : 0.0,
-            // Extra padding for last item
-            left: 0.0,
-            right: 0.0,
-          );
-          return InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ViewDetailPathalogyTestScreen(
-                    patahlogyTestName: item.testDetailName.toString(),
-                    pathalogyTestSlug: item.slug.toString(),
+      child: RefreshIndicator(
+        onRefresh: _refreshData,
+        child: ListView.builder(
+          controller: _scrollController, // Attach scroll controller
+          scrollDirection: Axis.vertical,
+          itemCount: provider.filteredPathalogyTest.length +
+              (provider.isFetchingMore ? 1 : 0),
+          // itemCount: pathalogyTestList.length,
+          itemBuilder: (context, index) {
+            if (index == provider.filteredPathalogyTest.length) {
+              return Center(child: CircularProgressIndicator()); // Show loader
+            }
+            final item = provider.filteredPathalogyTest[index];
+            // final item = pathalogyTestList[index];
+            // ✅ Calculate dynamic padding
+            EdgeInsets itemPadding = EdgeInsets.only(
+              top: index == 0 ? 8.0 : 0.0,
+              // Extra padding for first item
+              bottom: index == pathalogyTestList.length - 1 ? 8.0 : 0.0,
+              // Extra padding for last item
+              left: 0.0,
+              right: 0.0,
+            );
+            return InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ViewDetailPathalogyTestScreen(
+                      patahlogyTestName: item.testDetailName.toString(),
+                      pathalogyTestSlug: item.slug.toString(),
+                    ),
                   ),
-                ),
-              );
-              print(
-                  "Test naem => ${item.testDetailName}  Test Slug => ${item.slug} ");
-            },
-            splashColor: AppColors.whiteColor,
-            highlightColor: AppColors.whiteColor,
-            child: Padding(
-              padding: itemPadding,
-              child: Card(
-                color: AppColors.primary,
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 0.0,
-                  vertical: 8.0,
-                ),
-                shape: RoundedRectangleBorder(
-                    // side: BorderSide(
-                    //     color: AppColors.txtLightGreyColor, width: 0.2),
-                    borderRadius: BorderRadius.circular(5.0),
-                    side:
-                        BorderSide(color: AppColors.txtGreyColor, width: 0.12)),
-                elevation: 0,
-                // Elevation for shadow effect
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 5.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          // color: AppColors.pinkColor,
-                          colors: [Color(0xFFF9F7F4), Color(0xFFF1FBFC)],
-                          // Lighter shades
-                          begin: Alignment.bottomLeft,
-                          end: Alignment.topRight,
-                          stops: [0.4, 0.7],
-                          tileMode: TileMode.repeated,
+                );
+                print(
+                    "Test naem => ${item.testDetailName}  Test Slug => ${item.slug} ");
+              },
+              splashColor: AppColors.whiteColor,
+              highlightColor: AppColors.whiteColor,
+              child: Padding(
+                padding: itemPadding,
+                child: Card(
+                  color: AppColors.primary,
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 0.0,
+                    vertical: 8.0,
+                  ),
+                  shape: RoundedRectangleBorder(
+                      // side: BorderSide(
+                      //     color: AppColors.txtLightGreyColor, width: 0.2),
+                      borderRadius: BorderRadius.circular(5.0),
+                      side:
+                          BorderSide(color: AppColors.txtGreyColor, width: 0.12)),
+                  elevation: 0,
+                  // Elevation for shadow effect
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 5.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            // color: AppColors.pinkColor,
+                            colors: [Color(0xFFF9F7F4), Color(0xFFF1FBFC)],
+                            // Lighter shades
+                            begin: Alignment.bottomLeft,
+                            end: Alignment.topRight,
+                            stops: [0.4, 0.7],
+                            tileMode: TileMode.repeated,
+                          ),
+                          // image: DecorationImage(
+                          //     fit: BoxFit.fill,
+                          //     image: AssetImage("assets/images/pattern7.png")),
+                          // color: AppColors.lightYellowColor,
+                          borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(5),
+                              bottomLeft: Radius.circular(5))),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 15),
+                        child: Text(
+                          item.testDetailName.toString(),
+                          // '${category['title']} (${category['count']})',
+                          style: AppTextStyles.heading1(context,
+                              overrideStyle: TextStyle(
+                                  fontSize:
+                                      ResponsiveHelper.fontSize(context, 12))),
                         ),
-                        // image: DecorationImage(
-                        //     fit: BoxFit.fill,
-                        //     image: AssetImage("assets/images/pattern7.png")),
-                        // color: AppColors.lightYellowColor,
-                        borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(5),
-                            bottomLeft: Radius.circular(5))),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0, vertical: 15),
-                      child: Text(
-                        item.testDetailName.toString(),
-                        // '${category['title']} (${category['count']})',
-                        style: AppTextStyles.heading1(context,
-                            overrideStyle: TextStyle(
-                                fontSize:
-                                    ResponsiveHelper.fontSize(context, 12))),
                       ),
                     ),
                   ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }

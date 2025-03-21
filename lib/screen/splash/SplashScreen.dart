@@ -57,39 +57,51 @@ class _SplashScreenState extends State<SplashScreen> {
     String userEmail = StorageHelper().getEmail(); // Fetch stored email
     String userToken = StorageHelper().getUserAccessToken(); // Get stored token
     String? userRole = StorageHelper().getRole(); // Get stored role
-    if (userEmail.isNotEmpty) {
-      // Navigator.of(context).pushReplacement(
-      //   MaterialPageRoute(builder: (context) => BottomNavigationScreen()), // Replace with your home screen
-      // );
+    // if (userEmail.isNotEmpty) {
+    //   // Navigator.of(context).pushReplacement(
+    //   //   MaterialPageRoute(builder: (context) => BottomNavigationScreen()), // Replace with your home screen
+    //   // );
+    //
+    //   if (userRole == "user") {
+    //     Navigator.of(context).pushReplacement(
+    //       MaterialPageRoute(builder: (context) => BottomNavigationScreen()),
+    //     );
+    //
+    //   } else if (userRole == "delivery_boy") {
+    //     Navigator.of(context).pushReplacement(
+    //       MaterialPageRoute(builder: (context) => DeliveryBoyDashboardScreen()),
+    //     );
+    //
+    //   } else {
+    //     Navigator.pushReplacement(
+    //       context,
+    //       MaterialPageRoute(builder: (context) => UserSelectionScreen()),
+    //     );
+    //   }
+    // } else {
+    //   Navigator.of(context).pushReplacement(
+    //     MaterialPageRoute(builder: (context) => UserSelectionScreen()),
+    //     // MaterialPageRoute(builder: (context) => LoginScreen()),
+    //   );
+    // }
 
+    if (userRole == "user") {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => BottomNavigationScreen()),
+      );
 
-      if (userRole == "user") {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => BottomNavigationScreen()),
-        );
-
-      } else if (userRole == "delivery_boy") {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => DeliveryBoyDashboardScreen()),
-        );
-
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => UserSelectionScreen()),
-        );
-      }
-
-
-
-
+    } else if (userRole == "delivery_boy") {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => DeliveryBoyDashboardScreen()),
+      );
 
     } else {
-      Navigator.of(context).pushReplacement(
+      Navigator.pushReplacement(
+        context,
         MaterialPageRoute(builder: (context) => UserSelectionScreen()),
-        // MaterialPageRoute(builder: (context) => LoginScreen()),
       );
     }
+
 
 
 

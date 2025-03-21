@@ -11,8 +11,11 @@ import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:healthians/ui_helper/app_text_styles.dart';
 import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:provider/provider.dart';
 
 import '../../base_widgets/common/custom_offer_dialog_popup.dart';
+import '../nav/nav_home/frquently_pathalogy_test/controller/frequently_pathalogy_test_provider.dart';
+import '../nav/nav_home/health_concern/controller/health_concern_provider.dart';
 import '../nav/nav_home/home_checkups_organs_setion.dart';
 import '../nav/nav_home/home_contact_setion.dart';
 import '../nav/nav_home/home_lab_test_setion.dart';
@@ -22,11 +25,13 @@ import '../nav/nav_home/home_radiology_setion.dart';
 import '../nav/nav_home/home_services_setion.dart';
 import '../nav/nav_home/home_slider_2_setion.dart';
 import '../cart/cart_list_screen.dart';
+import '../nav/nav_home/slider/controller/home_banner_api_provider.dart';
+import '../service/controller/service_scans_provider.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(int) onTabChange;
 
-   HomeScreen({required this.onTabChange, Key? key}) : super(key: key);
+  HomeScreen({required this.onTabChange, Key? key}) : super(key: key);
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -57,18 +62,43 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _checkAndShowDialog();
+    Provider.of<ServiceApiProvider>(context, listen: false).loadCachedPackages();
+    Provider.of<HomeBannerApiProvider>(context, listen: false)
+        .loadCachedBanners();
+    Provider.of<HealthConcernApiProvider>(context, listen: false)
+        .getHealthConcernTagList(context);
+    Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false)
+        .loadCachedFrequentlyHomeLabTest();
+    Provider.of<HealthConcernApiProvider>(context, listen: false)
+        .getHealthConcernTagList(context);
   }
+
   Future<void> _checkAndShowDialog() async {
     bool isDialogShown = StorageHelper().getDialogShown();
     if (!isDialogShown) {
       if (mounted) {
-        await Future.delayed(Duration(milliseconds: 500)); // Delay to allow UI rendering
-        showSpecialOfferDialog(context); // Show dialog only if it hasn't been shown
+        await Future.delayed(
+            Duration(milliseconds: 500)); // Delay to allow UI rendering
+        showSpecialOfferDialog(
+            context); // Show dialog only if it hasn't been shown
         StorageHelper().setDialogShown(true); // Mark dialog as shown
       }
     }
     // await Future.delayed(Duration(milliseconds: 500)); // Small delay
     // showSpecialOfferDialog(context); // Show dialog only if it hasn't been shown
+  }
+
+  Future<void> _refreshData() async {
+    await Provider.of<ServiceApiProvider>(context, listen: false).fetchScansList();
+    await Provider.of<HomeBannerApiProvider>(context, listen: false) .loadCachedBanners();
+    await Provider.of<HealthConcernApiProvider>(context, listen: false).getHealthConcernTagList(context);
+    await Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false).loadCachedFrequentlyHomeLabTest();
+    await Provider.of<HealthConcernApiProvider>(context, listen: false)
+        .getHealthConcernTagList(context);
+
+
+    print("refresh data is loaded");
+
   }
 
   @override
@@ -85,32 +115,39 @@ class _HomeScreenState extends State<HomeScreen> {
               HomeToolbarSection(),
               // Banner Section
               Expanded(
-                child: SingleChildScrollView(
-                  child: Container(
-                    color: Colors.white,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        HomeFirstServiceSection(onTabChange: widget.onTabChange),
-                        HomeSliderSection(),
-                        HomeContactSection(),
-                        // SizedBox(height: 10),
-                        HomeServicesSection(
-                          sectionHeading: "Our Best Radiology",
-                        ),
-                        // SizedBox(height: 15),
-                        // Grid Title
-                        HomeSlider2Section(),
-                        HealthConcernSetion(),
-                        HomeLabTestSection( sectionHeading: "Frequently Lab Test", ),
-                        HomeHealthPackageSection(),
-                        // HomeCheckupsVitalSection(),
-                        // HomeRadiologySection(),
-                        // HorizontalAutoScrollingList(),
-                        // HomeStatsSection(),
-                        // HomeGoogleReviewSection(sectionHeading: "What Ours Patients Say",),
-                        HomeEndingSection()
-                      ],
+                child: RefreshIndicator(
+                  onRefresh: _refreshData,
+                  child: SingleChildScrollView(
+                    physics: AlwaysScrollableScrollPhysics(),
+                    child: Container(
+                      color: Colors.white,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          HomeFirstServiceSection(
+                              onTabChange: widget.onTabChange),
+                          HomeSliderSection(),
+                          HomeContactSection(),
+                          // SizedBox(height: 10),
+                          HomeServicesSection(
+                            sectionHeading: "Our Best Radiology",
+                          ),
+                          // SizedBox(height: 15),
+                          // Grid Title
+                          HomeSlider2Section(),
+                          HealthConcernSetion(),
+                          HomeLabTestSection(
+                            sectionHeading: "Frequently Lab Test",
+                          ),
+                          HomeHealthPackageSection(),
+                          // HomeCheckupsVitalSection(),
+                          // HomeRadiologySection(),
+                          // HorizontalAutoScrollingList(),
+                          // HomeStatsSection(),
+                          // HomeGoogleReviewSection(sectionHeading: "What Ours Patients Say",),
+                          HomeEndingSection()
+                        ],
+                      ),
                     ),
                   ),
                 ),

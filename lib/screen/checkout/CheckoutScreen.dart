@@ -509,7 +509,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         //     isRequired: true),
 
         CheckoutTextField(
-          label: "Name",
+          label: "Name*",
           hint: "Enter name",
           controller: fullNameController,
           isRequired: true,
@@ -519,7 +519,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         //     keyboardType: TextInputType.number, isRequired: true),
 
         CheckoutTextField(
-          label: "Age",
+          label: "Age*",
           hint: "Enter age",
           controller: ageController,
           isRequired: true,
@@ -593,7 +593,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         // buildTextField( "City , Address*", "City , Address", cityAddressController),
 
         CheckoutTextField(
-          label: "Address",
+          label: "Address*",
           hint: "123 Main Street, City, Country",
           controller: cityAddressController,
         ),

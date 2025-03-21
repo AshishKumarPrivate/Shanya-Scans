@@ -1,4 +1,6 @@
 import 'package:dio/dio.dart';
+import 'package:healthians/deliveryBoy/model/ChangeOrderStatusModelResponse.dart';
+import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderDetailModel.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryLoginModelResponse.dart';
 import 'package:healthians/screen/auth/model/LoginModel.dart';
 import 'package:healthians/screen/auth/model/UpdateProfileModel.dart';
@@ -16,6 +18,7 @@ import 'package:healthians/screen/service/model/HomeServiceDetailModel.dart';
 import 'package:healthians/screen/service/model/HomeServiceListModel.dart';
 import 'package:healthians/screen/service/model/ServiceDetailRateListModel.dart';
 
+import '../deliveryBoy/model/DeliveryOrderLIstModel.dart';
 import '../screen/auth/model/CreateUser.dart';
 import '../screen/auth/model/ListModel.dart';
 import '../screen/auth/model/ObjectModel.dart';
@@ -29,8 +32,8 @@ import 'dio_helper.dart';
 class Repository {
   static final DioHelper _dioHelper = DioHelper();
 
-  // static const String baseUrl = "https://dbsanya.drmanasaggarwal.com";
-  static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
+  static const String baseUrl = "https://dbsanya.drmanasaggarwal.com";
+  // static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
 
 
   //&&&&& Delivery boy url &&&&&&&&&
@@ -399,6 +402,9 @@ class Repository {
     return TermsConditionsPrivacyRefundPolicyModel.fromJson(response);
   }
 
+
+
+
   // &&&&&&&&&&&&&&&& ORDER API &&&&&&&&&&&&&&&&&&&&&&&&&&
   Future<CreateOrder2ModelResponse> createOrderResponse(
       Object requestBody) async {
@@ -408,7 +414,6 @@ class Repository {
     return CreateOrder2ModelResponse.fromJson(response);
     // return LogInModel.fromJson(response);
   }
-
   // order history
   Future<MyOrderHistoryListModel> getOrderHistoryResponse(String userId) async {
     // var response =
@@ -428,43 +433,10 @@ class Repository {
     // return LogInModel.fromJson(response);
   }
 
-//
-// //GET API
-// Future<FrequentlyLabTestDetailModel> getTestDetailResponse(
-//     String TestSlug) async {
-//   // var response =
-//   //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
-//   Map<String, dynamic> response =
-//       await _dioHelper.get(url: '$baseUrl/api/v1/package/more/$TestSlug');
-//   return FrequentlyLabTestDetailModel.fromJson(response);
-// }
-//
-
-// Future<dynamic> autoCompletePlaces (String placeName) async {
-//   Map<String, dynamic> response = await _dioHelper.get(url: 'https://geocoding-api.open-meteo.com/v1/search?name=$placeName&count=5');
-//   return AutoCompletePlace.fromJson(response);
-// }
-
-// Future<UserProfileModel> userProfile () async {
-//   Map<String, dynamic> response = await _dioHelper.get(url: '$baseUrl/api/v1/auth/profile', isAuthRequired: true);
-//   return UserProfileModel.fromJson(response);
-// }
-//
-// Future<ChangeProfileModel> changeProfile (Object requestBody) async {
-//   Map<String, dynamic> response = await _dioHelper.uploadFile(
-//       url: '$baseUrl/api/v1/files/upload', requestBody: requestBody);
-//   return ChangeProfileModel.fromJson(response);
-// }
-//
-//
-// Future<CurrentWeatherModel> currentWeather (String lat, String lng) async {
-//   Map<String, dynamic> response = await _dioHelper.get(url: 'https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lng&current_weather=true');
-//   return CurrentWeatherModel.fromJson(response);
-// }
 
 
 
-// ******************************  Shanya Scans Delivery Boy API  **************************************
+ // ✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨  Shanya Scans Delivery Boy API   ✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨
 
   // user login
   Future<DeliveryLoginModelResponse> deliveryBoyLogin(Map<String, dynamic> requestBody) async {
@@ -508,5 +480,29 @@ class Repository {
     }
   }
 
+  // order list
+  Future<DeliveryBoyOrderListModel> getDeliveryBoyOrderList(String deliveryBoyId) async {
+    // var response =
+    //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
+    Map<String, dynamic> response =
+    await _dioHelper.get(url: '$baseUrl/api/v1/collection/detail/${deliveryBoyId}');
+    return DeliveryBoyOrderListModel.fromJson(response);
+  }
+
+  Future<DeliveryBoyOrderDetailModel> getDeliveryBoyOrderDetail(String orderId) async {
+    // var response =
+    //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
+    Map<String, dynamic> response =
+    await _dioHelper.get(url: '$baseUrl/api/v1/order/home-collection/${orderId}');
+    return DeliveryBoyOrderDetailModel.fromJson(response);
+  }
+
+  //POST API
+  Future<ChangeOrderStatusModelResponse> changeOrderStatus(Object requestBody,String orderId) async {
+    Map<String, dynamic> response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/order/change-status/${orderId}', requestBody: requestBody);
+
+    return ChangeOrderStatusModelResponse.fromJson(response);
+  }
 
 }

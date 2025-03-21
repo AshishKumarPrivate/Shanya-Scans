@@ -29,11 +29,22 @@ class DateUtil {
   }
 
   /// ✅ Converts a timestamp (milliseconds) to a formatted date string.
-  static String formatTimestamp({
-    required int timestamp,
-    String format = "dd-MM-yy",
-  }) {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    return DateFormat(format).format(dateTime);
+  static String formatISODate(String dateString) {
+    try {
+      DateTime date = DateTime.parse(dateString);
+      return DateFormat("dd MMM yyyy").format(date);
+    } catch (e) {
+      return "Invalid Date";
+    }
+  }
+
+  /// ✅ Formats ISO 8601 time string to 'hh:mm a' (12-hour format with AM/PM)
+  static String formatISOTime(String timeString) {
+    try {
+      DateTime time = DateTime.parse(timeString);
+      return DateFormat("hh:mm a").format(time); // Output: 05:05 PM
+    } catch (e) {
+      return "Invalid Time";
+    }
   }
 }

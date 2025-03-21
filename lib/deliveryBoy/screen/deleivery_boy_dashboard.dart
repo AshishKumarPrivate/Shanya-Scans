@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:healthians/deliveryBoy/screen/widget/DelliveryOrderCard.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
+import 'package:healthians/deliveryBoy/screen/widget/DeliveryOrderList.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
-
+import '../../ui_helper/app_colors.dart';
 import '../controller/DeliveryOrdersProvider.dart';
-import '../model/DeliveryOrderLIstModel.dart';
 
 class DeliveryBoyDashboardScreen extends StatefulWidget {
   @override
@@ -17,193 +14,146 @@ class DeliveryBoyDashboardScreen extends StatefulWidget {
 class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  DateTime? lastBackPressedTime;
 
   @override
   void initState() {
     super.initState();
-    // Set status bar color correctly
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: AppColors.deliveryPrimary,
-      statusBarIconBrightness: Brightness.light, // Ensure icons are visible
-    ));
-
     _tabController = TabController(length: 3, vsync: this);
-    Provider.of<DeliveryOrdersProvider>(context, listen: false).fetchOrders();
+
+    // Fetch orders based on tab selection
+    _tabController.addListener(() {
+      if (!_tabController.indexIsChanging) {
+        _fetchOrdersForTab(_tabController.index);
+      }
+    });
+
+    // Fetch initial tab orders (Pending by default)
+    _fetchOrdersForTab(0);
   }
-  @override
-  void dispose() {
-    // ✅ Reset Status Bar Color when leaving the screen
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: AppColors.primary, // Restore default color
-      statusBarIconBrightness: Brightness.light, // Restore default icon brightness
-    ));
-    super.dispose();
+
+  void _fetchOrdersForTab(int index) {
+    final provider = Provider.of<DeliveryOrdersProvider>(context, listen: false);
+    if (index == 0) {
+      provider.fetchDeliveryBoyOrderList("confirmed");
+    } else if (index == 1) {
+      provider.fetchDeliveryBoyOrderList("ongoing");
+    } else if (index == 2) {
+      provider.fetchDeliveryBoyOrderList("completed");
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    Future.microtask(() {
-      SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-        statusBarColor: AppColors.deliveryPrimary,
-        statusBarIconBrightness: Brightness.light, // Ensure light icons
-      ));
-    });
-
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Custom Header with Summary & Tabs
-            _buildHeader(),
-
-            // Tab Views (Expands to full screen)
-            Expanded(
-              child: Consumer<DeliveryOrdersProvider>(
-                builder: (context, orderProvider, child) {
-                  return TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _buildOrderList(orderProvider.pendingOrders),
-                      _buildOrderList(orderProvider.ongoingOrders),
-                      _buildOrderList(orderProvider.deliveredOrders),
-                    ],
-                  );
-                },
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        backgroundColor: Colors.grey[200], // Subtle background
+        body: SafeArea(
+          child: Column(
+            children: [
+              _buildOrderSummary(),
+              _buildTabs(),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    DeliveryOrderList(status: "confirmed"),
+                    DeliveryOrderList(status: "ongoing"),
+                    DeliveryOrderList(status: "completed"),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
-  /// 🔹 **Custom Header**
-  Widget _buildHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        AppBar(
-          title: Text(
-            "Delivery Dashboard",
-            style: TextStyle(fontSize: 16, color: Colors.white),
-          ),
-          backgroundColor: AppColors.deliveryPrimary,
-        ),
-        _buildOrderSummary(),
-        TabBar(
-          controller: _tabController,
-          tabs: [
-            Tab(text: "Pending"),
-            Tab(text: "Ongoing"),
-            Tab(text: "Delivered"),
-          ],
-        ),
-      ],
-    );
-  }
-
-  /// 🔹 **Order Summary Container**
+  /// **Custom Header with Order Summary Above Tabs**
   Widget _buildOrderSummary() {
-    return Consumer<DeliveryOrdersProvider>(
-      builder: (context, orderProvider, child) {
-        int totalOrders = orderProvider.pendingOrders.length +
-            orderProvider.ongoingOrders.length +
-            orderProvider.deliveredOrders.length;
-
-        // Get the latest pending order (if available)
-        DeliveryBoyOrderListModel? latestOrder =
-            orderProvider.pendingOrders.isNotEmpty
-                ? orderProvider.pendingOrders.first
-                : null;
-
-        return Container(
-          width: double.infinity,
-          padding: EdgeInsets.all(12),
-          margin: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.blue.shade700, Colors.purple.shade400],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                  color: Colors.blue.shade900,
-                  blurRadius: 6,
-                  spreadRadius: 2,
-                  offset: Offset(2, 3)),
-            ],
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(12),
+      margin: EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [Colors.blue.shade700, Colors.purple.shade400],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.shade900.withOpacity(0.5),
+            blurRadius: 6,
+            spreadRadius: 2,
+            offset: Offset(2, 3),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 🔔 Notification Header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // 🔔 Pulsating Notification Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Total Orders: $totalOrders",
-                    style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
-                  ),
-                  _buildPulsatingIcon(), // Animated Notification Icon
-                ],
+              Text(
+                "Total Orders: 10",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white),
               ),
-              SizedBox(height: 10),
-
-              // 🚀 Shimmer Effect for New Order
-              if (latestOrder != null)
-                Shimmer.fromColors(
-                  baseColor: Colors.white,
-                  highlightColor: Colors.yellowAccent,
-                  child: Row(
-                    children: [
-                      Icon(Icons.delivery_dining,
-                          color: Colors.greenAccent, size: 22),
-                      SizedBox(width: 6),
-                      Text(
-                        "New Order Assigned!",
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-              SizedBox(height: 8),
-
-              // 📦 Order Details with Icons
-              if (latestOrder != null) ...[
-                // mai.js
-                _buildOrderDetail(
-                    Icons.receipt_long, "Order ID: ${latestOrder.id}323d322"),
-                _buildOrderDetail(
-                    Icons.location_on, "Address: ${latestOrder.address}",
-                    isExpanded: true),
-                _buildOrderDetail(
-                    Icons.access_time, "Sample Collection: 20 minutes"),
-              ] else
-                Center(
-                  child: Text(
-                    "No New Orders Assigned.",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white70),
-                  ),
-                ),
+              _buildPulsatingIcon(),
             ],
           ),
-        );
-      },
+          SizedBox(height: 10),
+
+          // Shimmer effect for new orders
+          Shimmer.fromColors(
+            baseColor: Colors.white,
+            highlightColor: Colors.yellowAccent,
+            child: Row(
+              children: [
+                Icon(Icons.delivery_dining, color: Colors.greenAccent, size: 22),
+                SizedBox(width: 6),
+                Text(
+                  "New Order Assigned!",
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+
+        ],
+      ),
     );
   }
 
-  /// 🔹 **Reusable Order Detail Row**
+  /// **Build Tab Bar**
+  Widget _buildTabs() {
+    return Container(
+      color: AppColors.deliveryPrimary,
+      child: TabBar(
+        controller: _tabController,
+        labelColor: Colors.white,
+        indicatorColor: Colors.white,
+        tabs: [
+          Tab(text: "Pending"),
+          Tab(text: "Ongoing"),
+          Tab(text: "Delivered",),
+        ],
+      ),
+    );
+  }
+
+  /// **Reusable Order Detail Row**
   Widget _buildOrderDetail(IconData icon, String text,
       {bool isExpanded = false}) {
     return Padding(
@@ -214,16 +164,17 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
           SizedBox(width: 6),
           isExpanded
               ? Expanded(
-                  child: Text(text,
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                      overflow: TextOverflow.ellipsis))
-              : Text(text, style: TextStyle(fontSize: 16, color: Colors.white)),
+              child: Text(text,
+                  style: TextStyle(fontSize: 16, color: Colors.white),
+                  overflow: TextOverflow.ellipsis))
+              : Text(text,
+              style: TextStyle(fontSize: 16, color: Colors.white)),
         ],
       ),
     );
   }
 
-  /// 🔔 **Animated Pulsating Notification Icon**
+  /// **Animated Pulsating Notification Icon**
   Widget _buildPulsatingIcon() {
     return TweenAnimationBuilder(
       tween: Tween<double>(begin: 1, end: 1.4),
@@ -243,16 +194,17 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
     );
   }
 
-  /// 🔹 **Order List Builder**
-  Widget _buildOrderList(List<DeliveryBoyOrderListModel> orders) {
-    if (orders.isEmpty) {
-      return Center(child: Text("No Orders Found"));
+  /// **Handles Back Button Press**
+  Future<bool> _onWillPop() async {
+    final currentTime = DateTime.now();
+    if (lastBackPressedTime == null ||
+        currentTime.difference(lastBackPressedTime!) > Duration(seconds: 2)) {
+      lastBackPressedTime = currentTime;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Press back again to exit the app")),
+      );
+      return false;
     }
-    return ListView.builder(
-      itemCount: orders.length,
-      itemBuilder: (context, index) {
-        return DeliveryOrderCard(order: orders[index]);
-      },
-    );
+    return true;
   }
 }

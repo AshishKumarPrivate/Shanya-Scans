@@ -78,6 +78,13 @@ class _HealthPackageScreenState extends State<HealthPackageScreen> {
     });
   }
 
+  Future<void> _refreshData() async {
+    await  Provider.of<HealthPacakgeListApiProvider>(context, listen: false)
+        .refreshBottomNavPackageList( context);
+    print("refresh data is loaded");
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -127,36 +134,39 @@ class _HealthPackageScreenState extends State<HealthPackageScreen> {
                       //     provider.navPackageListlModel?.data ?? [];
                       // Set the default selectedTabIndex and selectedTabId only when the data is first loaded
                       final packageList = provider.filteredPackages;
-                      return ListView.builder(
-                        itemCount: packageList.length,
-                        itemBuilder: (context, index) {
-                          final item = packageList[index];
-                          return CellNavPackageListItem(
-                            item: item,
-                            borderRadius: 10.0,
-                            borderColor: AppColors.txtLightGreyColor,
-                            borderWidth: 0.3,
-                            elevation: 1,
-                            margin: EdgeInsets.symmetric(vertical: 10),
-                            backgroundColor: Colors.white,
-                            padding: EdgeInsets.all(0.0),
-                            onTap: () {
-                              // FocusScope.of(context).unfocus();
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ViewDetailBottomNavPackageScreen(
-                                    packagetName: item.packageName.toString(),
-                                    packageSlug: item.slug.toString(),
+                      return RefreshIndicator(
+                        onRefresh: _refreshData,
+                        child: ListView.builder(
+                          itemCount: packageList.length,
+                          itemBuilder: (context, index) {
+                            final item = packageList[index];
+                            return CellNavPackageListItem(
+                              item: item,
+                              borderRadius: 10.0,
+                              borderColor: AppColors.txtLightGreyColor,
+                              borderWidth: 0.3,
+                              elevation: 1,
+                              margin: EdgeInsets.symmetric(vertical: 10),
+                              backgroundColor: Colors.white,
+                              padding: EdgeInsets.all(0.0),
+                              onTap: () {
+                                // FocusScope.of(context).unfocus();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ViewDetailBottomNavPackageScreen(
+                                      packagetName: item.packageName.toString(),
+                                      packageSlug: item.slug.toString(),
+                                    ),
                                   ),
-                                ),
-                              );
-                              FocusScope.of(context).unfocus();
-                              print("Container tapped: ${item.packageName}");
-                            },
-                          );
-                        },
+                                );
+                                FocusScope.of(context).unfocus();
+                                print("Container tapped: ${item.packageName}");
+                              },
+                            );
+                          },
+                        ),
                       );
                     },
                   ),

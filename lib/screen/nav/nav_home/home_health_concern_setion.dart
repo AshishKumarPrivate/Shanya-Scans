@@ -63,17 +63,31 @@ class _HealthConcernSetionState extends State<HealthConcernSetion> {
               }
               else if (provider.errorMessage.isNotEmpty) {
                 return Center(
-                  child: Text(
-                    provider.errorMessage,
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                  child: SizedBox(
+                    width: ResponsiveHelper.containerWidth(
+                        context, 50),
+                    height: ResponsiveHelper.containerWidth(
+                        context, 50),
+                    child: Image.asset(
+                      "assets/images/img_error.jpg",
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 );
               }
               final healthConcernList = provider.healthConcernPackageTagListModel?.data;
               if (healthConcernList == null || healthConcernList.isEmpty) {
                 return Center(
-                  child: Text("No health concerns available",
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: SizedBox(
+                    width: ResponsiveHelper.containerWidth(
+                        context, 50),
+                    height: ResponsiveHelper.containerWidth(
+                        context, 50),
+                    child: Image.asset(
+                      "assets/images/img_error.jpg",
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 );
               }
 

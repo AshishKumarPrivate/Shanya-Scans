@@ -125,6 +125,7 @@ class StorageHelper {
   String getUserName() {
     return sp.getString('user_name') ?? "";
   }
+
   void setEmail(String username) {
     sp.setString('email', username);
   }
@@ -141,8 +142,6 @@ class StorageHelper {
     return sp.getString('passwrod') ?? "";
   }
 
-
-
   void setPhoneNumber(String phoneNumber) {
     sp.setString('phoneNumber', phoneNumber);
   }
@@ -151,7 +150,6 @@ class StorageHelper {
     return sp.getString('phoneNumber') ?? "";
   }
 
-
   void setAge(String phoneNumber) {
     sp.setString('age', phoneNumber);
   }
@@ -159,8 +157,6 @@ class StorageHelper {
   String getAge() {
     return sp.getString('age') ?? "";
   }
-
-
 
   void setWhatsappNumber(String whatsappNumber) {
     sp.setString('whatsappNumber', whatsappNumber);
@@ -184,7 +180,6 @@ class StorageHelper {
     return sp.getString('user_profile_image') ?? "";
   }
 
-
   void setDialogShown(bool isDialogShown) {
     sp.setBool('isDialogShown', isDialogShown);
   }
@@ -193,7 +188,40 @@ class StorageHelper {
     return sp.getBool('isDialogShown') ?? false;
   }
 
-  //&&&&&&&&&&&&&&&&&&&&&&
+  //&&&&&&&&&&&&&&&&&&&&&&  DELIVERY BOY LOGIN &&&&&&&&&&&&&&&&&&&&&&
+
+  void setDeliveryBoyId(String username) {
+    sp.setString('delivery_boy_id', username);
+  }
+  String getDeliveryBoyId() {
+    return sp.getString('delivery_boy_id') ?? "";
+  }
+
+  void setDeliveryBoyEmail(String username) {
+    sp.setString('delivery_boy_email', username);
+  }
+
+  String getDeliveryBoyEmail() {
+    return sp.getString('delivery_boy_email') ?? "";
+  }
+  void setDeliveryBoyName(String username) {
+    sp.setString('delivery_boy_name', username);
+  }
+
+  String getDeliveryBoyName() {
+    return sp.getString('delivery_boy_name') ?? "";
+  }
+
+  void setDeliveryBoyPassword(String username) {
+    sp.setString('delivery_boy_password', username);
+  }
+
+  String getDeliveryBoyPassword() {
+    return sp.getString('delivery_boy_password') ?? "";
+  }
+
+
+
 
 
 

@@ -15,7 +15,6 @@ class DeliveryLoginScreen extends StatefulWidget {
 
 class _DeliveryLoginScreenState extends State<DeliveryLoginScreen> {
   final PageController _pageController = PageController();
-  int _currentPage = 0;
   final Uri _url = Uri.parse('https://codecrafter.co.in/');
 
   Future<void> _launchURL() async {

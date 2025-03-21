@@ -1,80 +1,28 @@
-class DeliveryBoyOrderListModel {
+class ChangeOrderStatusModelResponse {
   bool? success;
   String? message;
-  Data? data;
+  Order? order;
 
-  DeliveryBoyOrderListModel({this.success, this.message, this.data});
+  ChangeOrderStatusModelResponse({this.success, this.message, this.order});
 
-  DeliveryBoyOrderListModel.fromJson(Map<String, dynamic> json) {
+  ChangeOrderStatusModelResponse.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     message = json['message'];
-    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+    order = json['order'] != null ? new Order.fromJson(json['order']) : null;
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
     data['success'] = this.success;
     data['message'] = this.message;
-    if (this.data != null) {
-      data['data'] = this.data!.toJson();
+    if (this.order != null) {
+      data['order'] = this.order!.toJson();
     }
     return data;
   }
 }
 
-class Data {
-  String? sId;
-  String? name;
-  String? email;
-  String? password;
-  List<OrderDetails>? orderDetails;
-  String? createdAt;
-  String? updatedAt;
-  int? iV;
-
-  Data(
-      {this.sId,
-        this.name,
-        this.email,
-        this.password,
-        this.orderDetails,
-        this.createdAt,
-        this.updatedAt,
-        this.iV});
-
-  Data.fromJson(Map<String, dynamic> json) {
-    sId = json['_id'];
-    name = json['name'];
-    email = json['email'];
-    password = json['password'];
-    if (json['orderDetails'] != null) {
-      orderDetails = <OrderDetails>[];
-      json['orderDetails'].forEach((v) {
-        orderDetails!.add(new OrderDetails.fromJson(v));
-      });
-    }
-    createdAt = json['createdAt'];
-    updatedAt = json['updatedAt'];
-    iV = json['__v'];
-  }
-
-  Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['_id'] = this.sId;
-    data['name'] = this.name;
-    data['email'] = this.email;
-    data['password'] = this.password;
-    if (this.orderDetails != null) {
-      data['orderDetails'] = this.orderDetails!.map((v) => v.toJson()).toList();
-    }
-    data['createdAt'] = this.createdAt;
-    data['updatedAt'] = this.updatedAt;
-    data['__v'] = this.iV;
-    return data;
-  }
-}
-
-class OrderDetails {
+class Order {
   Report? report;
   String? sId;
   String? patientName;
@@ -90,13 +38,13 @@ class OrderDetails {
   String? bookingTime;
   String? reportStatus;
   String? userId;
+  String? assignedTo;
   String? orderDateTime;
   String? createdAt;
   String? updatedAt;
   int? iV;
-  String? assignedTo;
 
-  OrderDetails(
+  Order(
       {this.report,
         this.sId,
         this.patientName,
@@ -112,13 +60,13 @@ class OrderDetails {
         this.bookingTime,
         this.reportStatus,
         this.userId,
+        this.assignedTo,
         this.orderDateTime,
         this.createdAt,
         this.updatedAt,
-        this.iV,
-        this.assignedTo});
+        this.iV});
 
-  OrderDetails.fromJson(Map<String, dynamic> json) {
+  Order.fromJson(Map<String, dynamic> json) {
     report =
     json['report'] != null ? new Report.fromJson(json['report']) : null;
     sId = json['_id'];
@@ -135,11 +83,11 @@ class OrderDetails {
     bookingTime = json['bookingTime'];
     reportStatus = json['reportStatus'];
     userId = json['userId'];
+    assignedTo = json['assignedTo'];
     orderDateTime = json['orderDateTime'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     iV = json['__v'];
-    assignedTo = json['assignedTo'];
   }
 
   Map<String, dynamic> toJson() {
@@ -161,11 +109,11 @@ class OrderDetails {
     data['bookingTime'] = this.bookingTime;
     data['reportStatus'] = this.reportStatus;
     data['userId'] = this.userId;
+    data['assignedTo'] = this.assignedTo;
     data['orderDateTime'] = this.orderDateTime;
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;
-    data['assignedTo'] = this.assignedTo;
     return data;
   }
 }
@@ -188,43 +136,3 @@ class Report {
     return data;
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// class DeliveryBoyOrderListModel {
-//   final String id;
-//   final String customerName;
-//   final String status;
-//   final String address;
-//   final String dateTime;
-//
-//   DeliveryBoyOrderListModel({
-//     required this.id,
-//     required this.customerName,
-//     required this.status,
-//     required this.address,
-//     required this.dateTime,
-//   });
-//
-//   factory DeliveryBoyOrderListModel.fromJson(Map<String, dynamic> json) {
-//     return DeliveryBoyOrderListModel(
-//       id: json['id'],
-//       customerName: json['customer_name'],
-//       status: json['status'],
-//       address: json['address'],
-//       dateTime: json['date_time'],
-//     );
-//   }
-// }

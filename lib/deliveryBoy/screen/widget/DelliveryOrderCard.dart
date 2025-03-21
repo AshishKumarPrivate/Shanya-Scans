@@ -1,15 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryOrderLIstModel.dart';
+import 'package:healthians/util/date_formate.dart';
+
+import '../../../ui_helper/app_text_styles.dart';
+import '../../../ui_helper/responsive_helper.dart';
+import '../deleivery_boy_order_detail_screen.dart';
 
 class DeliveryOrderCard extends StatelessWidget {
-  final DeliveryBoyOrderListModel order;
+  final OrderDetails order;
 
   const DeliveryOrderCard({Key? key, required this.order}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+    return InkWell(
+      onTap: () {
+        print("Navigating to order details with ID: ${order.sId}");
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) =>  DeliveryBoyOrderDetailScreen(orderId: order.sId.toString(),)),
+        );
+
+
+      },
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
@@ -34,25 +47,76 @@ class DeliveryOrderCard extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    "Order ID: ${order.id}",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: Text(
+                      "${order.orderName}",
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      maxLines: 2, // Limits to 2 lines
+                      overflow: TextOverflow
+                          .ellipsis, // Adds "..." if text is too long
+                    ),
                   ),
-                  _buildStatusBadge(order.status),
+                  _buildStatusBadge(order.bookingStatus.toString()),
                 ],
               ),
+
               SizedBox(height: 6),
               // Customer & Address
-              Text(
-                "Customer: ${order.customerName}",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              Row(
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        "Patient Name: ",
+                        style: AppTextStyles.bodyText1(
+                          context,
+                          overrideStyle: TextStyle(
+                            color: Colors.black,
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        "${order.patientName.toString()}",
+                        style: AppTextStyles.bodyText1(
+                          context,
+                          overrideStyle: TextStyle(
+                            fontSize: ResponsiveHelper.fontSize(context, 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
 
               SizedBox(height: 5),
               Row(
                 children: [
                   Text(
-                    "Test Name: ",
+                    "Date:",
+                    style: AppTextStyles.bodyText1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: ResponsiveHelper.fontSize(context, 12),
+                      ),
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(width: 4),
+                  Expanded(
+                    child: Text(
+                      "${DateUtil.formatISODate(order.bookingDate.toString())}",
+                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  Text(
+                    "Time:",
                     style: TextStyle(fontSize: 13, color: Colors.black),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
@@ -60,7 +124,7 @@ class DeliveryOrderCard extends StatelessWidget {
                   SizedBox(width: 4),
                   Expanded(
                     child: Text(
-                      "Kidney Liver Test",
+                      "${DateUtil.formatISOTime(order.bookingTime.toString())}",
                       style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -68,74 +132,68 @@ class DeliveryOrderCard extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Icon(Icons.location_on, color: Colors.red, size: 18),
-                  SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      order.address,
-                      style: TextStyle(fontSize: 13, color: Colors.grey[700]),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 10),
-              Row(
-                children: [
-                  Text(
-                    "Payment Mode:",
-                    style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.black,
-                        fontWeight: FontWeight.bold),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  SizedBox(width: 4),
-                  Expanded(
-                    child: Text(
-                      "Cash on delivery ",
-                      style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
+              // SizedBox(height: 10),
+
+              // Row(
+              //   children: [
+              //     Icon(Icons.location_on, color: Colors.red, size: 18),
+              //     SizedBox(width: 4),
+              //     Expanded(
+              //       child: Text(
+              //         "Lucknow",
+              //         style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+              //         maxLines: 2,
+              //         overflow: TextOverflow.ellipsis,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+
+              // SizedBox(height: 10),
+              // Row(
+              //   children: [
+              //     Text(
+              //       "Payment Mode:",
+              //       style: TextStyle(
+              //           fontSize: 13,
+              //           color: Colors.black,
+              //           fontWeight: FontWeight.bold),
+              //       maxLines: 2,
+              //       overflow: TextOverflow.ellipsis,
+              //     ),
+              //     SizedBox(width: 4),
+              //     Expanded(
+              //       child: Text(
+              //         "Cash on delivery ",
+              //         style: TextStyle(
+              //             fontSize: 13,
+              //             color: Colors.black,
+              //             fontWeight: FontWeight.bold),
+              //         maxLines: 2,
+              //         overflow: TextOverflow.ellipsis,
+              //       ),
+              //     ),
+              //   ],
+              // ),
 
               // Call & Navigate Buttons (Replaced ElevatedButton with TextButton)
+              SizedBox(
+                height: 5,
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  TextButton.icon(
-                    onPressed: () {
-                      // Call action
-                    },
-                    icon: Icon(Icons.call, color: Colors.green),
-                    label: Text(
-                      "Call Customer",
-                      style: TextStyle(
-                          color: Colors.green, fontWeight: FontWeight.w600),
-                    ),
+                  Text(
+                    "Report: ${order.reportStatus == "not ready" ? "Not Ready" : "Pending"}",
+                    style: TextStyle(
+                        color: Colors.green, fontWeight: FontWeight.w600),
                   ),
-                  TextButton.icon(
-                    onPressed: () {
-                      // Navigation action
-                    },
-                    label: Text(
-                      "\u20B9 1200",
-                      style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
+                  Text(
+                    "\u20B9 ${order.orderPrice}",
+                    style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600),
                   ),
                 ],
               ),
@@ -150,13 +208,13 @@ class DeliveryOrderCard extends StatelessWidget {
   Widget _buildStatusBadge(String status) {
     Color badgeColor;
     switch (status) {
-      case "Pending":
+      case "confirmed":
         badgeColor = Colors.orange;
         break;
-      case "Ongoing":
+      case "ongoing":
         badgeColor = Colors.blue;
         break;
-      case "Delivered":
+      case "completed":
         badgeColor = Colors.green;
         break;
       default:
@@ -170,9 +228,20 @@ class DeliveryOrderCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        status,
+        // "${status == "confirmed" ? "Pending" : ""}",
+        status== "confirmed"
+            ? "Pending"
+            : status == "ongoing"
+            ? "Ongoing"
+            : status == "completed"
+            ? "Completed"
+            : "",
+
+
+
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       ),
     );
   }
+
 }
