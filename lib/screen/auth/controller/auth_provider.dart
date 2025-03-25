@@ -14,7 +14,10 @@ class AuthApiProvider with ChangeNotifier {
   final Repository _repository = Repository();
   bool _isLoading = false;
 
+  bool _isOtpSent = false; // Added to track OTP state
+
   bool get isLoading => _isLoading;
+  bool get isOtpSent => _isOtpSent;
 
   void _setLoading(bool value) {
     _isLoading = value;
@@ -25,7 +28,8 @@ class AuthApiProvider with ChangeNotifier {
     _setLoading(false);
   }
 
-  Future<void> signUpUser( BuildContext context, String name, String email, String password) async {
+  Future<void> signUpUser(
+      BuildContext context, String name, String email, String password) async {
     _setLoading(true);
     try {
       Map<String, dynamic> requestBody = {
@@ -104,7 +108,8 @@ class AuthApiProvider with ChangeNotifier {
     return false;
   }
 
-  Future<void> loginUser( BuildContext context, String email, String password) async {
+  Future<void> loginUser(
+      BuildContext context, String email, String password) async {
     _setLoading(true);
     try {
       Map<String, dynamic> requestBody = {"email": email, "password": password};
@@ -136,26 +141,32 @@ class AuthApiProvider with ChangeNotifier {
     }
   }
 
+  // Add method to manually update `isOtpSent`
+  void setOtpSent(bool value) {
+    _isOtpSent = value;
+    notifyListeners();
+  }
 
-  Future<void> forgetPassword( BuildContext context, String email, String password) async {
+
+  Future<bool> forgetPassword(BuildContext context, String email) async {
     _setLoading(true);
     try {
-      Map<String, dynamic> requestBody = {"email": email, "password": password};
-
+      Map<String, dynamic> requestBody = {"email": email};
       var response = await _repository.forgetPassword(requestBody);
 
-      if (response.success == true) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
+      if (response["success"] == true) {
+        setOtpSent(true); // Update OTP sent state
         showCustomSnackbarHelper.showSnackbar(
           context: context,
-          message: response.message ?? 'Login successful!',
+          message: response["message"] ?? "Reset link sent to your email!",
           backgroundColor: AppColors.primary,
           duration: Duration(seconds: 2),
         );
+        return true;
       } else {
         showCustomSnackbarHelper.showSnackbar(
           context: context,
-          message: "User not exist" ?? 'Login failed!',
+          message: response["message"] ?? "Failed to send reset link!",
           backgroundColor: Colors.red,
           duration: Duration(seconds: 2),
         );
@@ -163,12 +174,54 @@ class AuthApiProvider with ChangeNotifier {
     } on DioException catch (e) {
       _handleDioErrors(context, e);
     } catch (e) {
-      _handleUnexpectedErrors(context, e, "User not exist! Please SignUp");
+      _handleUnexpectedErrors(context, e, "Something went wrong!");
     } finally {
       _setLoading(false);
     }
+    return false;
   }
 
+  Future<bool> resetPassword(
+      BuildContext context, String email, String code, String newPassword) async {
+    _setLoading(true);
+    try {
+      Map<String, dynamic> requestBody = {
+        "email": email,
+        "code": code,
+        "newPassword": newPassword,
+      };
+
+      var response = await _repository.resetPassword(requestBody);
+
+      if (response["success"] == true) {
+        setOtpSent(false); // Update OTP sent state
+        StorageHelper().setPassword(newPassword);
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
+        showCustomSnackbarHelper.showSnackbar(
+          context: context,
+          message: response["message"] ?? "Password reset successfully!",
+          backgroundColor: AppColors.primary,
+          duration: Duration(seconds: 2),
+        );
+        return true;
+      } else {
+        showCustomSnackbarHelper.showSnackbar(
+          context: context,
+          message: response["message"] ?? "Password reset failed!",
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 2),
+        );
+      }
+    } on DioException catch (e) {
+      _handleDioErrors(context, e);
+    } catch (e) {
+      _handleUnexpectedErrors(context, e, "Something went wrong!");
+    } finally {
+      _setLoading(false);
+    }
+    return false;
+  }
   void logoutUser(BuildContext context) {
     _setLoading(true);
     Future.delayed(Duration(seconds: 1), () {
@@ -188,7 +241,8 @@ class AuthApiProvider with ChangeNotifier {
       StorageHelper().setEmail(response.data!.email.toString());
       StorageHelper().setPassword(response.data!.password.toString());
       StorageHelper().setPhoneNumber(response.data!.phoneNumber.toString());
-      StorageHelper() .setWhatsappNumber(response.data!.whatsappNumber.toString());
+      StorageHelper()
+          .setWhatsappNumber(response.data!.whatsappNumber.toString());
       await StorageHelper().saveOrderListFromApi(response);
     } else {
       await StorageHelper().clearOrderList();
@@ -207,14 +261,15 @@ class AuthApiProvider with ChangeNotifier {
 
       var response = await _repository.updateProfile(userId, requestBody);
 
-      if (response.success==true) {
-
+      if (response.success == true) {
         StorageHelper().setUserName(response.data!.name.toString());
         StorageHelper().setPhoneNumber(response.data!.phoneNumber.toString());
-        StorageHelper().setWhatsappNumber(response.data!.whatsappNumber.toString());
+        StorageHelper()
+            .setWhatsappNumber(response.data!.whatsappNumber.toString());
         StorageHelper().setAge(response.data!.age.toString());
 
-        Navigator.push(context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
         showCustomSnackbarHelper.showSnackbar(
           context: context,
           message: response.message.toString(),
@@ -254,7 +309,8 @@ class AuthApiProvider with ChangeNotifier {
     );
   }
 
-  void _handleUnexpectedErrors(  BuildContext context, dynamic e, String message) {
+  void _handleUnexpectedErrors(
+      BuildContext context, dynamic e, String message) {
     showCustomSnackbarHelper.showSnackbar(
       context: context,
       message: message,
@@ -262,6 +318,4 @@ class AuthApiProvider with ChangeNotifier {
       duration: Duration(seconds: 3),
     );
   }
-
-
 }

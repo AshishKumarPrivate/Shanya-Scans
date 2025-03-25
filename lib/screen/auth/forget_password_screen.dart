@@ -1,4 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:healthians/base_widgets/custom_rounded_container.dart';
+import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:provider/provider.dart';
+import 'package:healthians/screen/auth/controller/auth_provider.dart';
+import 'package:healthians/ui_helper/app_colors.dart';
+import '../../base_widgets/common/custom_text_field.dart';
+import '../../base_widgets/loading_indicator.dart';
+import '../../base_widgets/solid_rounded_button.dart';
+import '../../ui_helper/app_text_styles.dart';
+import '../../ui_helper/responsive_helper.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
@@ -7,74 +17,188 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _otpController = TextEditingController();
+  final TextEditingController _newPasswordController = TextEditingController();
+
+  final FocusNode _otpFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+  final _formKey = GlobalKey<FormState>();
+
+  String? _emailError, _otpError, _passwordError;
+
+  void _requestOtp() async {
+    final provider = context.read<AuthApiProvider>();
+    // String email = _emailController.text.trim();
+    //
+    // setState(() => _emailError = null);
+    //
+    // if (email.isEmpty || !_isValidEmail(email)) {
+    //   setState(() => _emailError = "Enter a valid email address");
+    //   return;
+    // }
+
+    bool success = await provider.forgetPassword(context, StorageHelper().getEmail());
+    if (success) {
+      setState(() {}); // Ensure UI updates
+    }
+  }
+
+  void _resetPassword() async {
+    final provider = context.read<AuthApiProvider>();
+    String otp = _otpController.text.trim();
+    String newPassword = _newPasswordController.text.trim();
+
+    setState(() {
+      _otpError = _passwordError = null;
+    });
+
+    if (otp.isEmpty) {
+      setState(() => _otpError = "Enter the OTP");
+      return;
+    }
+    if (newPassword.isEmpty) {
+      setState(() => _passwordError = "Invalid Password");
+      return;
+    }
+
+    await provider.resetPassword( context,StorageHelper().getEmail() , otp, newPassword);
+    setState(() {}); // Ensure UI updates
+  }
+
+  bool _isValidEmail(String email) {
+    final emailRegex =
+        RegExp(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+    return emailRegex.hasMatch(email);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _otpFocusNode.addListener(() => setState(() {}));
+    _passwordFocusNode.addListener(() => setState(() {}));
+  }
+
+
+  @override
+  void dispose() {
+    _otpController.dispose();
+    _newPasswordController.dispose();
+    _otpFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.transparent,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 20),
-            Text(
-              "Forgot password",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 8),
-            Text(
-              "Please enter your email to reset the password",
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            SizedBox(height: 20),
-            Text(
-              "Your Email",
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            SizedBox(height: 8),
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                hintText: "Enter your email",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey),
+      body: Consumer<AuthApiProvider>(
+        builder: (context, provider, child) {
+          return Container(
+            color: Colors.white,
+            padding: EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  provider.isOtpSent ? "Reset Password" : "Forgot Password",
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 14),
-              ),
-            ),
-            SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  // Implement Reset Password logic
-                  print("Reset Password for:"
-                      " ${_emailController.text}");
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo, // Adjusted button color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+                SizedBox(height: 8),
+                Text(
+                  provider.isOtpSent
+                      ? "Enter OTP and new password"
+                      : "Enter your email to receive OTP",
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+                SizedBox(height: 20),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      CustomRoundedContainer(
+                        borderRadius: 10,
+                        borderColor:AppColors.txtGreyColor.withAlpha(50),
+                        borderWidth: 1,
+                        elevation: 2,
+                        padding: EdgeInsets.all(10),
+                        backgroundColor: AppColors.endingGreyColor,
+                        child: Padding(
+                          padding: ResponsiveHelper.padding(context, 3, 0.2),
+                          child: Text(
+                            "${StorageHelper().getEmail()}",
+                            // "\u20B9${widget.pathalogyTestSlug}",
+                            style: AppTextStyles.bodyText1(context,
+                                overrideStyle: TextStyle(
+                                    fontSize: ResponsiveHelper.fontSize(
+                                        context, 12))),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 10),
+                      if (provider.isOtpSent) ...[
+
+                        CustomTextField(
+                          controller: _otpController,
+                          maxLength: 6,
+                          iconColor: AppColors.primary,
+                          shadowColor: AppColors.primary.withAlpha(70),
+                          borderColor: AppColors.primary,
+                          focusNode: _otpFocusNode,
+                          icon: Icons.keyboard_alt_outlined,
+                          hintText: "Enter Otp Code",
+                          title: "OTP",
+                          errorMessage: "Invalid OTP",
+                          keyboardType: TextInputType.number,
+                        ),
+                        SizedBox(height: 10),
+                        CustomTextField(
+                          controller: _newPasswordController,
+                          iconColor: AppColors.primary,
+                          shadowColor: AppColors.primary.withAlpha(70),
+                          borderColor: AppColors.primary,
+                          focusNode: _passwordFocusNode,
+                          icon: Icons.lock_clock_outlined,
+                          hintText: "Enter new password",
+                          title: "Password",
+                          errorMessage: "Invalid password",
+                          keyboardType: TextInputType.number,
+                        ),
+                      ],
+                    ],
                   ),
                 ),
-                child: Text(
-                  "Reset Password",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
+                SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: provider.isLoading
+                      ? loadingIndicator()
+                      : SolidRoundedButton(
+                          onPressed:
+                              provider.isOtpSent ? _resetPassword : _requestOtp,
+                          text: provider.isOtpSent
+                              ? 'Reset Password'
+                              : 'Request OTP',
+                          color: AppColors.primary,
+                          borderRadius: 10.0,
+                          textStyle:
+                              TextStyle(color: Colors.white, fontSize: 18),
+                        ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

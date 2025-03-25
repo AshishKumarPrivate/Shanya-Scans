@@ -291,28 +291,25 @@ class ProfileScreen extends StatelessWidget {
                               );
                             },
                           ),
-                          Visibility(
-                            visible: false,
-                            child: ProfileListTile(
-                              title: "Forget Password",
-                              onTap: () {
-                                print("Tapped on Forget Password");
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        ForgotPasswordScreen(),
-                                    // builder: (context) => MyWishListScreen(),
-                                  ),
-                                );
-                              },
-                              titleStyle: TextStyle(
-                                color: Colors.red,
-                              ),
-                              backgroundColor: Colors.transparent,
-                              leadingIcon: Icons.lock_reset_outlined,
-                              leadingIconColor: Colors.red,
+                          ProfileListTile(
+                            title: "Forget Password",
+                            onTap: () {
+                              print("Tapped on Forget Password");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      ForgotPasswordScreen(),
+                                  // builder: (context) => MyWishListScreen(),
+                                ),
+                              );
+                            },
+                            titleStyle: TextStyle(
+                              color: Colors.red,
                             ),
+                            backgroundColor: Colors.transparent,
+                            leadingIcon: Icons.lock_reset_outlined,
+                            leadingIconColor: Colors.red,
                           ),
                           SizedBox(
                             height: 15,

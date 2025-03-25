@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:healthians/deliveryBoy/model/ChangeOrderStatusModelResponse.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderDetailModel.dart';
+import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderSummaryModelResponse.dart';
+import 'package:healthians/deliveryBoy/model/DeliveryBoyProfileSummaryModelResponse.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryLoginModelResponse.dart';
 import 'package:healthians/screen/auth/model/LoginModel.dart';
 import 'package:healthians/screen/auth/model/UpdateProfileModel.dart';
@@ -32,12 +34,8 @@ import 'dio_helper.dart';
 class Repository {
   static final DioHelper _dioHelper = DioHelper();
 
-  static const String baseUrl = "https://dbsanya.drmanasaggarwal.com";
-  // static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
-
-
-  //&&&&& Delivery boy url &&&&&&&&&
-
+  static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
+  // static const String baseUrl = "https://dbsanya.drmanasaggarwal.com";
 
 
   // &&&&&&&&&&& testing api Start here &&&&&&&&&&&&&&&&
@@ -154,45 +152,57 @@ class Repository {
   }
 
   // Forget Password
-  Future<LoginModel> forgetPassword(Map<String, dynamic> requestBody) async {
+  Future<Map<String, dynamic>> forgetPassword(Map<String, dynamic> requestBody) async {
     try {
-      // ✅ API Call
       Map<String, dynamic>? response = await _dioHelper.post(
-        url: '$baseUrl/api/v1/user/login',
+        url: '$baseUrl/api/v1/user/forgot-password',
         requestBody: requestBody,
       );
 
-      // ✅ Debug Response
-      print("✅Forget Password API Raw Response: $response");
+      print("✅ Forget Password API Response: $response");
 
       if (response == null) {
-        print("❌ Forget Password API returned null response!");
-        return LoginModel(success: false, message: "No response from server");
+        return {"success": false, "message": "No response from server"};
       }
 
-      // ✅ Check if API returns success: false
-      if (response["success"] == false) {
-        String errorMessage =
-            response["message"] ?? "Failed to reset your password!";
-        return LoginModel(success: false, message: errorMessage);
-      }
-
-      // ✅ Return Parsed Model
-      return LoginModel.fromJson(response);
+      return {
+        "success": response["success"] ?? false,
+        "message": response["message"] ?? "Something went wrong"
+      };
     } on DioException catch (e) {
-      if (e.response != null) {
-        print("❌ Forget Password API Error: ${e.response?.data}");
-        return LoginModel(
-          success: false,
-          message: e.response?.data["message"] ?? "Something went wrong",
-        );
-      } else {
-        print("❌ Network Error: ${e.message}");
-        return LoginModel(success: false, message: "No Internet Connection");
-      }
+      return {
+        "success": false,
+        "message": e.response?.data["message"] ?? "Something went wrong"
+      };
     } catch (e) {
-      print("❌ Unexpected Error: $e");
-      return LoginModel(success: false, message: "Unexpected error occurred");
+      return {"success": false, "message": "Reset code not sent to email"};
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword(Map<String, dynamic> requestBody) async {
+    try {
+      Map<String, dynamic>? response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/user/reset-password',
+        requestBody: requestBody,
+      );
+
+      print("✅ Forget Password API Response: $response");
+
+      if (response == null) {
+        return {"success": false, "message": "No response from server"};
+      }
+
+      return {
+        "success": response["success"] ?? false,
+        "message": response["message"] ?? "Something went wrong"
+      };
+    } on DioException catch (e) {
+      return {
+        "success": false,
+        "message": e.response?.data["message"] ?? "Something went wrong"
+      };
+    } catch (e) {
+      return {"success": false, "message": "Unexpected error occurred"};
     }
   }
 
@@ -423,8 +433,6 @@ class Repository {
     return MyOrderHistoryListModel.fromJson(response);
   }
 
-// &&&&&&&&&&&&&&&& ENQUIRY OR NEED HELP API &&&&&&&&&&&&&&&&&&&&&&&&&&
-
   Future<EnquiryNeedHelpModel> sendEnquiry(Object requestBody) async {
     Map<String, dynamic> response = await _dioHelper.post(
         url: '$baseUrl/api/v1/contact', requestBody: requestBody);
@@ -504,5 +512,22 @@ class Repository {
 
     return ChangeOrderStatusModelResponse.fromJson(response);
   }
+
+  Future<DeliveryBoyOrderSummaryModelResponse> getDeliveryBoyOrderSummary(String deliveryBoyId) async {
+    // var response =
+    //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
+    Map<String, dynamic> response =
+    await _dioHelper.get(url: '$baseUrl/api/v1/collection/summary/${deliveryBoyId}');
+    return DeliveryBoyOrderSummaryModelResponse.fromJson(response);
+  }
+
+  Future<DeliveryBoyProfileSummaryModelResponse> getDeliveryBoyProfileSummary(String deliveryBoyId) async {
+    // var response =
+    //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
+    Map<String, dynamic> response =
+    await _dioHelper.get(url: '$baseUrl/api/v1/collection/detail/${deliveryBoyId}');
+    return DeliveryBoyProfileSummaryModelResponse.fromJson(response);
+  }
+
 
 }

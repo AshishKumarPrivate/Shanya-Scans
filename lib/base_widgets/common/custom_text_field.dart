@@ -8,6 +8,7 @@ class CustomTextField extends StatelessWidget {
   final FocusNode focusNode;
   final IconData icon;
   final Color? iconColor;
+  final int? maxLength;
   final String hintText;
   final String title;
   final String errorMessage;
@@ -24,6 +25,7 @@ class CustomTextField extends StatelessWidget {
     required this.focusNode,
     required this.icon,
     this.iconColor,
+    this.maxLength,
     required this.hintText,
     required this.title,
     required this.errorMessage,
@@ -107,7 +109,9 @@ class CustomTextField extends StatelessWidget {
                             controller: controller,
                             focusNode: focusNode,
                             keyboardType: keyboardType,
+                            maxLength: maxLength,
                             decoration: InputDecoration(
+                              counterText: "", // Hides the counter text
                               hintText: hintText,
                               border: InputBorder.none,
                               contentPadding:

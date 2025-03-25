@@ -58,7 +58,10 @@ class _DeliveryBoyOrderDetailScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("Order Details"),
+        iconTheme: IconThemeData(
+          color: Colors.white, // Change this to your desired color
+        ),
+        title: Text("Order Details",style: TextStyle(color: Colors.white),),
         backgroundColor: AppColors.deliveryPrimary,
       ),
       body: provider.isLoading

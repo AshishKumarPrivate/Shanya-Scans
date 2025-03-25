@@ -18,8 +18,10 @@ class _OrderListScreenState extends State<OrderListScreen> {
   @override
   void initState() {
     super.initState();
-    Provider.of<OrderApiProvider>(context, listen: false)
-        .getOrderHistory(context);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final orderProvider = Provider.of<OrderApiProvider>(context, listen: false);
+      orderProvider.getOrderHistory(context);
+    });
   }
 
   @override

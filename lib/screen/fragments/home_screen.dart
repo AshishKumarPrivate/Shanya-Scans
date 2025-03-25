@@ -130,7 +130,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           HomeContactSection(),
                           // SizedBox(height: 10),
                           HomeServicesSection(
-                            sectionHeading: "Our Best Radiology",
+                            sectionHeading: "Our Best Radiology Service",
                           ),
                           // SizedBox(height: 15),
                           // Grid Title
