@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ffi';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -219,6 +220,61 @@ class StorageHelper {
   String getDeliveryBoyPassword() {
     return sp.getString('delivery_boy_password') ?? "";
   }
+
+  // sales
+
+  /// **🌍 Save Latitude (double)**
+  void setSalesLat(double latitude) {
+    sp.setDouble('sales_lat', latitude);
+  }
+
+  /// **📍 Get Latitude (double)**
+  double getSalesLat() {
+    return sp.getDouble('sales_lat') ?? 0.0;
+  }
+
+  /// **🌍 Save Longitude (double)**
+  void setSalesLng(double longitude) {
+    sp.setDouble('sales_lng', longitude);
+  }
+
+  /// **📍 Get Longitude (double)**
+  double getSalesLng() {
+    return sp.getDouble('sales_lng') ?? 0.0;
+  }
+
+  void setUserOrderId(String userOrderId) {
+    sp.setString('user_order_id', userOrderId);
+  }
+
+  String getUserOrderId() {
+    return sp.getString('user_order_id') ?? "";
+  }
+
+
+
+
+  ////////////
+  void setUserLat(double latitude) {
+    sp.setDouble('user_lat', latitude);
+  }
+
+  /// **📍 Get Latitude (double)**
+  double getUserLat() {
+    return sp.getDouble('user_lat') ?? 0.0;
+  }
+//
+
+  void setUserLong(double latitude) {
+    sp.setDouble('user_lng', latitude);
+  }
+
+  /// **📍 Get Latitude (double)**
+  double getUserLong() {
+    return sp.getDouble('user_lng') ?? 0.0;
+  }
+
+
 
 
 

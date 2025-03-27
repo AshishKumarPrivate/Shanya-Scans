@@ -34,9 +34,9 @@ import 'dio_helper.dart';
 class Repository {
   static final DioHelper _dioHelper = DioHelper();
 
-  static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
-  // static const String baseUrl = "https://dbsanya.drmanasaggarwal.com";
-
+  // static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
+  static const String baseUrl = "https://dbsanya.drmanasaggarwal.com";
+  //
 
   // &&&&&&&&&&& testing api Start here &&&&&&&&&&&&&&&&
 

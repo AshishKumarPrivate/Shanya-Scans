@@ -6,7 +6,10 @@ import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:provider/provider.dart';
 import '../../ui_helper/app_text_styles.dart';
 import '../../ui_helper/responsive_helper.dart';
+import '../../ui_helper/storage_helper.dart';
+import '../../util/config.dart';
 import '../../util/date_formate.dart';
+import 'SalesTrackingScreen.dart';
 
 class DeliveryBoyOrderDetailScreen extends StatefulWidget {
   final String orderId;
@@ -120,7 +123,25 @@ class _DeliveryBoyOrderDetailScreenState
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   ElevatedButton.icon(
-                                    onPressed: () {},
+                                    onPressed: () {
+
+                                      StorageHelper().setUserOrderId(orderDetail.data!.sId.toString());
+                                      StorageHelper().setUserLat(double.parse(orderDetail.data!.lat.toString()));
+                                      StorageHelper().setUserLong(double.parse(orderDetail.data!.lng.toString()));
+
+                                      // Start live tracking
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => SalesLiveTrackingScreen(),
+                                        ),
+                                      );
+
+                                      /// Stop tracking (if needed)
+                                      //    ConfigUtils().stopTracking();
+
+
+                                    },
                                     icon: Icon(Icons.call, color: Colors.white),
                                     label: Text(
                                       "${orderDetail.data!.userId!.phoneNumber}",

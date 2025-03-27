@@ -1,192 +1,291 @@
+
+class MyOrderHistoryListModel {
+  bool? success;
+  String? message;
+  Data? data;
+
+  MyOrderHistoryListModel({this.success, this.message, this.data});
+
+  MyOrderHistoryListModel.fromJson(Map<String, dynamic> json) {
+    success = json['success'];
+    message = json['message'];
+    data = json['data'] != null ? new Data.fromJson(json['data']) : null;
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['success'] = this.success;
+    data['message'] = this.message;
+    if (this.data != null) {
+      data['data'] = this.data!.toJson();
+    }
+    return data;
+  }
+}
+
+class Data {
+  String? sId;
+  String? name;
+  String? email;
+  String? verificationCode;
+  bool? isVerified;
+  String? password;
+  List<dynamic>? member;
+  int? iV;
+  String? age;
+  List<OrderDetails>? orderDetails;
+  String? phoneNumber;
+  String? token;
+  String? whatsappNumber;
+
+  Data(
+      {this.sId,
+        this.name,
+        this.email,
+        this.verificationCode,
+        this.isVerified,
+        this.password,
+        this.member,
+        this.iV,
+        this.age,
+        this.orderDetails,
+        this.phoneNumber,
+        this.token,
+        this.whatsappNumber});
+
+  Data.fromJson(Map<String, dynamic> json) {
+    sId = json['_id'];
+    name = json['name'];
+    email = json['email'];
+    verificationCode = json['verificationCode'];
+    isVerified = json['isVerified'];
+    password = json['password'];
+    member = json['member'] ?? []; // FIXED: Handle null lists
+    // if (json['member'] != null) {
+    //   member = <Null>[];
+    //   json['member'].forEach((v) {
+    //     member!.add(new fromJson(v));
+    //   });
+    // }
+    iV = json['__v'];
+    age = json['age'];
+    if (json['orderDetails'] != null) {
+      orderDetails = <OrderDetails>[];
+      json['orderDetails'].forEach((v) {
+        orderDetails!.add(new OrderDetails.fromJson(v));
+      });
+    }
+    phoneNumber = json['phoneNumber'];
+    token = json['token'];
+    whatsappNumber = json['whatsappNumber'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['_id'] = this.sId;
+    data['name'] = this.name;
+    data['email'] = this.email;
+    data['verificationCode'] = this.verificationCode;
+    data['isVerified'] = this.isVerified;
+    data['password'] = this.password;
+    if (this.member != null) {
+      data['member'] = this.member!.map((v) => v.toJson()).toList();
+    }
+    data['__v'] = this.iV;
+    data['age'] = this.age;
+    if (this.orderDetails != null) {
+      data['orderDetails'] = this.orderDetails!.map((v) => v.toJson()).toList();
+    }
+    data['phoneNumber'] = this.phoneNumber;
+    data['token'] = this.token;
+    data['whatsappNumber'] = this.whatsappNumber;
+    return data;
+  }
+}
+
+class OrderDetails {
+  String? sId;
+  String? orderName;
+  String? phone;
+  String? altPhone;
+  String? address;
+  String? name;
+  String? category;
+  String? price;
+  String? bod;
+  String? bot;
+  String? createdAt;
+  String? updatedAt;
+  String? status; // ✅ Manually added field
+  int? iV;
+
+  OrderDetails(
+      {this.sId,
+        this.orderName,
+        this.phone,
+        this.altPhone,
+        this.address,
+        this.name,
+        this.category,
+        this.price,
+        this.bod,
+        this.bot,
+        this.createdAt,
+        this.updatedAt,
+        this.status = "Pending", // ✅ Default value if status is missing
+        this.iV});
+
+  OrderDetails.fromJson(Map<String, dynamic> json) {
+    sId = json['_id'];
+    orderName = json['orderName'];
+    phone = json['phone'];
+    altPhone = json['altPhone'];
+    address = json['address'];
+    name = json['name'];
+    category = json['category'];
+    price = json['price'];
+    bod = json['bod'];
+    bot = json['bot'];
+    createdAt = json['createdAt'];
+    updatedAt = json['updatedAt'];
+    status = json.containsKey('status') ? json['status'] : "Pending"; // ✅ Set status if available, else "Pending"
+    iV = json['__v'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['_id'] = this.sId;
+    data['orderName'] = this.orderName;
+    data['phone'] = this.phone;
+    data['altPhone'] = this.altPhone;
+    data['address'] = this.address;
+    data['name'] = this.name;
+    data['category'] = this.category;
+    data['price'] = this.price;
+    data['bod'] = this.bod;
+    data['bot'] = this.bot;
+    data['createdAt'] = this.createdAt;
+    data['updatedAt'] = this.updatedAt;
+    data['status'] = status; // ✅ Include manually added status field
+    data['__v'] = this.iV;
+    return data;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import 'dart:async';
+
+
+
+
+
+
+
 // import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:provider/provider.dart';
-// import 'package:shimmer/shimmer.dart';
-// import '../../ui_helper/app_colors.dart';
-// import '../controller/DeliveryOrdersProvider.dart';
-// import 'widget/DeliveryOrderList.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:geolocator/geolocator.dart';
 //
-// class DeliveryBoyDashboardScreen extends StatefulWidget {
+// class LiveTrackingScreen extends StatefulWidget {
 //   @override
-//   _DeliveryBoyDashboardScreenState createState() => _DeliveryBoyDashboardScreenState();
+//   _LiveTrackingScreenState createState() => _LiveTrackingScreenState();
 // }
 //
-// class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
-//     with SingleTickerProviderStateMixin {
-//   late TabController _tabController;
+// class _LiveTrackingScreenState extends State<LiveTrackingScreen> {
+//   late GoogleMapController _mapController;
+//   LatLng _salesPersonPosition = LatLng(28.6139, 77.2090); // Start Position (New Delhi)
+//   LatLng _userPosition = LatLng(28.6200, 77.2100); // Static User Position
+//   Set<Polyline> _polylines = {};
+//   Timer? _timer;
 //
 //   @override
 //   void initState() {
 //     super.initState();
-//     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-//       statusBarColor: AppColors.deliveryPrimary,
-//       statusBarIconBrightness: Brightness.light,
-//     ));
+//     _startSimulatedLocationUpdates();
+//   }
 //
-//     final provider = Provider.of<DeliveryOrdersProvider>(context, listen: false);
-//     provider.initializeSocket();
-//     _tabController = TabController(length: 3, vsync: this);
-//     _fetchOrdersForTab(0);
+//   void _startSimulatedLocationUpdates() {
+//     _timer = Timer.periodic(Duration(seconds: 5), (timer) {
+//       setState(() {
+//         _salesPersonPosition = LatLng(
+//           _salesPersonPosition.latitude + 0.0005, // Simulate movement
+//           _salesPersonPosition.longitude + 0.0005,
+//         );
+//         _updatePolylines();
+//       });
+//     });
+//   }
+//
+//   void _updatePolylines() {
+//     setState(() {
+//       _polylines.clear();
+//       _polylines.add(
+//         Polyline(
+//           polylineId: PolylineId("route"),
+//           color: Colors.blue,
+//           width: 5,
+//           points: [_salesPersonPosition, _userPosition],
+//         ),
+//       );
+//     });
 //   }
 //
 //   @override
 //   void dispose() {
-//     Provider.of<DeliveryOrdersProvider>(context, listen: false).disconnectSocket();
-//     _tabController.dispose();
+//     _timer?.cancel();
 //     super.dispose();
-//   }
-//
-//   void _fetchOrdersForTab(int index) {
-//     final provider = Provider.of<DeliveryOrdersProvider>(context, listen: false);
-//     String status = index == 0 ? "confirmed" : index == 1 ? "ongoing" : "completed";
-//     provider.fetchDeliveryBoyOrderList(status);
 //   }
 //
 //   @override
 //   Widget build(BuildContext context) {
 //     return Scaffold(
-//       backgroundColor: AppColors.deliveryPrimary,
-//       body: SafeArea(
-//         child: NestedScrollView(
-//           headerSliverBuilder: (context, innerBoxIsScrolled) => [
-//             SliverToBoxAdapter(
-//               child: Consumer<DeliveryOrdersProvider>(
-//                 builder: (context, provider, _) {
-//                   return _buildOrderSummary(provider.newOrderAssigned, provider);
-//                 },
-//               ),
-//             ),
-//             SliverToBoxAdapter(child: _buildDashboardSummary()),
-//             SliverPersistentHeader(
-//               pinned: true,
-//               delegate: _SliverAppBarDelegate(
-//                 TabBar(
-//                   controller: _tabController,
-//                   labelColor: Colors.white,
-//                   indicatorColor: Colors.white,
-//                   tabs: [
-//                     Tab(text: "Pending"),
-//                     Tab(text: "Ongoing"),
-//                     Tab(text: "Delivered"),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ],
-//           body: TabBarView(
-//             controller: _tabController,
-//             children: [
-//               DeliveryOrderList(status: "confirmed"),
-//               DeliveryOrderList(status: "ongoing"),
-//               DeliveryOrderList(status: "completed"),
-//             ],
+//       appBar: AppBar(title: Text('Live Tracking (Static)')),
+//       body: GoogleMap(
+//         initialCameraPosition: CameraPosition(
+//           target: _salesPersonPosition,
+//           zoom: 15,
+//         ),
+//         onMapCreated: (GoogleMapController controller) {
+//           _mapController = controller;
+//         },
+//         markers: {
+//           Marker(
+//             markerId: MarkerId('sales_person'),
+//             position: _salesPersonPosition,
+//             icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
 //           ),
-//         ),
-//       ),
-//     );
-//   }
-//
-//   Widget _buildDashboardSummary() {
-//     return Padding(
-//       padding: const EdgeInsets.all(16.0),
-//       child: GridView.count(
-//         shrinkWrap: true,
-//         physics: NeverScrollableScrollPhysics(),
-//         crossAxisCount: 2,
-//         crossAxisSpacing: 12,
-//         mainAxisSpacing: 12,
-//         childAspectRatio: 1.5,
-//         children: [
-//           _buildSummaryCard("Completed", "27", Icons.check_circle, Colors.green.shade100),
-//           _buildSummaryCard("Pending", "10", Icons.timer, Colors.yellow.shade100),
-//           _buildSummaryCard("Cancelled", "05", Icons.cancel, Colors.red.shade100),
-//           _buildSummaryCard("Returned", "16", Icons.replay, Colors.blue.shade100),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _buildSummaryCard(String title, String count, IconData icon, Color color) {
-//     return Container(
-//       decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(12)),
-//       padding: EdgeInsets.all(16),
-//       child: Column(
-//         crossAxisAlignment: CrossAxisAlignment.start,
-//         children: [
-//           Icon(icon, size: 30, color: Colors.black54),
-//           SizedBox(height: 8),
-//           Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-//           SizedBox(height: 4),
-//           Text(count, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-//         ],
-//       ),
-//     );
-//   }
-//
-//   Widget _buildOrderSummary(bool newOrderAssigned, DeliveryOrdersProvider provider) {
-//     return Visibility(
-//       visible: newOrderAssigned,
-//       child: Container(
-//         width: double.infinity,
-//         padding: EdgeInsets.all(12),
-//         margin: EdgeInsets.all(10),
-//         decoration: BoxDecoration(
-//           gradient: LinearGradient(
-//             colors: [Colors.blue.shade700, Colors.purple.shade400],
-//             begin: Alignment.topLeft,
-//             end: Alignment.bottomRight,
+//           Marker(
+//             markerId: MarkerId('user'),
+//             position: _userPosition,
+//             icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
 //           ),
-//           borderRadius: BorderRadius.circular(16),
-//         ),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Row(
-//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//               children: [
-//                 Text("New Order Assigned!", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-//                 IconButton(icon: Icon(Icons.close, color: Colors.white), onPressed: () => provider.resetNewOrderNotification()),
-//               ],
-//             ),
-//             SizedBox(height: 10),
-//             Shimmer.fromColors(
-//               baseColor: Colors.white,
-//               highlightColor: Colors.yellowAccent,
-//               child: Row(
-//                 children: [
-//                   Icon(Icons.delivery_dining, color: Colors.greenAccent, size: 22),
-//                   SizedBox(width: 6),
-//                   Text("You have a new delivery order!", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
+//         },
+//         polylines: _polylines,
 //       ),
 //     );
-//   }
-// }
-//
-// class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-//   final TabBar tabBar;
-//
-//   _SliverAppBarDelegate(this.tabBar);
-//
-//   @override
-//   double get minExtent => tabBar.preferredSize.height;
-//   @override
-//   double get maxExtent => tabBar.preferredSize.height;
-//
-//   @override
-//   Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
-//     return Container(
-//       color: AppColors.deliveryPrimary,
-//       child: tabBar,
-//     );
-//   }
-//
-//   @override
-//   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) {
-//     return false;
 //   }
 // }

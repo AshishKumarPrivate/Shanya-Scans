@@ -44,4 +44,5 @@ class StringUtils {
   static String getOrderType() {
     return type;
   }
+
 }

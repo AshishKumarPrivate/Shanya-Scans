@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:healthians/deliveryBoy/controller/delivery_boy_auth_provider.dart';
 import 'package:healthians/deliveryBoy/screen/widget/DeliveryOrderList.dart';
+import 'package:healthians/util/config.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../base_widgets/outlined_rounded_button.dart';
@@ -11,7 +12,7 @@ import '../../ui_helper/app_colors.dart';
 import '../../ui_helper/app_text_styles.dart';
 import '../../ui_helper/responsive_helper.dart';
 import '../controller/DeliveryOrdersProvider.dart';
-import 'UserTrackingScreen.dart';
+import 'SalesTrackingScreen.dart';
 
 class DeliveryBoyDashboardScreen extends StatefulWidget {
   @override
@@ -212,13 +213,16 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
       String title, dynamic count, IconData icon, Color color) {
     return InkWell(
       onTap: () {
+
+
         Provider.of<DeliveryOrdersProvider>(context, listen: false).callEmit();
-        // Navigator.push(
-        //   context,
-        //   MaterialPageRoute(
-        //     builder: (context) => const UserTrackingScreen(),
-        //   ),
-        // );
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SalesLiveTrackingScreen(),
+          ),
+        );
+
       },
       child: Container(
         decoration: BoxDecoration(

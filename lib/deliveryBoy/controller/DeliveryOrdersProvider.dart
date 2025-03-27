@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,14 +6,18 @@ import 'package:healthians/deliveryBoy/model/ChangeOrderStatusModelResponse.dart
 import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderDetailModel.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderSummaryModelResponse.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryBoyProfileSummaryModelResponse.dart';
-import 'package:healthians/deliveryBoy/model/DeliveryOrderLIstModel.dart' as deliveryBoyOrder;
+import 'package:healthians/deliveryBoy/model/DeliveryOrderLIstModel.dart'
+    as deliveryBoyOrder;
 import 'package:healthians/ui_helper/storage_helper.dart';
 import '../../network_manager/repository.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
+import '../../util/config.dart';
+
 class DeliveryOrdersProvider extends ChangeNotifier {
   final Repository _repository = Repository();
   late IO.Socket _socket;
+  Timer? _locationUpdateTimer; // Timer for periodic location updates
 
   DateTime? _selectedDate;
 
@@ -27,13 +32,24 @@ class DeliveryOrdersProvider extends ChangeNotifier {
   bool _newOrderAssigned = false; // Flag to show shimmer notification
 
   bool get isLoading => _isLoading;
+
   String get errorMessage => _errorMessage;
+
   List<deliveryBoyOrder.OrderDetails> get orderList => _orderList;
+
   DeliveryBoyOrderDetailModel? get orderDetail => _deliveryBoyOrderDetailModel;
-  ChangeOrderStatusModelResponse? get changeOrderStatusModel => _changeOrderStatusModel;
-  DeliveryBoyOrderSummaryModelResponse? get deliveryBoyOrderSummaryModel => _deliveryBoyOrderSummaryModel;
-  DeliveryBoyProfileSummaryModelResponse? get deliveryBoyProfileSummaryModel => _deliveryBoyProfileSummaryModel;
+
+  ChangeOrderStatusModelResponse? get changeOrderStatusModel =>
+      _changeOrderStatusModel;
+
+  DeliveryBoyOrderSummaryModelResponse? get deliveryBoyOrderSummaryModel =>
+      _deliveryBoyOrderSummaryModel;
+
+  DeliveryBoyProfileSummaryModelResponse? get deliveryBoyProfileSummaryModel =>
+      _deliveryBoyProfileSummaryModel;
+
   bool get newOrderAssigned => _newOrderAssigned;
+
   DateTime? get selectedDate => _selectedDate;
 
   /// **Set Loading State for UI**
@@ -50,15 +66,16 @@ class DeliveryOrdersProvider extends ChangeNotifier {
   }
 
   /// **Initialize Socket Connection**
-  void initializeSocket() {
+  void initializeSocket() async {
     String deliveryBoyId = StorageHelper().getDeliveryBoyId();
 
     _socket = IO.io(
       "${Repository.baseUrl}", // Replace with actual server URL
-      IO.OptionBuilder()
-          .setTransports(["websocket"])
-          .setQuery({"deliveryBoyId": deliveryBoyId}) // Pass delivery boy ID to identify
-          .setExtraHeaders({"autoConnect": "true"}) // This replaces `setAutoConnect`
+      IO.OptionBuilder().setTransports(["websocket"]).setQuery({
+        "deliveryBoyId": deliveryBoyId
+      }) // Pass delivery boy ID to identify
+          .setExtraHeaders(
+              {"autoConnect": "true"}) // This replaces `setAutoConnect`
           .build(),
     );
 
@@ -84,15 +101,62 @@ class DeliveryOrdersProvider extends ChangeNotifier {
       fetchDeliveryBoyOrderList("confirmed"); // Refresh orders list
     });
 
-    _socket.emit("joinRoom",deliveryBoyId);
+    _socket.emit("joinRoom", deliveryBoyId);
+
+    /////////////// live lat long of the person //////////
+    // Start periodic location updates every 5 minutes
+    _startLocationUpdates();
+
+/////////////// live lat long of the person //////////
 
     _socket.onDisconnect((_) => print("❌ Disconnected from Socket.IO Server"));
   }
 
-  void callEmit(){
-    _socket.emit("don","Emit message triggered");
+  /// **Start Sending Location Updates Every 5 seconds**
+  void _startLocationUpdates() {
+    _locationUpdateTimer?.cancel(); // Cancel previous timer if exists
 
-    _newOrderAssigned = true;
+    _locationUpdateTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      final ConfigUtils _configUtils = ConfigUtils();
+      _configUtils.startTracking();
+
+      Map<String, dynamic> locationData = await _configUtils.locationStream.first;
+      String latitude = locationData["latitude"].toString();
+      String longitude = locationData["longitude"].toString();
+      String address = locationData["address"];
+
+      StorageHelper().setSalesLat(double.parse(latitude));
+      StorageHelper().setSalesLng(double.parse(longitude));
+
+      // &&&&&&&&&&&&&&&&&&&& this socket for only sales dashboard screen &&&&&&&&&&&&&&&&&&&&
+      _socket.emit("sales-dashboard-join", {
+        "salesId": StorageHelper().getDeliveryBoyId(),
+        "lat": latitude,
+        "lng": longitude,
+        "address": address,
+      });
+
+      /// **2️⃣ its just for testing not usable
+      // _socket.on("updated-sales-lat-lng", (data) {
+      //   if (data != null) {
+      //     _salesPersonPosition = LatLng(
+      //       double.parse(data["lat"].toString()),
+      //       double.parse(data["lng"].toString()),
+      //     );
+      //     _updatePolylines();
+      //   }
+      // });
+
+      // &&&&&&&&&&&&&&&&&&&& this socket for only sales dashboard screen &&&&&&&&&&&&&&&&&&&&
+
+      print("📡 Sent Live Location: $latitude, $longitude");
+    });
+  }
+
+  void callEmit() {
+    // _socket.emit("don", "Emit message triggered");
+
+    // _newOrderAssigned = true;
     notifyListeners();
   }
 
@@ -101,11 +165,11 @@ class DeliveryOrdersProvider extends ChangeNotifier {
     _newOrderAssigned = false;
     notifyListeners();
   }
+
   /// **Disconnect Socket on Logout**
   void disconnectSocket() {
     _socket.disconnect();
   }
-
 
   /// **Fetch Delivery Boy Order List**
   Future<bool> fetchDeliveryBoyOrderList(String status) async {
@@ -118,13 +182,15 @@ class DeliveryOrdersProvider extends ChangeNotifier {
       String deliveryBoyId = StorageHelper().getDeliveryBoyId();
       var response = await _repository.getDeliveryBoyOrderList(deliveryBoyId);
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response != null &&
+          response.success == true &&
+          response.data != null) {
         print("✅ Order List Fetched Successfully");
 
         _deliveryBoyOrderListModel = response;
         _orderList = response.data!.orderDetails
-            ?.where((order) => order.bookingStatus == status)
-            .toList() ??
+                ?.where((order) => order.bookingStatus == status)
+                .toList() ??
             [];
         setLoadingState(false);
         return true;
@@ -137,6 +203,7 @@ class DeliveryOrdersProvider extends ChangeNotifier {
 
     return false;
   }
+
   /// **Filter Orders by Selected Date**
   void setFilterDate(DateTime? date) {
     _selectedDate = date;
@@ -153,7 +220,6 @@ class DeliveryOrdersProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-
   /// **Fetch Delivery Boy Order List**
   Future<bool> fetchDeliveryBoyOrderDetails(String orderId) async {
     setLoadingState(true);
@@ -163,7 +229,9 @@ class DeliveryOrdersProvider extends ChangeNotifier {
     try {
       var response = await _repository.getDeliveryBoyOrderDetail(orderId);
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response != null &&
+          response.success == true &&
+          response.data != null) {
         print("✅ Order Details Fetched Successfully");
 
         _deliveryBoyOrderDetailModel = response;
@@ -178,18 +246,20 @@ class DeliveryOrdersProvider extends ChangeNotifier {
 
     return false;
   }
+
   /// **Fetch Delivery Boy Order List**
-  Future<bool> changeOrderStatus(String orderStatus , String orderId) async {
+  Future<bool> changeOrderStatus(String orderStatus, String orderId) async {
     // _setLoadingState(true);
     _errorMessage = "";
     _changeOrderStatusModel = null;
 
     try {
-
       Map<String, dynamic> requestBody = {"newStatus": orderStatus};
 
-      var response = await _repository.changeOrderStatus(requestBody,orderId);
-      if (response != null && response.success == true && response.order != null) {
+      var response = await _repository.changeOrderStatus(requestBody, orderId);
+      if (response != null &&
+          response.success == true &&
+          response.order != null) {
         print("✅ Order Details Fetched Successfully");
 
         _changeOrderStatusModel = response;
@@ -207,9 +277,8 @@ class DeliveryOrdersProvider extends ChangeNotifier {
     return false;
   }
 
-
   /// **Fetch Delivery Boy Order List**
-  Future<bool> fetchDeliveryBoyOrderSummary( ) async {
+  Future<bool> fetchDeliveryBoyOrderSummary() async {
     setLoadingState(true);
     _errorMessage = "";
     _deliveryBoyOrderSummaryModel = null;
@@ -217,9 +286,12 @@ class DeliveryOrdersProvider extends ChangeNotifier {
     try {
       String deliveryBoyId = StorageHelper().getDeliveryBoyId();
       print("deliveryBoyid=>${deliveryBoyId}");
-      var response = await _repository.getDeliveryBoyOrderSummary(deliveryBoyId);
+      var response =
+          await _repository.getDeliveryBoyOrderSummary(deliveryBoyId);
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response != null &&
+          response.success == true &&
+          response.data != null) {
         print("✅ Order Details Fetched Successfully");
 
         _deliveryBoyOrderSummaryModel = response;
@@ -235,17 +307,19 @@ class DeliveryOrdersProvider extends ChangeNotifier {
     return false;
   }
 
-
-  Future<bool> fetchDeliveryBoyProfileSummary( ) async {
+  Future<bool> fetchDeliveryBoyProfileSummary() async {
     setLoadingState(true);
     _errorMessage = "";
     _deliveryBoyProfileSummaryModel = null;
 
     try {
       String deliveryBoyId = StorageHelper().getDeliveryBoyId();
-      var response = await _repository.getDeliveryBoyProfileSummary(deliveryBoyId);
+      var response =
+          await _repository.getDeliveryBoyProfileSummary(deliveryBoyId);
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response != null &&
+          response.success == true &&
+          response.data != null) {
         print("✅ Order Details Fetched Successfully");
 
         _deliveryBoyProfileSummaryModel = response;
@@ -260,5 +334,4 @@ class DeliveryOrdersProvider extends ChangeNotifier {
 
     return false;
   }
-
 }

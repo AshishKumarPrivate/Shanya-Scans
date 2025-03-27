@@ -13,9 +13,11 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+
 
 
 
@@ -58,9 +60,11 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAUIOK7nbVnx8xDVCjQMJldNfYmiq5C9RA"/>
+            android:value="AIzaSyC9ZOZHwHmyTWXqACqpZY2TL7wX2_Zn05U"/>
+<!--            android:value="AIzaSyCl1FHYWqMa8vjrbjFu7PsRVlHxmnDkFHw"/>-->
 
 
     </application>

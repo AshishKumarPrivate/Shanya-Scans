@@ -9,6 +9,7 @@ import '../../../network_manager/api_error_handler.dart';
 import '../../../ui_helper/snack_bar.dart';
 import '../../screen/auth/login_screen.dart';
 import '../../screen/other/screen/user_selection_screen.dart';
+import '../../util/config.dart';
 import '../model/DeliveryLoginModelResponse.dart';
 
 class DeliveryBoyAuthApiProvider with ChangeNotifier {
@@ -28,14 +29,28 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier {
 
   Future<void> deliveryBoyLogin( BuildContext context, String email, String password) async {
     _setLoading(true);
+
+     ConfigUtils _configUtils = ConfigUtils();
+    _configUtils.startTracking();
+    Map<String, dynamic> locationData = await _configUtils.locationStream.first;
+
+    String latitude = locationData["latitude"].toString();
+    String longitude = locationData["longitude"].toString();
+    String address = locationData["address"];
+
     try {
-      Map<String, dynamic> requestBody = {"email": email, "password": password};
+      Map<String, dynamic> requestBody = {
+        "email": email,
+        "password": password,
+        "lat": latitude,
+        "lng": longitude,
+        "address": address,
+
+      };
+
       var response = await _repository.deliveryBoyLogin(requestBody);
-
       if (response.success == true) {
-
         await _storeDeliveryBoyData(response);
-
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => DeliveryBoyDashboardScreen()));
         showCustomSnackbarHelper.showSnackbar(

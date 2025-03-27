@@ -2,9 +2,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../base_widgets/common/default_common_app_bar.dart';
+import '../../../deliveryBoy/screen/SalesTrackingScreen.dart';
+import '../../../deliveryBoy/screen/UserTrackingScreen.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../ui_helper/responsive_helper.dart';
+import '../../../ui_helper/storage_helper.dart';
+import '../../../util/date_formate.dart';
 import '../controller/order_provider.dart';
 import '../model/MyOrderHistoryListModel.dart';
 import 'package:healthians/base_widgets/loading_indicator.dart';
@@ -38,8 +42,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
                 child: Text(orderProvider.errorMessage,
                     style: TextStyle(color: Colors.red)));
           } else {
-            final orderHistoryList =
-                orderProvider.myOrderHistoryListModel?.data?.orderDetails;
+            final orderHistoryList = orderProvider.myOrderHistoryListModel?.data;
             if (orderHistoryList == null || orderHistoryList.isEmpty) {
               return Center(
                 child: Text("No orders found",
@@ -63,7 +66,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
 }
 
 class OrderCard extends StatelessWidget {
-  final OrderDetails order;
+  final Data order;
   final Random _random = Random();
 
   OrderCard({Key? key, required this.order}) : super(key: key);
@@ -98,7 +101,7 @@ class OrderCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                order.name.toString(),
+                order.orderName.toString(),
                 style: AppTextStyles.heading1(context,
                     overrideStyle: TextStyle(
                         fontSize: ResponsiveHelper.fontSize(context, 14))),
@@ -114,7 +117,15 @@ class OrderCard extends StatelessWidget {
                   ),
                   SizedBox(width: 5,),
                   Text(
-                    "${order.bod.toString()}",
+                    "${order.bookingDate.toString()}",
+                    // "${
+                    //     DateUtil.formatDate(
+                    //         date: order.bookingDate.toString(),
+                    //         currentFormat: "yyyy-MM-dd HH:mm:ss.SSS",
+                    //         desiredFormat: "dd-MM-yyyy"
+                    //     )
+                    // }",
+
                     style: AppTextStyles.bodyText1(context,
                         overrideStyle: TextStyle(
                             fontSize: ResponsiveHelper.fontSize(context, 12))),
@@ -131,11 +142,41 @@ class OrderCard extends StatelessWidget {
                       color: statusColor.withAlpha(200),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(order.status.toString(),
-                        style: TextStyle(
-                            color: Colors.white, fontWeight: FontWeight.bold)),
+                    child: Text(
+                        order.bookingStatus.toString(),
+                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+
+
                   ),
-                  Text("\u20B9${order.price.toString()}",
+                  InkWell(
+                    onTap: (){
+                      double lat = double.parse(order.lat.toString());
+                      double long = double.parse(order.lng.toString());
+
+                      StorageHelper().setUserLat(lat);
+                      StorageHelper().setUserLong(long);
+                      // set the order id for tracking
+                      StorageHelper().setUserOrderId(order.sId.toString());
+
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserLiveTrackingScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: statusColor.withAlpha(200),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text("Track Order", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+
+
+                    ),
+                  ),
+                  Text("\u20B9${order.orderPrice.toString()}",
                       style:
                           TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 ],
