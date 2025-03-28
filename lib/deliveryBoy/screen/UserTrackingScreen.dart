@@ -1,11 +1,16 @@
-///////// user tracking screen //////
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:healthians/network_manager/repository.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:flutter/services.dart' show rootBundle;
+import 'dart:typed_data';
+import 'dart:ui' as ui;
+import 'dart:math' as math;
 
 class UserLiveTrackingScreen extends StatefulWidget {
 
@@ -30,16 +35,72 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
   Set<Polyline> _polylines = {};
   Set<Marker> _markers = {}; // ✅ Marker set added
   bool hasArrived = false;
+  double bearing=0.0;
 
   String salesPersonName = "Rahul Sharma";
   String salesPersonPhone = "+91 9876543210";
+  late BitmapDescriptor customIcon;
 
   @override
   void initState() {
     super.initState();
+    _loadCustomMarker();
     _connectToSocket();
     _startLocationUpdates();
   }
+
+  // ✅ Load custom marker function
+  Future<void> _loadCustomMarker() async {
+    final Uint8List markerIcon = await _getBytesFromAsset('assets/images/sales_marker.png', 200);
+    setState(() {
+      customIcon = BitmapDescriptor.fromBytes(markerIcon);
+    });
+  }
+
+  // ✅ Convert asset image to bytes
+  Future<Uint8List> _getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    ByteData? byteData = await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    return byteData!.buffer.asUint8List();
+  }
+
+  double calculateBearing(LatLng start, LatLng end) {
+    double lat1 = start.latitude * (math.pi / 180);
+    double lat2 = end.latitude * (math.pi / 180);
+    double longDiff = (end.longitude - start.longitude) * (math.pi / 180);
+
+    double x = math.sin(longDiff) * math.cos(lat2);
+    double y = math.cos(lat1) * math.sin(lat2) -
+        math.sin(lat1) * math.cos(lat2) * math.cos(longDiff);
+
+    bearing = math.atan2(x, y) * (180 / math.pi);
+    return (bearing + 360) % 360; // Ensure positive angle
+  }
+
+  void moveMarkerAlongPolyline(List<LatLng> polylinePoints) async {
+    int index = 0;
+    Timer.periodic(Duration(milliseconds: 300), (Timer timer) {
+      if (index < polylinePoints.length - 1) {
+        LatLng nextPosition = polylinePoints[index];
+
+        // ✅ Bearing calculate karein next point tak
+        double newBearing = calculateBearing(_salesPersonPosition, nextPosition);
+
+        setState(() {
+          _salesPersonPosition = nextPosition;
+          bearing = newBearing; // Direction update karein
+          _updateMarkers();
+        });
+
+        index++;
+      } else {
+        timer.cancel(); // ✅ Stop animation when destination is reached
+      }
+    });
+  }
+
 
   /// **1️⃣ Connect to Socket.IO Server**
   void _connectToSocket() {
@@ -50,6 +111,7 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
     _socket = IO.io("${Repository.baseUrl}", <String, dynamic>{
       "transports": ["websocket"],
       "autoConnect": true,
+      "reconnect": true,
     });
 
     // print("user and sales lat long => ${StorageHelper().getUserLat()} , ${StorageHelper().getUserLong()} //// ${StorageHelper().getSalesLat()} , ${StorageHelper().getSalesLng()} ");
@@ -71,10 +133,11 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
         print("inside the if condition");
         print("Sales Latitude: ${data['sales_lat']}");
         print("Sales Longitude: ${data['sales_lng']}");
-
         // Convert to double if necessary
         double salesLat = double.tryParse(data['sales_lat'].toString())??0.0;
         double salesLng = double.tryParse(data['sales_lng'].toString()) ??0.0;
+
+        updateMarkerSmoothly(LatLng(salesLat, salesLng));
 
         print("Sales Lat: $salesLat, Sales Lng: $salesLng");
         print("after getting data ");
@@ -89,7 +152,6 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
         _updateMarkers();
         _updatePolylines();
         _moveCameraToSalesPerson();
-        // _updatePolylines();
         print("Stored in StorageHelper: ${StorageHelper().getSalesLat()}, ${StorageHelper().getSalesLng()} /// ${StorageHelper().getUserLat()} , ${StorageHelper().getUserLong()}");
       } else {
         print("Error: Data is not in Map format -> $data");
@@ -98,9 +160,44 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
 
     _socket!.onDisconnect((_) {
       print("Disconnected from Socket.IO ❌");
+      _reconnectSocket();  // ✅ Attempt Reconnection
     });
   }
 
+  void updateMarkerSmoothly(LatLng newPosition) {
+    final GoogleMapController controller = _mapController;
+    // ✅ Bearing calculate karein
+    double bearing = calculateBearing(_salesPersonPosition, newPosition);
+
+    // Camera ko naye position pe smoothly animate karo
+    controller.animateCamera(CameraUpdate.newLatLng(newPosition));
+
+    setState(() {
+      _markers.add(
+        Marker(
+          markerId: MarkerId('sales_person'),
+          position: newPosition,
+          icon: customIcon,
+          rotation: bearing,  // ✅ Rotation apply karein
+          anchor: Offset(0.5, 0.5), // ✅ Center se rotate hoga
+          // icon: BitmapDescriptor.defaultMarkerWithHue(
+          //   hasArrived ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
+          // ),
+
+
+        ),
+      );
+
+    });
+  }
+
+  /// **2️⃣ Handle Socket Reconnection**
+  void _reconnectSocket() {
+    if (_socket != null && !_socket!.connected) {
+      print("Attempting to reconnect...");
+      _socket!.connect();
+    }
+  }
 
   /// **3️⃣ Fetch Current Location (for salesperson)**
   void _startLocationUpdates() async {
@@ -128,9 +225,10 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
       if (mounted) {
         setState(() {
           _salesPersonPosition = LatLng(position.latitude, position.longitude);
-          _updateMarkers(); // ✅ Marker update here
-          _updatePolylines();
+
         });
+        _updateMarkers(); // ✅ Marker update here
+        _updatePolylines();
       }
 
       /// **4️⃣ Send Salesperson's Updated Location to Backend**
@@ -149,9 +247,12 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
         Marker(
           markerId: MarkerId('sales_person'),
           position: _salesPersonPosition,
-          icon: BitmapDescriptor.defaultMarkerWithHue(
-            hasArrived ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
-          ),
+          rotation: bearing,  // ✅ Rotation apply karein
+          icon: customIcon,
+          // icon: BitmapDescriptor.defaultMarkerWithHue(
+          //   hasArrived ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
+          // ),
+
         ),
       );
       _markers.add(
@@ -164,25 +265,77 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
     });
   }
 
-
-
   /// **5️⃣ Update Route Polyline**
-  void _updatePolylines() {
+  // void _updatePolylines() {
+  //   setState(() {
+  //     _polylines.clear();
+  //     _polylines.add(
+  //       Polyline(
+  //         polylineId: PolylineId("route"),
+  //         color: Colors.blue,
+  //         width: 5,
+  //         points: [_salesPersonPosition, _userPosition],
+  //       ),
+  //     );
+  //   });
+  // }
+
+  /// **🛣 Fetch Road Polyline Route**
+  void _updatePolylines() async {
+    List<LatLng> routeCoordinates =
+    await getRouteCoordinates(_salesPersonPosition, _userPosition);
+
     setState(() {
       _polylines.clear();
-      _polylines.add(
-        Polyline(
-          polylineId: PolylineId("route"),
-          color: Colors.blue,
-          width: 5,
-          points: [_salesPersonPosition, _userPosition],
-        ),
-      );
+      if (routeCoordinates.isNotEmpty) {
+        _polylines.add(
+          Polyline(
+            polylineId: PolylineId("route"),
+            color: Colors.blue,
+            width: 5,
+            points: routeCoordinates,
+          ),
+        );
+      }
     });
   }
 
 
+  Future<List<LatLng>> getRouteCoordinates(LatLng source, LatLng destination) async {
+    const String googleAPIKey = "AIzaSyC9ZOZHwHmyTWXqACqpZY2TL7wX2_Zn05U"; // 🔹 API Key add karein
 
+    String url =
+        "https://maps.googleapis.com/maps/api/directions/json?origin=${source.latitude},${source.longitude}&destination=${destination.latitude},${destination.longitude}&key=$googleAPIKey&mode=driving";
+
+    try {
+      var response = await Dio().get(url);
+      Map values = response.data;
+      if (values['status'] == 'OK') {
+        List<LatLng> routePoints = [];
+        var steps = values['routes'][0]['legs'][0]['steps'];
+
+        for (var step in steps) {
+          // double lat = step['end_location']['lat'];
+          // double lng = step['end_location']['lng'];
+          // routePoints.add(LatLng(lat, lng));
+          double startLat = step['start_location']['lat'];
+          double startLng = step['start_location']['lng'];
+          double endLat = step['end_location']['lat'];
+          double endLng = step['end_location']['lng'];
+
+          routePoints.add(LatLng(startLat, startLng));  // ✅ Include start point
+          routePoints.add(LatLng(endLat, endLng));  // ✅ Include end point
+        }
+        return routePoints;
+      } else {
+        print("Google Directions API Error: ${values['status']}");
+        return [];
+      }
+    } catch (e) {
+      print("Error fetching route: $e");
+      return [];
+    }
+  }
   /// **🔹 Move Camera to Salesperson's Location**
   void _moveCameraToSalesPerson() {
     if (_mapController != null) {
@@ -191,8 +344,6 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
       );
     }
   }
-
-
 
   @override
   void dispose() {

@@ -51,7 +51,7 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier {
       var response = await _repository.deliveryBoyLogin(requestBody);
       if (response.success == true) {
         await _storeDeliveryBoyData(response);
-        Navigator.push(
+        Navigator.pushReplacement(
             context, MaterialPageRoute(builder: (context) => DeliveryBoyDashboardScreen()));
         showCustomSnackbarHelper.showSnackbar(
           context: context,

@@ -211,46 +211,71 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
 
   Widget _buildSummaryCard(
       String title, dynamic count, IconData icon, Color color) {
-    return InkWell(
-      onTap: () {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double width = constraints.maxWidth;
+        double cardPadding = width * 0.04; // Dynamic padding
+        double iconSize = 25; // Responsive icon size
+        double textSize = ResponsiveHelper.fontSize(context, 14);
 
-
-        Provider.of<DeliveryOrdersProvider>(context, listen: false).callEmit();
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => SalesLiveTrackingScreen(),
-          ),
-        );
-
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, size: 30, color: Colors.black54),
-            SizedBox(height: 8),
-            Text(title,
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-            SizedBox(height: 4),
-            AnimatedSwitcher(
-              duration: Duration(milliseconds: 300),
-              child: Text(
-                count.toString(),
-                key: ValueKey(count),
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        return InkWell(
+          onTap: () {
+            Provider.of<DeliveryOrdersProvider>(context, listen: false).callEmit();
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => SalesLiveTrackingScreen(),
+              ),
+            );
+          },
+          child: SizedBox(
+            width: ResponsiveHelper.containerWidth(context, 1), // Adjust width dynamically
+            child: Container(
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(10), // Responsive border radius
+              ),
+              padding: EdgeInsets.all(cardPadding),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(icon, size: iconSize, color: Colors.black54),
+                  SizedBox(height: cardPadding * 0.5),
+                  Text(
+                    title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.heading1(
+                      context,
+                      overrideStyle: TextStyle(
+                        fontSize: textSize,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: cardPadding * 0.3),
+                  AnimatedSwitcher(
+                    duration: Duration(milliseconds: 300),
+                    child: Text(
+                      count.toString(),
+                      key: ValueKey(count),
+                      style: AppTextStyles.heading1(
+                        context,
+                        overrideStyle: TextStyle(
+                          fontSize: textSize,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
+
 
   /// **Custom Header with Order Summary Above Tabs**
   /// **Custom Header with Order Summary Above Tabs**
@@ -403,7 +428,10 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
       );
       return false;
     }
-    return true;
+    SystemNavigator.pop(); // Close the app
+
+    return false;
+    // return true;
   }
 }
 
