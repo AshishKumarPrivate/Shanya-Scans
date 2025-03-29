@@ -7,6 +7,7 @@ import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/storage_helper.dart';
 import '../../../network_manager/api_error_handler.dart';
 import '../../../ui_helper/snack_bar.dart';
+import '../../firebase/FirebaseNotificationService.dart';
 import '../../screen/auth/login_screen.dart';
 import '../../screen/other/screen/user_selection_screen.dart';
 import '../../util/config.dart';
@@ -59,6 +60,7 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier {
           backgroundColor: Colors.green,
           duration: Duration(seconds: 2),
         );
+
       } else {
         showCustomSnackbarHelper.showSnackbar(
           context: context,
@@ -117,6 +119,7 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier {
       duration: Duration(seconds: 3),
     );
   }
+
 
 
 }

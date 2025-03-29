@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "400683123229",
-    "project_id": "shanya-scans-b62e9",
-    "storage_bucket": "shanya-scans-b62e9.firebasestorage.app"
+    "project_number": "1000716877402",
+    "project_id": "shanya-scans-a70aa",
+    "storage_bucket": "shanya-scans-a70aa.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:400683123229:android:94c3327cf1222a4a383cf4",
+        "mobilesdk_app_id": "1:1000716877402:android:cf21d65a290314d4412263",
         "android_client_info": {
           "package_name": "com.example.shanyascans"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyBXkk_RIVzJ6d6mN5COq3eDe7Rxh4ZDDFk"
+          "current_key": "AIzaSyAiRykDBLMRuglZFaNpwZbj6MnANirZHt0"
         }
       ],
       "services": {

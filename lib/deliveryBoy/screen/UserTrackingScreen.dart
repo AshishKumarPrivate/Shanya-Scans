@@ -5,6 +5,7 @@ import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:healthians/network_manager/repository.dart';
+import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:healthians/ui_helper/storage_helper.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -12,15 +13,15 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 import 'dart:math' as math;
 
-class UserLiveTrackingScreen extends StatefulWidget {
+import '../controller/socket_provider.dart';
 
+class UserLiveTrackingScreen extends StatefulWidget {
   // String? userLat, userLong;
   //
   // LiveTrackingScreen({
   //   required this.userLat,
   //   required this.userLong,
   // });
-
 
   @override
   _UserLiveTrackingScreenState createState() => _UserLiveTrackingScreenState();
@@ -29,13 +30,13 @@ class UserLiveTrackingScreen extends StatefulWidget {
 class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
   late GoogleMapController _mapController;
   IO.Socket? _socket;
-  LatLng _salesPersonPosition = LatLng(StorageHelper().getSalesLat(), StorageHelper().getSalesLng());
+  LatLng _salesPersonPosition =LatLng(StorageHelper().getSalesLat(), StorageHelper().getSalesLng());
   LatLng _userPosition = LatLng(StorageHelper().getUserLat(), StorageHelper().getUserLong()); // Example user location
   // LatLng _userPosition = LatLng(26.883301, 80.983299); // Example user location
   Set<Polyline> _polylines = {};
   Set<Marker> _markers = {}; // ✅ Marker set added
   bool hasArrived = false;
-  double bearing=0.0;
+  double bearing = 0.0;
 
   String salesPersonName = "Rahul Sharma";
   String salesPersonPhone = "+91 9876543210";
@@ -45,13 +46,62 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
   void initState() {
     super.initState();
     _loadCustomMarker();
-    _connectToSocket();
+    // _connectToSocket();
     _startLocationUpdates();
+
+
   }
+
+  // @override
+  // void dispose() {
+  //   // _socket?.clearListeners();
+  //   _socket?.disconnect();
+  //   _socket?.dispose();
+  //   print("Socket disconnected properly ❌");
+  //   super.dispose();
+  // }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // _ensureSocketConnected();
+    // Use the SocketProvider to get the sales person's position
+    final socketProvider = Provider.of<SocketProvider>(context);
+
+    // Add a post frame callback to ensure setState() is not called during the build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (socketProvider.salesPersonPosition.latitude != 0 && socketProvider.salesPersonPosition.longitude != 0) {
+        setState(() {
+          _salesPersonPosition = socketProvider.salesPersonPosition;
+        });
+        _updateMarkers();
+        _updatePolylines();
+      }
+      print("Socket Reconnect✅ ");
+    });
+    print("Socket Reconnect✅ ");
+  }
+
+  // void socketReconnect() {
+  //   if (!_socket!.connected) {
+  //     _connectToSocket(); // Ensure reconnection
+  //   }
+  // }
+
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   if (state == AppLifecycleState.resumed) {
+  //     if (!_socket!.connected) {
+  //       _connectToSocket(); // Reconnect when app comes to foreground
+  //     }
+  //   }
+  // }
+
 
   // ✅ Load custom marker function
   Future<void> _loadCustomMarker() async {
-    final Uint8List markerIcon = await _getBytesFromAsset('assets/images/sales_marker.png', 200);
+    final Uint8List markerIcon =
+        await _getBytesFromAsset('assets/images/sales_marker.png', 200);
     setState(() {
       customIcon = BitmapDescriptor.fromBytes(markerIcon);
     });
@@ -60,9 +110,11 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
   // ✅ Convert asset image to bytes
   Future<Uint8List> _getBytesFromAsset(String path, int width) async {
     ByteData data = await rootBundle.load(path);
-    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(), targetWidth: width);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+        targetWidth: width);
     ui.FrameInfo fi = await codec.getNextFrame();
-    ByteData? byteData = await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    ByteData? byteData =
+        await fi.image.toByteData(format: ui.ImageByteFormat.png);
     return byteData!.buffer.asUint8List();
   }
 
@@ -79,90 +131,69 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
     return (bearing + 360) % 360; // Ensure positive angle
   }
 
-  void moveMarkerAlongPolyline(List<LatLng> polylinePoints) async {
-    int index = 0;
-    Timer.periodic(Duration(milliseconds: 300), (Timer timer) {
-      if (index < polylinePoints.length - 1) {
-        LatLng nextPosition = polylinePoints[index];
-
-        // ✅ Bearing calculate karein next point tak
-        double newBearing = calculateBearing(_salesPersonPosition, nextPosition);
-
-        setState(() {
-          _salesPersonPosition = nextPosition;
-          bearing = newBearing; // Direction update karein
-          _updateMarkers();
-        });
-
-        index++;
-      } else {
-        timer.cancel(); // ✅ Stop animation when destination is reached
-      }
-    });
-  }
-
 
   /// **1️⃣ Connect to Socket.IO Server**
-  void _connectToSocket() {
-    // print("User and Sales lat long => "
-    //     "${StorageHelper().getSalesLat()}, ${StorageHelper().getSalesLng()} /// "
-    //     "${StorageHelper().getUserLat()}, ${StorageHelper().getUserLong()}");
-
-    _socket = IO.io("${Repository.baseUrl}", <String, dynamic>{
-      "transports": ["websocket"],
-      "autoConnect": true,
-      "reconnect": true,
-    });
-
-    // print("user and sales lat long => ${StorageHelper().getUserLat()} , ${StorageHelper().getUserLong()} //// ${StorageHelper().getSalesLat()} , ${StorageHelper().getSalesLng()} ");
-
-    _socket!.onConnect((_) {
-      print("Connected to Socket.IO ✅");
-
-      _socket!.emit("get-sales-lat-lng", {
-        "orderDetailId": StorageHelper().getUserOrderId(),
-      });
-
-    });
-
-    _socket!.on("get-updated-sales-lat-lng", (data) {
-      print("Raw Data Received: $data");
-
-      // Check if data is a Map before accessing values
-      if (data is Map<String, dynamic>) {
-        print("inside the if condition");
-        print("Sales Latitude: ${data['sales_lat']}");
-        print("Sales Longitude: ${data['sales_lng']}");
-        // Convert to double if necessary
-        double salesLat = double.tryParse(data['sales_lat'].toString())??0.0;
-        double salesLng = double.tryParse(data['sales_lng'].toString()) ??0.0;
-
-        updateMarkerSmoothly(LatLng(salesLat, salesLng));
-
-        print("Sales Lat: $salesLat, Sales Lng: $salesLng");
-        print("after getting data ");
-        // Store in StorageHelper
-        StorageHelper().setSalesLat(salesLat);
-        StorageHelper().setSalesLng(salesLng);
-        setState(() {
-          _salesPersonPosition = LatLng(salesLat, salesLng);
-
-        });
-        // Markers aur Polylines ko setState ke baad update karein
-        _updateMarkers();
-        _updatePolylines();
-        _moveCameraToSalesPerson();
-        print("Stored in StorageHelper: ${StorageHelper().getSalesLat()}, ${StorageHelper().getSalesLng()} /// ${StorageHelper().getUserLat()} , ${StorageHelper().getUserLong()}");
-      } else {
-        print("Error: Data is not in Map format -> $data");
-      }
-    });
-
-    _socket!.onDisconnect((_) {
-      print("Disconnected from Socket.IO ❌");
-      _reconnectSocket();  // ✅ Attempt Reconnection
-    });
-  }
+  // void _connectToSocket() {
+  //   _socket = IO.io("${Repository.baseUrl}", <String, dynamic>{
+  //     "transports": ["websocket"],
+  //     'autoConnect': true, // Ensure automatic connection
+  //     'reconnection': true, // Enable auto-reconnect
+  //     'reconnectionAttempts': 5, // Retry up to 5 times
+  //     'reconnectionDelay': 2000, // Wait 2s before retry
+  //   });
+  //
+  //   // print("user and sales lat long => ${StorageHelper().getUserLat()} , ${StorageHelper().getUserLong()} //// ${StorageHelper().getSalesLat()} , ${StorageHelper().getSalesLng()} ");
+  //
+  //   _socket!.onConnect((_) {
+  //     print("Connected to Socket.IO ✅");
+  //
+  //     _socket!.emit("get-sales-lat-lng", {
+  //       "orderDetailId": StorageHelper().getUserOrderId(),
+  //     });
+  //   });
+  //
+  //   _socket!.on("get-updated-sales-lat-lng", (data) {
+  //     print("Raw Data Received: $data");
+  //
+  //     // Check if data is a Map before accessing values
+  //     if (data is Map<String, dynamic>) {
+  //       print("inside the if condition");
+  //       print("Sales Latitude: ${data['sales_lat']}");
+  //       print("Sales Longitude: ${data['sales_lng']}");
+  //       // Convert to double if necessary
+  //       double salesLat = double.tryParse(data['sales_lat'].toString()) ?? 0.0;
+  //       double salesLng = double.tryParse(data['sales_lng'].toString()) ?? 0.0;
+  //
+  //       updateMarkerSmoothly(LatLng(salesLat, salesLng));
+  //
+  //       print("Sales Lat: $salesLat, Sales Lng: $salesLng");
+  //       print("after getting data ");
+  //       // Store in StorageHelper
+  //       StorageHelper().setSalesLat(salesLat);
+  //       StorageHelper().setSalesLng(salesLng);
+  //       setState(() {
+  //         _salesPersonPosition = LatLng(salesLat, salesLng);
+  //       });
+  //       // Markers aur Polylines ko setState ke baad update karein
+  //       _updateMarkers();
+  //       _updatePolylines();
+  //       _moveCameraToSalesPerson();
+  //       print(
+  //           "Stored in StorageHelper: ${StorageHelper().getSalesLat()}, ${StorageHelper().getSalesLng()} /// ${StorageHelper().getUserLat()} , ${StorageHelper().getUserLong()}");
+  //     } else {
+  //       print("Error: Data is not in Map format -> $data");
+  //     }
+  //   });
+  //
+  //   _socket!.onDisconnect((_) {
+  //     print("Disconnected from Socket.IO ❌");
+  //     _reconnectSocket(); // ✅ Attempt Reconnection
+  //   });
+  //
+  //   _socket!.onError((error) {
+  //     print('Socket error ❌: $error');
+  //   });
+  // }
 
   void updateMarkerSmoothly(LatLng newPosition) {
     final GoogleMapController controller = _mapController;
@@ -178,16 +209,14 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
           markerId: MarkerId('sales_person'),
           position: newPosition,
           icon: customIcon,
-          rotation: bearing,  // ✅ Rotation apply karein
+          rotation: bearing,
+          // ✅ Rotation apply karein
           anchor: Offset(0.5, 0.5), // ✅ Center se rotate hoga
           // icon: BitmapDescriptor.defaultMarkerWithHue(
           //   hasArrived ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
           // ),
-
-
         ),
       );
-
     });
   }
 
@@ -217,7 +246,8 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
     }
 
     Geolocator.getPositionStream(
-      locationSettings: LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 5),
+      locationSettings:
+          LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 5),
     ).listen((Position position) {
       double latitude = position.latitude;
       double longitude = position.longitude;
@@ -225,7 +255,6 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
       if (mounted) {
         setState(() {
           _salesPersonPosition = LatLng(position.latitude, position.longitude);
-
         });
         _updateMarkers(); // ✅ Marker update here
         _updatePolylines();
@@ -238,7 +267,6 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
     });
   }
 
-
   /// **3️⃣ Update Markers on Map**
   void _updateMarkers() {
     setState(() {
@@ -247,12 +275,11 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
         Marker(
           markerId: MarkerId('sales_person'),
           position: _salesPersonPosition,
-          rotation: bearing,  // ✅ Rotation apply karein
+          rotation: bearing, // ✅ Rotation apply karein
           icon: customIcon,
           // icon: BitmapDescriptor.defaultMarkerWithHue(
           //   hasArrived ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
           // ),
-
         ),
       );
       _markers.add(
@@ -283,7 +310,7 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
   /// **🛣 Fetch Road Polyline Route**
   void _updatePolylines() async {
     List<LatLng> routeCoordinates =
-    await getRouteCoordinates(_salesPersonPosition, _userPosition);
+        await getRouteCoordinates(_salesPersonPosition, _userPosition);
 
     setState(() {
       _polylines.clear();
@@ -300,9 +327,10 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
     });
   }
 
-
-  Future<List<LatLng>> getRouteCoordinates(LatLng source, LatLng destination) async {
-    const String googleAPIKey = "AIzaSyC9ZOZHwHmyTWXqACqpZY2TL7wX2_Zn05U"; // 🔹 API Key add karein
+  Future<List<LatLng>> getRouteCoordinates(
+      LatLng source, LatLng destination) async {
+    const String googleAPIKey =
+        "AIzaSyC9ZOZHwHmyTWXqACqpZY2TL7wX2_Zn05U"; // 🔹 API Key add karein
 
     String url =
         "https://maps.googleapis.com/maps/api/directions/json?origin=${source.latitude},${source.longitude}&destination=${destination.latitude},${destination.longitude}&key=$googleAPIKey&mode=driving";
@@ -323,8 +351,8 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
           double endLat = step['end_location']['lat'];
           double endLng = step['end_location']['lng'];
 
-          routePoints.add(LatLng(startLat, startLng));  // ✅ Include start point
-          routePoints.add(LatLng(endLat, endLng));  // ✅ Include end point
+          routePoints.add(LatLng(startLat, startLng)); // ✅ Include start point
+          routePoints.add(LatLng(endLat, endLng)); // ✅ Include end point
         }
         return routePoints;
       } else {
@@ -336,6 +364,7 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
       return [];
     }
   }
+
   /// **🔹 Move Camera to Salesperson's Location**
   void _moveCameraToSalesPerson() {
     if (_mapController != null) {
@@ -345,81 +374,95 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
     }
   }
 
-  @override
-  void dispose() {
-    _socket?.disconnect();
-    _socket?.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Live Tracking')),
-      body: Stack(
-        children: [
-          GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: _salesPersonPosition,
-              zoom: 15,
-            ),
-            onMapCreated: (GoogleMapController controller) {
-              _mapController = controller;
-              _updateMarkers(); // ✅ Ensure markers are set after map creation
-              _updatePolylines();
-            },
+    return Consumer<SocketProvider>(
+      builder: (context, socketProvider, child) {
+        LatLng salesPersonPosition = socketProvider.salesPersonPosition;
 
-            markers: _markers, // ✅ Use updated markers
-            polylines: _polylines,
-          ),
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (socketProvider.salesPersonPosition != _salesPersonPosition) {
+            setState(() {
+              _salesPersonPosition = socketProvider.salesPersonPosition;
+            });
+            _updateMarkers();
+            _updatePolylines();
+          }
+        });
 
-          // Bottom Status Box
-          Align(
-            alignment: Alignment.bottomCenter,
-            child: Container(
-              padding: EdgeInsets.all(16),
-              margin: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5)],
+        return   Scaffold(
+          appBar: AppBar(title: Text('Live Tracking')),
+          body: Stack(
+            children: [
+              GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: _salesPersonPosition,
+                  zoom: 15,
+                ),
+                onMapCreated: (GoogleMapController controller) {
+                  _mapController = controller;
+                  _updateMarkers(); // ✅ Ensure markers are set after map creation
+                  _updatePolylines();
+                },
+                markers: _markers, // ✅ Use updated markers
+                polylines: _polylines,
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    hasArrived
-                        ? "Salesperson has reached the destination!"
-                        : "Salesperson is on the way...",
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+
+              // Bottom Status Box
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  padding: EdgeInsets.all(16),
+                  margin: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5)],
                   ),
-                  SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.blueAccent,
-                        child: Icon(Icons.person, color: Colors.white),
+                      Text(
+                        hasArrived
+                            ? "Salesperson has reached the destination!"
+                            : "Salesperson is on the way...",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(width: 10),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(salesPersonName, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                          Text(salesPersonPhone, style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+                          CircleAvatar(
+                            backgroundColor: Colors.blueAccent,
+                            child: Icon(Icons.person, color: Colors.white),
+                          ),
+                          SizedBox(width: 10),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(salesPersonName,
+                                  style: TextStyle(
+                                      fontSize: 16, fontWeight: FontWeight.w600)),
+                              Text(salesPersonPhone,
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.grey[700])),
+                            ],
+                          ),
                         ],
                       ),
+                      SizedBox(height: 10),
+                      if (!hasArrived)
+                        LinearProgressIndicator(
+                            color: Colors.blue, backgroundColor: Colors.grey[300]),
                     ],
                   ),
-                  SizedBox(height: 10),
-                  if (!hasArrived)
-                    LinearProgressIndicator(color: Colors.blue, backgroundColor: Colors.grey[300]),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

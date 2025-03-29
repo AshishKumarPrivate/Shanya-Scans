@@ -8,6 +8,7 @@ import 'package:healthians/util/config.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../base_widgets/outlined_rounded_button.dart';
+import '../../firebase/FirebaseNotificationService.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../ui_helper/app_text_styles.dart';
 import '../../ui_helper/responsive_helper.dart';
@@ -34,12 +35,12 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
       statusBarIconBrightness: Brightness.light,
     ));
 
-    final provider =
-        Provider.of<DeliveryOrdersProvider>(context, listen: false);
+    final provider =  Provider.of<DeliveryOrdersProvider>(context, listen: false);
 
     provider.fetchDeliveryBoyOrderSummary(); // Call API after build phase
     provider.initializeSocket(); // Initialize Socket.IO
 
+    NotificationService.initialize(context); // Initialize FCM
     _tabController = TabController(length: 3, vsync: this);
 
     // Fetch orders based on tab selection

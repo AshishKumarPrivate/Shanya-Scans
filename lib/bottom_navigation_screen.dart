@@ -9,6 +9,8 @@ import 'package:healthians/screen/fragments/nav_pathalogy_teest_screen.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:healthians/ui_helper/app_colors.dart';
 
+import 'firebase/FirebaseNotificationService.dart';
+
 class BottomNavigationScreen extends StatefulWidget {
   final int initialPageIndex;
 

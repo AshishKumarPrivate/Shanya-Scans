@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:healthians/deliveryBoy/model/ChangeOrderStatusModelResponse.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderDetailModel.dart';
@@ -9,9 +10,12 @@ import 'package:healthians/deliveryBoy/model/DeliveryBoyProfileSummaryModelRespo
 import 'package:healthians/deliveryBoy/model/DeliveryOrderLIstModel.dart'
     as deliveryBoyOrder;
 import 'package:healthians/ui_helper/storage_helper.dart';
+import '../../network_manager/api_error_handler.dart';
 import '../../network_manager/repository.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
+import '../../ui_helper/app_colors.dart';
+import '../../ui_helper/snack_bar.dart';
 import '../../util/config.dart';
 
 class DeliveryOrdersProvider extends ChangeNotifier {
@@ -333,5 +337,61 @@ class DeliveryOrdersProvider extends ChangeNotifier {
     }
 
     return false;
+  }
+
+  void _handleDioErrors(BuildContext context, DioException e) {
+    showCustomSnackbarHelper.showSnackbar(
+      context: context,
+      message: ApiErrorHandler.handleError(e),
+      backgroundColor: Colors.red,
+      duration: Duration(seconds: 3),
+    );
+  }
+
+  void _handleUnexpectedErrors(  BuildContext context, dynamic e, String message) {
+    showCustomSnackbarHelper.showSnackbar(
+      context: context,
+      message: message,
+      backgroundColor: Colors.red,
+      duration: Duration(seconds: 3),
+    );
+  }
+
+
+  Future<void> sendFcmToken(  String fcmToken) async {
+    setLoadingState(true);
+    try {
+      Map<String, dynamic> requestBody = {
+        "id": StorageHelper().getDeliveryBoyId(),
+        "token":fcmToken ,
+
+      };
+
+      var response = await _repository.sendFcmToken(requestBody);
+      if (response["success"] == true) {
+        print("Token send successfully");
+
+      } else {
+
+        print("Token failed ");
+
+        // showCustomSnackbarHelper.showSnackbar(
+        //   context: context,
+        //   message: response["message"] ?? "Failed to send token!",
+        //   backgroundColor: Colors.red,
+        //   duration: Duration(seconds: 2),
+        // );
+
+
+      }
+    } on DioException catch (e) {
+      // _handleDioErrors(context, e);
+      print("Token failed ");
+    } catch (e) {
+      // _handleUnexpectedErrors(context, e, "Something went wrong!");
+      print("Token failed ");
+    } finally {
+      setLoadingState(false);
+    }
   }
 }

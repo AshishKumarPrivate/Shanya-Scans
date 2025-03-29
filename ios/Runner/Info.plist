@@ -8,6 +8,21 @@
         <string>We need your location even in the background.</string>
 
 
+        <key>FirebaseAppDelegateProxyEnabled</key>
+        <false/>
+        <key>NSAppTransportSecurity</key>
+        <dict>
+            <key>NSAllowsArbitraryLoads</key>
+            <true/>
+        </dict>
+        <key>NSPushNotificationUsageDescription</key>
+        <string>We would like to send you push notifications.</string>
+
+
+
+
+
+
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>

@@ -322,7 +322,7 @@ packages:
     source: hosted
     version: "7.0.1"
   firebase_core:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: firebase_core
       sha256: f4d8f49574a4e396f34567f3eec4d38ab9c3910818dec22ca42b2a467c685d8b
@@ -346,7 +346,7 @@ packages:
     source: hosted
     version: "2.21.1"
   firebase_messaging:
-    dependency: "direct dev"
+    dependency: "direct main"
     description:
       name: firebase_messaging
       sha256: "5fc345c6341f9dc69fd0ffcbf508c784fd6d1b9e9f249587f30434dd8b6aa281"

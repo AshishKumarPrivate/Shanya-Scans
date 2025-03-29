@@ -4,6 +4,7 @@ import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderDetailModel.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderSummaryModelResponse.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryBoyProfileSummaryModelResponse.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryLoginModelResponse.dart';
+import 'package:healthians/firebase/FirebaseModel.dart';
 import 'package:healthians/screen/auth/model/LoginModel.dart';
 import 'package:healthians/screen/auth/model/UpdateProfileModel.dart';
 import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/model/FrequentlyPathalogyTagListModel.dart';
@@ -527,6 +528,34 @@ class Repository {
     Map<String, dynamic> response =
     await _dioHelper.get(url: '$baseUrl/api/v1/collection/detail/${deliveryBoyId}');
     return DeliveryBoyProfileSummaryModelResponse.fromJson(response);
+  }
+
+  Future<Map<String, dynamic>> sendFcmToken(Object requestBody) async {
+
+    try{
+      Map<String, dynamic> response = await _dioHelper.post(
+          url: '$baseUrl/api/v1/collection/fcm/token', requestBody: requestBody);
+
+      print("✅ Send fcm token API Response: $response");
+
+      if (response == null) {
+        return {"success": false, "message": "No response from server"};
+      }
+
+      return {
+        "success": response["success"] ?? false,
+        "message": response["message"] ?? "Something went wrong"
+      };
+    }on DioException catch (e) {
+      return {
+        "success": false,
+        "message": e.response?.data["message"] ?? "Something went wrong"
+      };
+    } catch (e) {
+      return {"success": false, "message": "Unexpected error occurred"};
+    }
+
+    // return FirebaseModel.fromJson(response);
   }
 
 

@@ -1,10 +1,12 @@
 import 'package:device_preview/device_preview.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:healthians/bottom_navigation_screen.dart';
 import 'package:healthians/deliveryBoy/controller/DeliveryOrdersProvider.dart';
 import 'package:healthians/deliveryBoy/controller/delivery_boy_auth_provider.dart';
+import 'package:healthians/deliveryBoy/controller/socket_provider.dart';
 import 'package:healthians/screen/auth/controller/auth_provider.dart';
 import 'package:healthians/screen/auth/login_screen.dart';
 import 'package:healthians/screen/cart/controller/cart_list_api_provider.dart';
@@ -29,12 +31,18 @@ import 'package:healthians/ui_helper/storage_helper.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
+import 'firebase/FirebaseNotificationService.dart';
+
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); // ✅ Ensure Flutter binding is initialized
+  await Firebase.initializeApp();
+
   StorageHelper().init(); // ✅ Initialize SharedPreferences
   await PackageInfo.fromPlatform(); // Ensures package is loaded
+
+
   runApp(
     MultiProvider(
       providers: [
@@ -57,6 +65,7 @@ Future<void> main() async {
         /// &&&&&&&&&&& Dellivery BOy ***********
         ChangeNotifierProvider(create: (context) => DeliveryOrdersProvider()),
         ChangeNotifierProvider(create: (context) => DeliveryBoyAuthApiProvider()),
+        ChangeNotifierProvider(create: (context) => SocketProvider()),
 
 
       ],
