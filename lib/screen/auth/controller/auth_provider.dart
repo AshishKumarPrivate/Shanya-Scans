@@ -28,8 +28,7 @@ class AuthApiProvider with ChangeNotifier {
     _setLoading(false);
   }
 
-  Future<void> signUpUser(
-      BuildContext context, String name, String email, String password) async {
+  Future<void> signUpUser( BuildContext context, String name, String email, String password) async {
     _setLoading(true);
     try {
       Map<String, dynamic> requestBody = {
@@ -40,8 +39,7 @@ class AuthApiProvider with ChangeNotifier {
       var response = await _repository.userSignUp(requestBody);
 
       if (response.success) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => OTPScreen(email)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => OTPScreen(email)));
         showCustomSnackbarHelper.showSnackbar(
           context: context,
           message: "Sign-up successful! Please verify OTP.",
@@ -49,15 +47,33 @@ class AuthApiProvider with ChangeNotifier {
           duration: Duration(seconds: 2),
         );
       } else {
+        print("❌ Unexpected response format: $response");
         _handleSignupErrors(context, response.message);
+        throw Exception("Invalid API response format");
       }
     } on DioException catch (e) {
-      _handleDioErrors(context, e);
+      print("❌ DioException occurred: $e");
+      String errorMessage = ApiErrorHandler.handleError(e);
+      showCustomSnackbarHelper.showSnackbar(
+        context: context,
+        message: errorMessage,
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
+      );
     } catch (e) {
-      _handleUnexpectedErrors(context, e, "SignUp Failed! Please try again");
-    } finally {
-      _setLoading(false);
+      // print("Stacktrace: $stacktrace");
+      // showCustomSnackbarHelper.showSnackbar(
+      //   context: context,
+      //   message: "Account already exists! Try logging in",
+      //   backgroundColor: Colors.red,
+      //   duration: Duration(seconds: 3),
+      // );
+      _handleUnexpectedErrors(context, e, "Account already exists! Try logging in");
     }
+    // finally {
+    //   print("finalyy block ");
+      _setLoading(false);
+    // }
   }
 
   Future<bool> getOtp(BuildContext context, String email, String otp) async {
@@ -67,6 +83,7 @@ class AuthApiProvider with ChangeNotifier {
       var response = await _repository.verifyOtp(requestBody);
 
       if (response.success == true) {
+        await StorageHelper().setOtpVerified(true);
         await _storeUserData(response);
         Navigator.pushReplacement(context,
             MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
@@ -116,14 +133,20 @@ class AuthApiProvider with ChangeNotifier {
       var response = await _repository.userLogin(requestBody);
 
       if (response.success == true) {
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => OTPScreen(email)));
-        showCustomSnackbarHelper.showSnackbar(
-          context: context,
-          message: response.message ?? 'Login successful!',
-          backgroundColor: AppColors.primary,
-          duration: Duration(seconds: 2),
-        );
+        bool isOtpVerified = await StorageHelper().getOtpVerified();
+        if (!isOtpVerified) {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => OTPScreen(email)));
+        } else {
+          Navigator.pushReplacement(
+              context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
+        }
+        // showCustomSnackbarHelper.showSnackbar(
+        //   context: context,
+        //   message: response.message ?? 'Login successful!',
+        //   backgroundColor: AppColors.primary,
+        //   duration: Duration(seconds: 2),
+        // );
       } else {
         showCustomSnackbarHelper.showSnackbar(
           context: context,
@@ -222,6 +245,7 @@ class AuthApiProvider with ChangeNotifier {
     }
     return false;
   }
+
   void logoutUser(BuildContext context) {
     _setLoading(true);
     Future.delayed(Duration(seconds: 1), () {

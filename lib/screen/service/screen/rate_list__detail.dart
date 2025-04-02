@@ -52,6 +52,7 @@ class _RateListDetailScreenState extends State<RateListDetailScreen> {
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
+        bottom: false,
         child: Container(
           color: Colors.white,
           child: Padding(
@@ -98,17 +99,14 @@ class _RateListDetailScreenState extends State<RateListDetailScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:CrossAxisAlignment.center,
                                       // Ensure text doesn't overflow
                                       children: [
                                         Expanded(
                                           // Ensures text wraps properly
                                           child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            crossAxisAlignment:  CrossAxisAlignment.start,
                                             children: [
                                               Text(
                                                 "${StringUtils.toUpperCase(widget.serviceData.testDetailName.toString())}",
@@ -124,8 +122,7 @@ class _RateListDetailScreenState extends State<RateListDetailScreen> {
                                               ),
                                               // Added spacing to prevent text overlap
                                               Padding(
-                                                padding: const EdgeInsets.only(
-                                                    right: 5.0, top: 2.0),
+                                                padding: const EdgeInsets.only( right: 5.0, top: 2.0),
                                                 child: Text(
                                                   "Shanya Scans & Theranostics – Uttar Pradesh’s No. 1 Diagnostic Centre in Lucknow for Accurate & Reliable Testing!",
                                                   style: AppTextStyles.heading1(
@@ -212,50 +209,25 @@ class _RateListDetailScreenState extends State<RateListDetailScreen> {
 
 
 
-
-
-
-
-
-
                                             InkWell(
                                               onTap: () {
                                                 /// Function to extract plain text from an HTML string
-                                                String extractPlainText(
-                                                    String htmlString) {
-                                                  var document =
-                                                      parse(htmlString);
-                                                  return document.body?.text ??
-                                                      "";
+                                                String extractPlainText( String htmlString) {
+                                                  var document = parse(htmlString);
+                                                  return document.body?.text ?? "";
                                                 }
 
                                                 // set order type
-                                                StringUtils.setOrderType(
-                                                    "scan");
+                                                StringUtils.setOrderType("scan");
 
-                                                final extractedText =
-                                                    extractPlainText(widget
-                                                        .serviceData
-                                                        .testRequirement1
-                                                        .toString());
+                                                final extractedText = extractPlainText(widget .serviceData .testRequirement1.toString());
 
                                                 OrderItem orderItem = OrderItem(
-                                                    id:
-                                                        widget.serviceData
-                                                                .sId ??
-                                                            "",
+                                                    id: widget.serviceData.sId ?? "",
                                                     orderType:"scan",
-                                                    name:
-                                                        widget.serviceData
-                                                            .testDetailName
-                                                            .toString(),
-                                                    category:
-                                                        widget.serviceData
-                                                            .category
-                                                            .toString(),
-                                                    price:
-                                                        double.parse(
-                                                            widget.serviceData
+                                                    name: widget.serviceData.testDetailName .toString(),
+                                                    category:  widget.serviceData .category .toString(),
+                                                    price: double.parse(widget.serviceData
                                                                 .testPrice
                                                                 .toString()),
                                                     imageUrl:

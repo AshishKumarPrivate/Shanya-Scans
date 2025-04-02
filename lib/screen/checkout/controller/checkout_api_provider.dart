@@ -221,7 +221,8 @@ class CheckoutProvider with ChangeNotifier {
       String phone,
       String altPhone,
       String gender,
-      String cityState
+      String cityState,
+      String addressType
 
       ) async {
     _setLoadingState(true);
@@ -278,6 +279,7 @@ class CheckoutProvider with ChangeNotifier {
       Map<String, dynamic> requestBody = {
         "email": email,
         "address": cityState,
+        "addressType": addressType,
         "phoneNumber": phone,
         "altPhoneNumber": altPhone,
         "orderDetails": orderDetailsJson,

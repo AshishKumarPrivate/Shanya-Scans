@@ -149,15 +149,11 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            AllServicesDetailListScreen(
-                                          serviceName: item.serviceDetailName!
-                                              .toString(),
+                                        builder: (context) =>  AllServicesDetailListScreen(
+                                          serviceName: item.serviceDetailName! .toString(),
                                           serviceSlug: item.slug! ?? "",
-                                          serviceDescription:
-                                              item.serviceDetail! ?? "",
-                                          servicePhoto:
-                                              item.servicePhoto!.secureUrl! ??
+                                          serviceDescription: item.serviceDetail! ?? "",
+                                          servicePhoto: item.servicePhoto!.secureUrl! ??
                                                   "",
                                         ),
                                       ),

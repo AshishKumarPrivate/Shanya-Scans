@@ -40,6 +40,7 @@ class _AllServicesDetailListScreenState
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
+        bottom: false,
         child: Container(
           color: Colors.white,
           child: Column(

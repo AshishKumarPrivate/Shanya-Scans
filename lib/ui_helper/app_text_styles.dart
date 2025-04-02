@@ -63,7 +63,8 @@ class AppTextStyles {
 
   // Helper function to calculate responsive font size
   static double _responsiveFontSize(BuildContext context, double baseFontSize) {
-    double screenWidth = MediaQuery.of(context).size.width;
-    return baseFontSize * (screenWidth / 375.0); // Reference width is 375.0
+    double screenWidth = MediaQuery.of(context).size.shortestSide;
+    double scaleFactor = MediaQuery.of(context).textScaleFactor;
+    return (baseFontSize * (screenWidth / 375.0))*scaleFactor; // Reference width is 375.0
   }
 }

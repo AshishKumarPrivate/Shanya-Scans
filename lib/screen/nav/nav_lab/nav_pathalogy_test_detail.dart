@@ -47,6 +47,7 @@ class _ViewDetailPathalogyTestScreenState
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
+        bottom: false,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
           child: Container(

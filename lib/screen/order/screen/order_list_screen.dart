@@ -10,6 +10,7 @@ import '../../../ui_helper/app_text_styles.dart';
 import '../../../ui_helper/responsive_helper.dart';
 import '../../../ui_helper/storage_helper.dart';
 import '../../../util/date_formate.dart';
+import '../../testing_file.dart';
 import '../controller/order_provider.dart';
 import '../model/MyOrderHistoryListModel.dart';
 import 'package:healthians/base_widgets/loading_indicator.dart';
@@ -99,6 +100,7 @@ class OrderCard extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) =>  UserOrderHistoryDetailScreen(orderId: order.sId.toString(),)),
+              // MaterialPageRoute(builder: (context) =>  OrderDetailsPage(orderId: order.sId.toString(),)),
             );
 
           },
@@ -203,7 +205,7 @@ class OrderCard extends StatelessWidget {
                       SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          "${DateUtil.formatISOTime(order.bookingTime.toString())}",
+                          "${DateUtil.formatISOTime(order.bookingDate.toString())}",
                           style: TextStyle(fontSize: 13, color: Colors.grey[700]),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -267,36 +269,36 @@ class OrderCard extends StatelessWidget {
                         style: TextStyle(
                             color: Colors.green, fontWeight: FontWeight.w600),
                       ),
-                      InkWell(
-                        onTap: (){
-                          // double lat = double.parse(order.lat.toString());
-                          // double long = double.parse(order.lng.toString());
-                          //
-                          // StorageHelper().setUserLat(lat);
-                          // StorageHelper().setUserLong(long);
-                          // // set the order id for tracking
-                          // StorageHelper().setUserOrderId(order.sId.toString());
-                          //
-                          //
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => UserLiveTrackingScreen(),
-                          //   ),
-                          // );
-
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: statusColor.withAlpha(200),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text("Track Order", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-
-
-                        ),
-                      ),
+                      // InkWell(
+                      //   onTap: (){
+                      //     // double lat = double.parse(order.lat.toString());
+                      //     // double long = double.parse(order.lng.toString());
+                      //     //
+                      //     // StorageHelper().setUserLat(lat);
+                      //     // StorageHelper().setUserLong(long);
+                      //     // // set the order id for tracking
+                      //     // StorageHelper().setUserOrderId(order.sId.toString());
+                      //     //
+                      //     //
+                      //     // Navigator.push(
+                      //     //   context,
+                      //     //   MaterialPageRoute(
+                      //     //     builder: (context) => UserLiveTrackingScreen(),
+                      //     //   ),
+                      //     // );
+                      //
+                      //   },
+                      //   child: Container(
+                      //     padding: EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                      //     decoration: BoxDecoration(
+                      //       color: statusColor.withAlpha(200),
+                      //       borderRadius: BorderRadius.circular(8),
+                      //     ),
+                      //     child: Text("Track Order", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                      //
+                      //
+                      //   ),
+                      // ),
                       Text(
                         "\u20B9 ${order.orderPrice}",
                         style: TextStyle(

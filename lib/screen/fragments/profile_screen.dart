@@ -18,6 +18,7 @@ import '../../base_widgets/outlined_rounded_button.dart';
 import '../../deliveryBoy/screen/deleivery_boy_dashboard.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../util/share_app_utils.dart';
+import '../testing_file.dart';
 
 class ProfileScreen extends StatelessWidget {
   // const ProfileScreen({super.key});
@@ -52,7 +53,8 @@ class ProfileScreen extends StatelessWidget {
                     ClipPath(
                       clipper: CustomClipPath(),
                       child: Container(
-                        height: 170, // Height of the curved container
+                        height: 170,
+                        // Height of the curved container
                         // height: ResponsiveHelper.containerHeight(context, 20), // Height of the curved container
                         color: AppColors.primary,
                         child: Stack(
@@ -63,7 +65,6 @@ class ProfileScreen extends StatelessWidget {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-
                                   SizedBox(
                                     width: ResponsiveHelper.containerWidth(
                                         context, 15),
@@ -212,7 +213,8 @@ class ProfileScreen extends StatelessWidget {
                                       isRefundPolicy: false,
                                       isTermAndConditions: false,
                                       aciviyName: "Privacy Policy",
-                                      url: "https://ayush.webakash1806.com/privacy-policy"),
+                                      url:
+                                          "https://ayush.webakash1806.com/privacy-policy"),
                                 ),
                               );
                             },
@@ -275,22 +277,22 @@ class ProfileScreen extends StatelessWidget {
                                   context); // Call the reusable share function
                             },
                           ),
-                          SizedBox(
-                            height: 15,
-                          ),
-                          ProfileListTile(
-                            title: "Sales Dashoard",
-                            leadingIcon: Icons.share,
-                            leadingIconColor: AppColors.primary,
-                            onTap: () {
-                              // Call the reusable share function
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        DeliveryBoyDashboardScreen()), // Replace with your home screen
-                              );
-                            },
-                          ),
+                          // SizedBox(
+                          //   height: 15,
+                          // ),
+                          // ProfileListTile(
+                          //   title: "Sales Dashoard",
+                          //   leadingIcon: Icons.share,
+                          //   leadingIconColor: AppColors.primary,
+                          //   onTap: () {
+                          //     // Call the reusable share function
+                          //     Navigator.of(context).push(
+                          //       MaterialPageRoute(
+                          //           builder: (context) =>
+                          //               OrderDetailsPage()), // Replace with your home screen
+                          //     );
+                          //   },
+                          // ),
                           ProfileListTile(
                             title: "Forget Password",
                             onTap: () {
@@ -298,8 +300,7 @@ class ProfileScreen extends StatelessWidget {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      ForgotPasswordScreen(),
+                                  builder: (context) => ForgotPasswordScreen(),
                                   // builder: (context) => MyWishListScreen(),
                                 ),
                               );

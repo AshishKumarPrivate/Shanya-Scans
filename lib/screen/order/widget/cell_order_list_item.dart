@@ -204,10 +204,8 @@ class _CellOrderListItemState extends State<CellOrderListItem> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) =>
-                                    ServicesDetailListDetailBuyNowScreen(
-                                  productName:
-                                      rateListItem.testDetailName ?? "N/A",
+                                builder: (context) =>ServicesDetailListDetailBuyNowScreen(
+                                  productName: rateListItem.testDetailName ?? "N/A",
                                 ),
                               ),
                             );

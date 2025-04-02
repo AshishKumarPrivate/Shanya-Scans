@@ -35,18 +35,16 @@ import 'dio_helper.dart';
 class Repository {
   static final DioHelper _dioHelper = DioHelper();
 
-  static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
+  // static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
   // static const String baseUrl = "https://dbsanya.drmanasaggarwal.com";
-  //
+  static const String baseUrl = "https://db.shanyascans.com";
+
 
   // &&&&&&&&&&& testing api Start here &&&&&&&&&&&&&&&&
 
   //GET API
   Future<ObjectModel> objectModelApiResponse() async {
-    // var response =
-    //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
-    Map<String, dynamic> response =
-        await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
+    Map<String, dynamic> response = await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
     return ObjectModel.fromJson(response);
   }
 
@@ -70,7 +68,7 @@ class Repository {
 
   // ******************************  Shanya Scans API  **************************************
   Future<SignUpModel> userSignUp(Map<String, dynamic> requestBody) async {
-    try {
+    // try {
       print("📤 Sending Signup Request: $requestBody");
 
       Map<String, dynamic>? response = await _dioHelper.post(
@@ -93,21 +91,22 @@ class Repository {
 
       // ✅ Convert API response into Model
       return SignUpModel.fromJson(response);
-    } on DioException catch (e) {
-      if (e.response != null) {
-        print("❌ API Error: ${e.response?.data}");
-        String errorMessage =
-            e.response?.data["message"] ?? "Something went wrong";
-
-        return SignUpModel(success: false, message: errorMessage);
-      } else {
-        print("❌ Network Error: ${e.message}");
-        return SignUpModel(success: false, message: "No Internet Connection");
-      }
-    } catch (e) {
-      print("❌ Unexpected Error: $e");
-      return SignUpModel(success: false, message: "Unexpected error occurred");
-    }
+    // }
+    // on DioException catch (e) {
+    //   if (e.response != null) {
+    //     print("❌ API Error: ${e.response?.data}");
+    //     String errorMessage =
+    //         e.response?.data["message"] ?? "Something went wrong";
+    //
+    //     return SignUpModel(success: false, message: errorMessage);
+    //   } else {
+    //     print("❌ Network Error: ${e.message}");
+    //     return SignUpModel(success: false, message: "No Internet Connection");
+    //   }
+    // } catch (e) {
+    //   print("❌ Unexpected Error: $e");
+    //   return SignUpModel(success: false, message: "Unexpected error occurred");
+    // }
   }
 
   // user login

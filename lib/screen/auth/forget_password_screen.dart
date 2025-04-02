@@ -28,16 +28,16 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
   void _requestOtp() async {
     final provider = context.read<AuthApiProvider>();
-    // String email = _emailController.text.trim();
-    //
-    // setState(() => _emailError = null);
-    //
-    // if (email.isEmpty || !_isValidEmail(email)) {
-    //   setState(() => _emailError = "Enter a valid email address");
-    //   return;
-    // }
+    String email = _emailController.text.trim();
 
-    bool success = await provider.forgetPassword(context, StorageHelper().getEmail());
+    setState(() => _emailError = null);
+
+    if (email.isEmpty || !_isValidEmail(email)) {
+      setState(() => _emailError = "Enter a valid email address");
+      return;
+    }
+
+    bool success = await provider.forgetPassword(context, _emailController.text.toString());
     if (success) {
       setState(() {}); // Ensure UI updates
     }
@@ -61,7 +61,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       return;
     }
 
-    await provider.resetPassword( context,StorageHelper().getEmail() , otp, newPassword);
+    await provider.resetPassword( context,_emailController.text.toString() , otp, newPassword);
     setState(() {}); // Ensure UI updates
   }
 
@@ -103,7 +103,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         builder: (context, provider, child) {
           return Container(
             color: Colors.white,
-            padding: EdgeInsets.all(20.0),
+            padding: EdgeInsets.all(10.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -124,24 +124,33 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      CustomRoundedContainer(
-                        borderRadius: 10,
-                        borderColor:AppColors.txtGreyColor.withAlpha(50),
-                        borderWidth: 1,
-                        elevation: 2,
-                        padding: EdgeInsets.all(10),
-                        backgroundColor: AppColors.endingGreyColor,
-                        child: Padding(
-                          padding: ResponsiveHelper.padding(context, 3, 0.2),
-                          child: Text(
-                            "${StorageHelper().getEmail()}",
-                            // "\u20B9${widget.pathalogyTestSlug}",
-                            style: AppTextStyles.bodyText1(context,
-                                overrideStyle: TextStyle(
-                                    fontSize: ResponsiveHelper.fontSize(
-                                        context, 12))),
-                          ),
+                      Padding(
+                        padding: ResponsiveHelper.padding(context, 1, 0.2),
+                        child:  CustomTextField(
+                          controller: _emailController,
+                          iconColor: AppColors.primary,
+                          shadowColor: AppColors.primary.withAlpha(70),
+                          borderColor: AppColors.primary,
+                          focusNode: _otpFocusNode,
+                          icon: Icons.email,
+                          hintText: "Enter email",
+                          title: "Email",
+                          // errorMessage: "Invalid Email",
+                          errorMessage: _emailError.toString(),
+                          keyboardType: TextInputType.emailAddress,
                         ),
+
+                        // Text(
+                        //   "${StorageHelper().getEmail()}",
+                        //   // "\u20B9${widget.pathalogyTestSlug}",
+                        //   style: AppTextStyles.bodyText1(context,
+                        //       overrideStyle: TextStyle(
+                        //           fontSize: ResponsiveHelper.fontSize(
+                        //               context, 12))),
+                        // ),
+
+
+
                       ),
 
                       SizedBox(height: 10),
@@ -157,7 +166,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           icon: Icons.keyboard_alt_outlined,
                           hintText: "Enter Otp Code",
                           title: "OTP",
-                          errorMessage: "Invalid OTP",
+                          // errorMessage: "Invalid OTP",
+                          errorMessage: _otpError.toString(),
                           keyboardType: TextInputType.number,
                         ),
                         SizedBox(height: 10),
@@ -170,25 +180,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                           icon: Icons.lock_clock_outlined,
                           hintText: "Enter new password",
                           title: "Password",
-                          errorMessage: "Invalid password",
+                          // errorMessage: "Invalid password",
+                          errorMessage: _passwordError.toString(),
                           keyboardType: TextInputType.number,
                         ),
                       ],
                     ],
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
-                  height: 50,
+                  // height: 50,
                   child: provider.isLoading
                       ? loadingIndicator()
                       : SolidRoundedButton(
-                          onPressed:
-                              provider.isOtpSent ? _resetPassword : _requestOtp,
-                          text: provider.isOtpSent
-                              ? 'Reset Password'
-                              : 'Request OTP',
+                          onPressed: (){
+                            print("🟢 Button Clicked");
+                            provider.isOtpSent ? _resetPassword() : _requestOtp();
+                          },
+                          text: provider.isOtpSent? 'Reset Password' : 'Request OTP',
                           color: AppColors.primary,
                           borderRadius: 10.0,
                           textStyle:

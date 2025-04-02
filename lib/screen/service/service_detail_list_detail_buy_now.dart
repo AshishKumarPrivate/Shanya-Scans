@@ -16,37 +16,9 @@ class ServicesDetailListDetailBuyNowScreen extends StatefulWidget {
       _ServicesDetailListDetailBuyNowScreenState();
 }
 
-class _ServicesDetailListDetailBuyNowScreenState
-    extends State<ServicesDetailListDetailBuyNowScreen> {
-  final List<Map<String, dynamic>> itemsList = [
-    {
-      'title': 'Comprehensive Full Body Checkup with Vitamin D B12',
-      'price': '1199',
-      'oldPrice': '2199',
-      'tests': 'Includes 92 tests',
-      'discount': '45% OFF',
-      'fasting': 'Fasting required',
-      'reportTime': 'Reports in 15 Hrs',
-    },
-    {
-      'title': 'Senior Citizen Health Checkup',
-      'price': '999',
-      'oldPrice': '1949',
-      'tests': 'Includes 87 tests',
-      'discount': '49% OFF',
-      'fasting': 'Fasting not required',
-      'reportTime': 'Reports in 24 Hrs',
-    },
-    {
-      'title': 'Women’s Master Checkup',
-      'price': '1299',
-      'oldPrice': '2299',
-      'tests': 'Includes 93 tests',
-      'discount': '43% OFF',
-      'fasting': 'Fasting required',
-      'reportTime': 'Reports in 12 Hrs',
-    },
-  ];
+class _ServicesDetailListDetailBuyNowScreenState extends State<ServicesDetailListDetailBuyNowScreen> {
+
+
   final TextEditingController nameController = TextEditingController();
   final TextEditingController mobileController = TextEditingController();
   final TextEditingController whatsappController = TextEditingController();
@@ -82,6 +54,7 @@ class _ServicesDetailListDetailBuyNowScreenState
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
+        bottom: false,
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
           child: Column(
@@ -430,131 +403,3 @@ class buildTestInformation extends StatelessWidget {
   }
 }
 
-class buildInstructions extends StatelessWidget {
-  String type;
-
-  buildInstructions({required this.type});
-
-  @override
-  Widget build(BuildContext context) {
-    final testCategories = [
-      {
-        'title': 'Fasting: 4-6 hours prior to the scan',
-        'hindiTitle':
-            'इस स्कैन से पहले 4-6 घंटे उपवास करना आवश्यक है ताकि सही परिणाम प्राप्त हो सकें।',
-        'count': 12,
-      },
-      {
-        'title': 'Duration of the scan: 30-60 minutes',
-        'hindiTitle':
-            'सादा पानी पीना अनुमत है, लेकिन अन्य किसी तरल पदार्थ का सेवन न करें।',
-        'count': 11,
-      },
-      {
-        'title':
-            'Radioactive Injection: To create detailed images during the scan',
-        'hindiTitle':
-            'चीनी युक्त खाद्य पदार्थों और पेय पदार्थों से बचें, क्योंकि इससे स्कैन के परिणामों में विघटन हो सकता है।',
-        'count': 21
-      },
-      {
-        'title':
-            'Post-scan: You may resume your normal activities after the scan, but drink plenty of fluids to help eliminate the radioactive material from your body.',
-        'hindiTitle':
-            'यदि आप मधुमेह से ग्रस्त हैं, तो कृपया अपने डॉक्टर से परामर्श करें कि क्या आपको स्कैन से पहले अपनी इंसुलिन या मधुमेह दवाओं को बंद करना होगा।',
-        'count': 24
-      },
-      {
-        'title':
-            'Radioactive Injection: To create detailed images during the scan',
-        'hindiTitle':
-            'स्कैन के दिन किसी प्रकार की शारीरिक मेहनत या शारीरिक गतिविधियों से बचें, क्योंकि यह परिणामों को प्रभावित कर सकता है।',
-        'count': 21
-      },
-      {
-        'title':
-            'Post-scan: You may resume your normal activities after the scan, but drink plenty of fluids to help eliminate the radioactive material from your body.',
-        'hindiTitle':
-            'आपको रेडियोधर्मी पदार्थ का इंजेक्शन दिया जाएगा, जो सुरक्षित होता है और स्कैन के दौरान स्पष्ट चित्र बनाने में मदद करता है।',
-        'count': 24
-      },
-      {
-        'title':
-            'Radioactive Injection: To create detailed images during the scan',
-        'hindiTitle':
-            'कृपया टेकनीशियन को सूचित करें यदि आप गर्भवती हैं या स्तनपान करवा रही हैं, क्योंकि स्कैन में रेडिएशन शामिल होता है।',
-        'count': 21
-      }
-    ];
-
-    return Container(
-      height: 150, // Set fixed height for the container
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Text(
-            //   "Instructions",
-            //   style: AppTextStyles.heading1.copyWith(
-            //     fontSize: 14,
-            //   ),
-            // ),
-            SizedBox(height: 10),
-            Expanded(
-              // Makes the ListView scrollable within the fixed height
-              child: ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                itemCount: testCategories.length,
-                itemBuilder: (context, index) {
-                  final category = testCategories[index];
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 4.0),
-                          child: Text(
-                            '\u2022', // Unicode for bullet point
-                            style: TextStyle(
-                              fontSize: 30,
-                              height: 0.4, // Align bullet vertically with text
-                              color: Colors.black, // Bullet color
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 8), // Space between bullet and text
-                        Expanded(
-                          child: Text(
-                            "${type == "eng" ? category['title']! : category['hindiTitle']!}",
-                            // "${category['title']!}",
-
-                            // style: AppTextStyles.bodyText1.copyWith(
-                            //     fontSize: 12,
-                            //     color: Colors.black,
-                            //     letterSpacing: 1),
-                            style: AppTextStyles.bodyText1(
-                              context,
-                              overrideStyle: AppTextStyles.bodyText1(context,
-                                  overrideStyle: TextStyle(
-                                      color: Colors.black,
-                                      letterSpacing: 1,
-                                      fontSize: ResponsiveHelper.fontSize(
-                                          context, 12))),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

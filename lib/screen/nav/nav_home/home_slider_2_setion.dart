@@ -42,22 +42,25 @@ class _HomeSlider2SectionState extends State<HomeSlider2Section> {
         if (provider.isLoading  && provider.homeBanner1ListModel== null ) {
           return HomeSliderShimmer();
         } else if (provider.errorMessage.isNotEmpty) {
-          return Center(
-            child: SizedBox(
-              width: ResponsiveHelper.containerWidth(context, 50),
-              height: ResponsiveHelper.containerWidth(context, 50),
-              child: Image.asset(
-                "assets/images/img_error.jpg",
-                fit: BoxFit.cover,
-              ),
-            ),
-          );
+          return SizedBox();// API error case: Hide section
+
+          //   Center(
+          //   child: SizedBox(
+          //     width: ResponsiveHelper.containerWidth(context, 50),
+          //     height: ResponsiveHelper.containerWidth(context, 50),
+          //     child: Image.asset(
+          //       "assets/images/img_error.jpg",
+          //       fit: BoxFit.cover,
+          //     ),
+          //   ),
+          // );
         }
 
         final homeBannerList = provider.homeBanner1ListModel?.data ?? [];
 
         if (homeBannerList.isEmpty) {
-          return Center(
+          return SizedBox(); // **No data case: Hide section**
+            Center(
             child: SizedBox(
               width: ResponsiveHelper.containerWidth(context, 50),
               height: ResponsiveHelper.containerWidth(context, 50),

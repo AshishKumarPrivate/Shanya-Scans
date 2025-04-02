@@ -7,6 +7,9 @@ import '../SplashScreen.dart';
 class NoInternetScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Access the network connection status from the provider
+    bool isConnected = Provider.of<NetworkProvider>(context).isConnected;
+
     return Scaffold(
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -21,10 +24,20 @@ class NoInternetScreen extends StatelessWidget {
           Text("Please check your network and try again."),
           SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () {
-              bool isConnected = Provider.of<NetworkProvider>(context, listen: false).isConnected;
-              if (isConnected) {
+            onPressed: () async {
+              // Refresh network connection status
+              await Provider.of<NetworkProvider>(context, listen: false).checkConnection(context);
+
+              // After checking, update the UI based on the new connection status
+              bool updatedConnectionStatus = Provider.of<NetworkProvider>(context, listen: false).isConnected;
+
+              if (updatedConnectionStatus) {
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => SplashScreen()));
+              } else {
+                // Optionally, show a dialog or some message if still not connected
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("No internet connection. Please try again.")),
+                );
               }
             },
             child: Text("Retry"),

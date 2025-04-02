@@ -18,6 +18,11 @@
         <key>NSPushNotificationUsageDescription</key>
         <string>We would like to send you push notifications.</string>
 
+        <key>NSLocationWhenInUseUsageDescription</key>
+        <string>We need your location to show places nearby</string>
+
+        <key>NSLocationAlwaysUsageDescription</key>
+        <string>We need your location for better experience</string>
 
 
 

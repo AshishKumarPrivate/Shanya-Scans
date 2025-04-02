@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class CheckoutTextField extends StatelessWidget {
   final String label;
   final String hint;
+  final int? maxLength;
   final TextEditingController controller;
   final TextInputType keyboardType;
   final bool isRequired;
@@ -11,6 +12,7 @@ class CheckoutTextField extends StatelessWidget {
     Key? key,
     required this.label,
     required this.hint,
+    this.maxLength,
     required this.controller,
     this.keyboardType = TextInputType.text,
     this.isRequired = false,
@@ -28,6 +30,8 @@ class CheckoutTextField extends StatelessWidget {
           TextFormField(
             controller: controller,
             keyboardType: keyboardType,
+            maxLength: maxLength,
+
             validator: isRequired
                 ? (value) {
               if (value == null || value.trim().isEmpty) {
@@ -39,6 +43,7 @@ class CheckoutTextField extends StatelessWidget {
             decoration: InputDecoration(
               hintText: hint,
               filled: true,
+              counterText: "",
               fillColor: Colors.grey.shade100,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),

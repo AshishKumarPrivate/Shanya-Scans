@@ -35,6 +35,46 @@ import 'firebase/FirebaseNotificationService.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+  // Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized(); // ✅ Ensure Flutter binding is initialized
+//   await Firebase.initializeApp();
+//
+//   StorageHelper().init(); // ✅ Initialize SharedPreferences
+//   await PackageInfo.fromPlatform(); // Ensures package is loaded
+//
+//
+//   runApp(
+//     MultiProvider(
+//       providers: [
+//         ChangeNotifierProvider(create: (context) => NetworkProvider()),
+//         ChangeNotifierProvider(create: (context) => AuthApiProvider()),
+//         ChangeNotifierProvider(create: (context) => ServiceApiProvider()),
+//         ChangeNotifierProvider(create: (context) => PathalogyTestApiProvider()),
+//         ChangeNotifierProvider(create: (context) => HealthConcernApiProvider()),
+//         ChangeNotifierProvider(create: (context) => FrequentlyPathalogyTagApiProvider()),
+//         ChangeNotifierProvider(create: (context) => HealthPacakgeListApiProvider()),
+//         ChangeNotifierProvider(create: (context) => HomeBannerApiProvider()),
+//         ChangeNotifierProvider(create: (context) => CartProvider()),
+//         ChangeNotifierProvider(create: (context) => SearchProvider()),
+//         ChangeNotifierProvider(create: (context) => TermConditionPrivacyPolicyApiProvider()),
+//         ChangeNotifierProvider(create: (context) => OrderApiProvider()),
+//         ChangeNotifierProvider(create: (context) => NeedHelpApiProvider()),
+//         ChangeNotifierProvider(create: (context) => CheckoutProvider()),
+//
+//
+//         /// &&&&&&&&&&& Dellivery BOy ***********
+//         ChangeNotifierProvider(create: (context) => DeliveryOrdersProvider()),
+//         ChangeNotifierProvider(create: (context) => DeliveryBoyAuthApiProvider()),
+//         ChangeNotifierProvider(create: (context) => SocketProvider()),
+//
+//
+//       ],
+//       child: MyApp(),
+//     ),
+//   );
+// }
+
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); // ✅ Ensure Flutter binding is initialized
   await Firebase.initializeApp();
@@ -42,45 +82,36 @@ Future<void> main() async {
   StorageHelper().init(); // ✅ Initialize SharedPreferences
   await PackageInfo.fromPlatform(); // Ensures package is loaded
 
-
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => NetworkProvider()),
-        ChangeNotifierProvider(create: (context) => AuthApiProvider()),
-        ChangeNotifierProvider(create: (context) => ServiceApiProvider()),
-        ChangeNotifierProvider(create: (context) => PathalogyTestApiProvider()),
-        ChangeNotifierProvider(create: (context) => HealthConcernApiProvider()),
-        ChangeNotifierProvider(create: (context) => FrequentlyPathalogyTagApiProvider()),
-        ChangeNotifierProvider(create: (context) => HealthPacakgeListApiProvider()),
-        ChangeNotifierProvider(create: (context) => HomeBannerApiProvider()),
-        ChangeNotifierProvider(create: (context) => CartProvider()),
-        ChangeNotifierProvider(create: (context) => SearchProvider()),
-        ChangeNotifierProvider(create: (context) => TermConditionPrivacyPolicyApiProvider()),
-        ChangeNotifierProvider(create: (context) => OrderApiProvider()),
-        ChangeNotifierProvider(create: (context) => NeedHelpApiProvider()),
-        ChangeNotifierProvider(create: (context) => CheckoutProvider()),
+    DevicePreview(
+      enabled: !kReleaseMode, // Enable DevicePreview in non-release mode
+      builder: (context) => MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (context) => NetworkProvider()),
+          ChangeNotifierProvider(create: (context) => AuthApiProvider()),
+          ChangeNotifierProvider(create: (context) => ServiceApiProvider()),
+          ChangeNotifierProvider(create: (context) => PathalogyTestApiProvider()),
+          ChangeNotifierProvider(create: (context) => HealthConcernApiProvider()),
+          ChangeNotifierProvider(create: (context) => FrequentlyPathalogyTagApiProvider()),
+          ChangeNotifierProvider(create: (context) => HealthPacakgeListApiProvider()),
+          ChangeNotifierProvider(create: (context) => HomeBannerApiProvider()),
+          ChangeNotifierProvider(create: (context) => CartProvider()),
+          ChangeNotifierProvider(create: (context) => SearchProvider()),
+          ChangeNotifierProvider(create: (context) => TermConditionPrivacyPolicyApiProvider()),
+          ChangeNotifierProvider(create: (context) => OrderApiProvider()),
+          ChangeNotifierProvider(create: (context) => NeedHelpApiProvider()),
+          ChangeNotifierProvider(create: (context) => CheckoutProvider()),
 
-
-        /// &&&&&&&&&&& Dellivery BOy ***********
-        ChangeNotifierProvider(create: (context) => DeliveryOrdersProvider()),
-        ChangeNotifierProvider(create: (context) => DeliveryBoyAuthApiProvider()),
-        ChangeNotifierProvider(create: (context) => SocketProvider()),
-
-
-      ],
-      child: MyApp(),
+          /// &&&&&&&&&&& Delivery Boy ***********
+          ChangeNotifierProvider(create: (context) => DeliveryOrdersProvider()),
+          ChangeNotifierProvider(create: (context) => DeliveryBoyAuthApiProvider()),
+          ChangeNotifierProvider(create: (context) => SocketProvider()),
+        ],
+        child: MyApp(),
+      ),
     ),
   );
 }
-
-// void main() => runApp(
-//     DevicePreview(
-//       enabled: !kReleaseMode,
-//       builder: (context) => MyApp(), // Wrap your app
-//     ),
-//     );
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 

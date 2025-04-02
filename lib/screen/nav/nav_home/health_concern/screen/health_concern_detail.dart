@@ -49,6 +49,7 @@ class _ViewDetailHealthConcernScreenState
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
+        bottom: false,
         child: Container(
           color: Colors.white,
           child: Padding(

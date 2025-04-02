@@ -1,110 +1,136 @@
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:provider/provider.dart';
-import '../controller/SearchProvider.dart';
+import 'package:uuid/uuid.dart';
+import 'package:http/http.dart' as http;
 
-class SearchScreen extends StatefulWidget {
-  final String title;
-  final String hintText;
+class GoogleMapSearchPlacesApi extends StatefulWidget {
+  const GoogleMapSearchPlacesApi({Key? key}) : super(key: key);
 
-  const SearchScreen({Key? key, required this.title, required this.hintText})
-      : super(key: key);
 
   @override
-  _SearchScreenState createState() => _SearchScreenState();
+  _GoogleMapSearchPlacesApiState createState() => _GoogleMapSearchPlacesApiState();
 }
 
-class _SearchScreenState extends State<SearchScreen> {
-  final TextEditingController searchController = TextEditingController();
+class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
+
+
+  final _controller =  TextEditingController(text: "Lucknow");
+  var uuid =  const Uuid();
+  String _sessionToken = '1234567890';
+  List<dynamic> _placeList = [];
 
   @override
   void initState() {
-
-    // Status bar color fix
-    // _setStatusBarColor();
-
-    searchController.addListener(() {
-      Provider.of<SearchProvider>(context, listen: false)
-          .filterSearch(searchController.text);
-    });
-
     super.initState();
+    getSuggestion(_controller.text);
+    _controller.addListener(() {
+      _onChanged();
+    });
   }
 
-  void _setStatusBarColor() {
-    SystemChrome.setSystemUIOverlayStyle(
-      SystemUiOverlayStyle(
-        statusBarColor: AppColors.primary, // Status bar color fixed to primary
-        statusBarIconBrightness: Brightness.light, // Status bar icons white
-      ),
-    );
+  _onChanged() {
+    if (_sessionToken == null) {
+      setState(() {
+        _sessionToken = uuid.v4();
+      });
+    }
+    getSuggestion(_controller.text);
   }
 
-  @override
-  void dispose() {
-    // Status bar color reset if needed
-    // _setStatusBarColor();
-    searchController.dispose();
-    super.dispose();
+  void getSuggestion(String input) async {
+
+
+    const String PLACES_API_KEY = "AIzaSyC9ZOZHwHmyTWXqACqpZY2TL7wX2_Zn05U";
+
+    try{
+      String baseURL = 'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+      String request = '$baseURL?input=$input&key=$PLACES_API_KEY&sessiontoken=$_sessionToken&components=country:IN';
+      var response = await http.get(Uri.parse(request));
+      var data = json.decode(response.body);
+      if (kDebugMode) {
+        print('mydata');
+        print(data);
+      }
+      if (response.statusCode == 200) {
+        setState(() {
+          _placeList = json.decode(response.body)['predictions'];
+        });
+      } else {
+        throw Exception('Failed to load predictions');
+      }
+    }catch(e){
+      print(e);
+    }
+
   }
 
   @override
   Widget build(BuildContext context) {
-    final searchProvider = Provider.of<SearchProvider>(context);
-    final primaryColor = AppColors.primary;
-
     return Scaffold(
-
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: primaryColor, // Search bar background color set to primary
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: Offset(0, 2),
-                  )
-                ],
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      appBar: AppBar(
+        elevation: 0,
+        title: const Text('Search places Api' ,),
+      ),
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: <Widget>[
+          Align(
+            alignment: Alignment.topCenter,
+            child: Padding(
+              padding:  EdgeInsets.symmetric(horizontal: 15.0),
               child: TextField(
-                controller: searchController,
-                onTap: () => _setStatusBarColor(), // Ensure status bar remains primary
+                controller: _controller,
                 decoration: InputDecoration(
-                  hintText: widget.hintText,
-                  prefixIcon:  IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.black), // ✅ Back Arrow
-                    onPressed: () => Navigator.pop(context), // ✅ Close on tap
+                  hintText: "Search your location here",
+                  focusColor: Colors.white,
+                  floatingLabelBehavior: FloatingLabelBehavior.never,
+                  prefixIcon: const Icon(Icons.map),
+                  suffixIcon: IconButton(
+                    icon: const Icon(Icons.cancel), onPressed: () {
+                    _controller.clear() ;
+                  },
+                  ),
+
+                  // ✅ Rounded Borders
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10), // ✅ Rounded corners
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10), // ✅ Rounded corners
+                    borderSide: BorderSide(color: Colors.grey.shade300),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10), // ✅ Rounded corners
+                    borderSide: BorderSide(color: Colors.blue, width: 0.5),
                   ),
                   filled: true,
-                  fillColor: Colors.white,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: BorderSide(color: Colors.white),
-                  ),
-                  hintStyle: TextStyle(color: Colors.black54),
+                  fillColor: Colors.white, // ✅ Background white for better visibility
                 ),
-                style: TextStyle(color: Colors.black),
-                cursorColor: primaryColor,
+
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: searchProvider.filteredItems.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(searchProvider.filteredItems[index]),
-                  );
-                },
-              ),
+          ),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _placeList.length,
+              itemBuilder: (context, index) {
+                return GestureDetector(
+                  onTap: () {
+                    // ✅ Selected place ka data return karke previous screen par bhejna
+                    Navigator.pop(context, _placeList[index]["description"]);
+                  },
+                  child: ListTile(
+                    leading: Icon(Icons.location_on, color: Colors.blue),
+                    title: Text(_placeList[index]["description"]),
+                  ),
+                );
+              },
             ),
-          ],
-        ),
+          )
+        ],
       ),
     );
   }

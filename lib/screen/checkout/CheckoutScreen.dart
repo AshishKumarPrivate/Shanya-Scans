@@ -5,6 +5,7 @@ import 'package:flutter_html/flutter_html.dart';
 import 'package:healthians/screen/checkout/checkout_text_fields.dart';
 import 'package:healthians/screen/order/controller/order_provider.dart';
 import 'package:healthians/screen/order/model/OrderItem.dart';
+import 'package:healthians/screen/other/screen/search_screen.dart';
 import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
@@ -34,10 +35,8 @@ class CheckoutScreen extends StatefulWidget {
 class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController ageController = TextEditingController();
-  TextEditingController phoneController = TextEditingController(
-      text: StorageHelper().getPhoneNumber().isEmpty
-          ? ""
-          : StorageHelper().getPhoneNumber());
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController altPhoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController localityController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
@@ -60,8 +59,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   String? selectedDateString = DateUtil.formatDate(
       date: DateTime.now().toString(),
       currentFormat: "yyyy-MM-dd HH:mm:ss.SSS",
-      desiredFormat: "yyyy-MM-dd"
-  ); // ✅ Store default date
+      desiredFormat: "yyyy-MM-dd"); // ✅ Store default date
   String? selectedTimeString;
 
   bool showBookingFor = false;
@@ -74,6 +72,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   bool isBookingExpanded = false;
   int _currentStep = 0;
+
+  String? selectedPlace;
 
   // intialize Razer payment
 
@@ -216,6 +216,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           // ],
         ),
         body: SafeArea(
+          bottom: false,
           child: Container(
             color: Colors.white,
             child: Column(
@@ -420,9 +421,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           fullNameController.text.toString(),
                           ageController.text.toString(),
                           phoneController.text.toString(),
-                          phoneController.text.toString(),
+                          altPhoneController.text.toString(),
                           selectedGender.toString(),
                           cityAddressController.text.toString(),
+                          selectedAddressType.toString(),
                         );
                       }
                     },
@@ -542,6 +544,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             }),
 
         buildPhoneField(),
+        buildAltPhoneField(),
       ],
     );
   }
@@ -575,11 +578,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         // buildTextField("Postal Code*", "Enter postal code", postalController,
         //     keyboardType: TextInputType.number),
 
-        CheckoutTextField(
-            label: "Postal Code*",
-            hint: "Enter postal code",
-            controller: postalController,
-            keyboardType: TextInputType.number),
+        // CheckoutTextField(
+        //     label: "Postal Code*",
+        //     hint: "Enter postal code",
+        //     controller: postalController,
+        //     keyboardType: TextInputType.number),
 
         // buildTextField("House No / Flat No / Landmark*",
         //     "House No / Flat No / Landmark", addressController),
@@ -592,6 +595,85 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
         // buildTextField( "City , Address*", "City , Address", cityAddressController),
 
+        // CheckoutTextField(
+        //   label: "Choose Location",
+        //   hint: "Location",
+        //   controller: cityAddressController,
+        // ),
+        SizedBox(height: 5,),
+
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Choose Location",
+                style: AppTextStyles.heading1(
+                  context,
+                  overrideStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: ResponsiveHelper.fontSize(
+                        context, 12),
+                  ),
+                ),
+              ),
+              SizedBox(height: 5,),
+              GestureDetector(
+                onTap: () async{
+                  // Navigator.push(context, MaterialPageRoute(builder: (context) => GoogleMapSearchPlacesApi()));
+
+                  // ✅ Open Search Page and Get Selected Place
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GoogleMapSearchPlacesApi(),
+                    ),
+                  );
+
+                  // ✅ Agar user ne koi place select kiya hai to update karein
+                  if (result != null) {
+                    setState(() {
+                      selectedPlace = result;
+                    });
+                  }
+
+                },
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade100,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            selectedPlace ?? "Lucknow",
+                            style: AppTextStyles.bodyText1(
+                              context,
+                              overrideStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize: ResponsiveHelper.fontSize(
+                                    context, 12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        SizedBox(height: 5,),
         CheckoutTextField(
           label: "Address*",
           hint: "123 Main Street, City, Country",
@@ -604,6 +686,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           onSelected: (value) {
             setState(() {
               selectedAddressType = value;
+              print("Address type =>${selectedAddressType.toString()}");
             });
           },
         ),
@@ -651,7 +734,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   }
 
   Widget buildBookingDate() {
-
     print("selectedDateString: $selectedDateString"); // Debugging output
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 20),
@@ -675,7 +757,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    selectedDateString ?? "Select Date", // ✅ Display formatted date
+                    selectedDateString ?? "Select Date",
+                    // ✅ Display formatted date
                     // "${DateUtil.formatDate(
                     //   date: "${selectedDate}",
                     //   currentFormat: "yyyy-MM-dd",
@@ -709,8 +792,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         selectedDateString = DateUtil.formatDate(
             date: picked.toString(),
             currentFormat: "yyyy-MM-dd HH:mm:ss.SSS",
-            desiredFormat: "yyyy-MM-dd"
-        ); // ✅ Store selected date in correct format
+            desiredFormat:
+                "yyyy-MM-dd"); // ✅ Store selected date in correct format
         print("selectedDateString: $selectedDateString"); // Debugging output
         selectedDate = picked;
       });
@@ -1180,8 +1263,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget buildPhoneField() {
     return CheckoutTextField(
         label: "Phone Number*",
-        hint: "nter phone number",
+        hint: "Enter phone number",
         controller: phoneController,
+        maxLength: 10,
+        keyboardType: TextInputType.number,
+        isRequired: true);
+
+    // buildTextField(
+    //   "Phone Number*", "Enter phone number", phoneController,
+    //   keyboardType: TextInputType.number, isRequired: true);
+  }
+
+  Widget buildAltPhoneField() {
+    return CheckoutTextField(
+        label: "Alternate Number",
+        hint: "Alternate number",
+        controller: altPhoneController,
+        maxLength: 10,
         keyboardType: TextInputType.number,
         isRequired: true);
 
@@ -1340,12 +1438,12 @@ class _PaymentSelectionWidgetState extends State<PaymentSelectionWidget> {
           ),
 
           // ✅ Cash on Delivery (COD) Option
-          _buildPaymentOption(
-            title: "Cash on Delivery",
-            subtitle: "Pay cash upon receiving the order",
-            image: "assets/images/codimage.png",
-            value: "cod",
-          ),
+          // _buildPaymentOption(
+          //   title: "Cash on Delivery",
+          //   subtitle: "Pay cash upon receiving the order",
+          //   image: "assets/images/codimage.png",
+          //   value: "cod",
+          // ),
         ],
       ),
     );

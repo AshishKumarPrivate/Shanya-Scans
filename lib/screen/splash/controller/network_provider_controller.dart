@@ -3,33 +3,36 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
 class NetworkProvider with ChangeNotifier {
-  final Connectivity _connectivity = Connectivity();
   bool _isConnected = true;
-  StreamSubscription<List<ConnectivityResult>>? _subscription;
-
   bool get isConnected => _isConnected;
 
-  NetworkProvider() {
-    _checkInitialConnection();
-    _subscription = _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+  // Constructor doesn't start connectivity check anymore
+  NetworkProvider();
+
+  // Method to manually check the network status
+  Future<void> checkConnection(BuildContext context) async {
+    // Check the current connectivity status
+    List<ConnectivityResult> result = await Connectivity().checkConnectivity();
+    bool isNotConnected = result == ConnectivityResult.none;
+    _isConnected = !isNotConnected;
+    notifyListeners();  // Notify listeners to update the UI
+
+    // Show the network status via Snackbar after checking
+    _showNetworkStatusSnackBar(context, isNotConnected);
   }
 
-  Future<void> _checkInitialConnection() async {
-    var results = await _connectivity.checkConnectivity();
-    _updateConnectionStatus(results);
-  }
-
-  void _updateConnectionStatus(List<ConnectivityResult> results) {
-    bool newStatus = results.isNotEmpty && results.any((result) => result != ConnectivityResult.none);
-    if (_isConnected != newStatus) {
-      _isConnected = newStatus;
-      notifyListeners();
-    }
-  }
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
+  // Method to listen for connectivity changes and show the snackbar
+  void _showNetworkStatusSnackBar(BuildContext context, bool isNotConnected) {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: isNotConnected ? Colors.red : Colors.green,
+        duration: Duration(seconds: isNotConnected ? 6 : 3),
+        content: Text(
+          isNotConnected ? "No internet connection" : "Connected",
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
   }
 }

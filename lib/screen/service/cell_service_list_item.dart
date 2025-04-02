@@ -64,7 +64,10 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
             Consumer<ServiceApiProvider>(builder: (context, provider, child) {
           // Check if the loading state is true
           if (provider.isLoading) {
-            return RateListServiceShimmer(borderWidth: 0,elevation: 1,); // Show shimmer effect while loading
+            return RateListServiceShimmer(
+              borderWidth: 0,
+              elevation: 1,
+            ); // Show shimmer effect while loading
           }
 
           // Check if there was an error
@@ -144,7 +147,9 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                   StringUtils.toUpperCase( rateListItem.testDetailName.toString()) ?? "N/A",
+                    StringUtils.toUpperCase(
+                            rateListItem.testDetailName.toString()) ??
+                        "N/A",
                     // Add null safety here
                     style: AppTextStyles.heading1(
                       context,
@@ -178,22 +183,26 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
                                 text: TextSpan(
                                   children: [
                                     TextSpan(
-                                      text: "\u20B9 ", // Rupee Symbol with space
+                                      text: "\u20B9 ",
+                                      // Rupee Symbol with space
                                       style: AppTextStyles.heading1(
                                         context,
                                         overrideStyle: TextStyle(
                                           color: AppColors.primary,
-                                          fontSize: ResponsiveHelper.fontSize(context, 16),
+                                          fontSize: ResponsiveHelper.fontSize(
+                                              context, 16),
                                         ),
                                       ),
                                     ),
                                     TextSpan(
-                                      text: rateListItem.testPrice.toString(), // Price Amount
+                                      text: rateListItem.testPrice.toString(),
+                                      // Price Amount
                                       style: AppTextStyles.heading1(
                                         context,
                                         overrideStyle: TextStyle(
                                           color: AppColors.primary,
-                                          fontSize: ResponsiveHelper.fontSize(context, 16),
+                                          fontSize: ResponsiveHelper.fontSize(
+                                              context, 16),
                                         ),
                                       ),
                                     ),
@@ -203,7 +212,8 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
                                         context,
                                         overrideStyle: TextStyle(
                                           color: AppColors.primary,
-                                          fontSize: ResponsiveHelper.fontSize(context, 12), // Smaller font size
+                                          fontSize: ResponsiveHelper.fontSize(
+                                              context, 12), // Smaller font size
                                         ),
                                       ),
                                     ),
@@ -212,7 +222,6 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
                               ),
                             ],
                           )
-
                         ],
                       ),
                       SizedBox(
@@ -227,11 +236,12 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => RateListDetailScreen(
-                                  serviceSlug : widget.serviceSlug,
-                                  serviceName : widget.serviceName,
-                                  packageName: StringUtils.toUpperCase(rateListItem.testDetailName ?? "N/A"),
+                                  serviceSlug: widget.serviceSlug,
+                                  serviceName: widget.serviceName,
+                                  packageName: StringUtils.toUpperCase(
+                                      rateListItem.testDetailName ?? "N/A"),
                                   // packageName:  rateListItem.testDetailName ?? "N/A",
-                                  packageSlug:rateListItem.slug ?? "N/A",
+                                  packageSlug: rateListItem.slug ?? "N/A",
                                   serviceData: rateListItem, // Pass the object
                                 ),
                               ),
@@ -250,18 +260,23 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
                     color: AppColors.txtLightGreyColor.withOpacity(0.2),
                   ),
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      /// First text (Aligned to Start)
-                      Expanded(
+                      Flexible(
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Icon(Icons.timer, size: 18, color: Colors.grey),
-                            SizedBox(width: 5),
-                            Expanded(
+                            SizedBox(width: 2),
+                            Flexible(
                               child: Text(
                                 rateListItem.fasting ?? "N/A",
-                                style: TextStyle(fontSize: 12, color: Colors.grey[700]),
+                                style: AppTextStyles.heading2(
+                                  context,
+                                  overrideStyle: TextStyle(
+                                    fontSize: ResponsiveHelper.fontSize(context, 10),
+                                  ),
+                                ),
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
                                 softWrap: true,
@@ -270,30 +285,38 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
                           ],
                         ),
                       ),
-
-                      /// Second text (Aligned to End)
-                      Expanded(
+                      Flexible(
                         child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          mainAxisAlignment: MainAxisAlignment.end, // Align to the end
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          // Align to the end
                           children: [
-                            Icon(Icons.access_time, size: 18, color: Colors.grey),
-                            SizedBox(width: 5),
-                            Text(
-                              rateListItem.reportTime ?? "N/A",
-                              style: TextStyle(fontSize: 12, color: Colors.grey[700]),
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 2,
-                              softWrap: true,
-                              textAlign: TextAlign.right, // Align text to the right
+                            Icon(Icons.access_time,
+                                size: 18, color: Colors.grey),
+                            SizedBox(width: 2),
+                            Flexible(
+                              child: Text(
+                                rateListItem.reportTime ?? "N/A",
+                                // "${rateListItem.reportTime}",
+                                style: AppTextStyles.heading2(
+                                  context,
+                                  overrideStyle: TextStyle(
+                                    fontSize:
+                                        ResponsiveHelper.fontSize(context, 10),
+                                  ),
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                softWrap: true,
+                                textAlign:
+                                    TextAlign.start, // Align text to the right
+                              ),
                             ),
                           ],
                         ),
                       ),
                     ],
                   )
-
-
                 ],
               ),
             ),

@@ -118,6 +118,24 @@ class StorageHelper {
 
   // set user order data
 
+  Future<void> setOtpVerified(bool value) async {
+    await  sp.setBool("_otpVerifiedKey", value);
+  }
+
+  Future<bool> getOtpVerified() async {
+    return  sp.getBool("_otpVerifiedKey") ?? false;
+  }
+  // Save login state
+  Future<void> setUserLoggedIn(bool isLoggedIn) async {
+    await sp.setBool("_keyIsLoggedIn", isLoggedIn);
+  }
+
+  // Retrieve login state
+  Future<bool> isUserLoggedIn() async {
+    return sp.getBool("_keyIsLoggedIn") ?? false; // Default is false
+  }
+
+
 
   void setUserName(String username) {
     sp.setString('user_name', username);

@@ -1,471 +1,504 @@
-// import 'dart:async';
-// import 'package:dio/dio.dart';
 // import 'package:flutter/material.dart';
-// import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
-// import 'package:geolocator/geolocator.dart';
-// import 'package:healthians/network_manager/repository.dart';
+// import 'package:flutter/services.dart';
+// import 'package:healthians/util/StringUtils.dart';
 // import 'package:provider/provider.dart';
-// import 'package:socket_io_client/socket_io_client.dart' as IO;
-// import 'package:healthians/ui_helper/storage_helper.dart';
-// import 'package:flutter/services.dart' show rootBundle;
-// import 'dart:typed_data';
-// import 'dart:ui' as ui;
-// import 'dart:math' as math;
 //
-// import '../controller/socket_provider.dart';
+// import '../base_widgets/loading_indicator.dart';
+// import '../base_widgets/outlined_rounded_button.dart';
+// import '../base_widgets/solid_rounded_button.dart';
+// import '../deliveryBoy/controller/DeliveryOrdersProvider.dart';
+// import '../deliveryBoy/screen/UserTrackingScreen.dart';
+// import '../ui_helper/app_colors.dart';
+// import '../ui_helper/app_text_styles.dart';
+// import '../ui_helper/responsive_helper.dart';
+// import '../ui_helper/storage_helper.dart';
+// import '../util/date_formate.dart';
 //
-// class UserLiveTrackingScreen extends StatefulWidget {
-//   // String? userLat, userLong;
-//   //
-//   // LiveTrackingScreen({
-//   //   required this.userLat,
-//   //   required this.userLong,
-//   // });
+// class OrderDetailsPage extends StatefulWidget {
+//   final String orderId;
+//
+//   const OrderDetailsPage({Key? key, required this.orderId}) : super(key: key);
+//
+//   // const OrderDetailsPage({Key? key}) : super(key: key);
 //
 //   @override
-//   _UserLiveTrackingScreenState createState() => _UserLiveTrackingScreenState();
+//   State<OrderDetailsPage> createState() => _OrderDetailsPageState();
 // }
 //
-// class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
-//   late GoogleMapController _mapController;
-//   IO.Socket? _socket;
-//   LatLng _salesPersonPosition =LatLng(StorageHelper().getSalesLat(), StorageHelper().getSalesLng());
-//   LatLng _userPosition = LatLng(StorageHelper().getUserLat(), StorageHelper().getUserLong()); // Example user location
-//   // LatLng _userPosition = LatLng(26.883301, 80.983299); // Example user location
-//   Set<Polyline> _polylines = {};
-//   Set<Marker> _markers = {}; // ✅ Marker set added
-//   bool hasArrived = false;
-//   double bearing = 0.0;
-//
-//   String salesPersonName = "Rahul Sharma";
-//   String salesPersonPhone = "+91 9876543210";
-//   late BitmapDescriptor customIcon;
-//
+// class _OrderDetailsPageState extends State<OrderDetailsPage> {
 //   @override
 //   void initState() {
 //     super.initState();
-//     _loadCustomMarker();
-//     _connectToSocket();
-//     _startLocationUpdates();
+//     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+//       statusBarColor: AppColors.primary,
+//       statusBarIconBrightness: Brightness.light,
+//     ));
+//     Future.microtask(() {
+//       final provider =
+//           Provider.of<DeliveryOrdersProvider>(context, listen: false);
+//       provider.fetchDeliveryBoyOrderDetails(widget.orderId);
+//     });
+//
+//     // requestPermissions();
+//     // getToken();
 //   }
 //
 //   @override
 //   void dispose() {
-//     // _socket?.clearListeners();
-//     _socket?.disconnect();
-//     _socket?.dispose();
-//     print("Socket disconnected properly ❌");
+//     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+//       statusBarColor: AppColors.primary,
+//       statusBarIconBrightness: Brightness.light,
+//     ));
 //     super.dispose();
 //   }
 //
 //   @override
-//   void didChangeDependencies() {
-//     super.didChangeDependencies();
-//     // _ensureSocketConnected();
-//     _loadCustomMarker();
-//     _connectToSocket();
-//     _startLocationUpdates();
-//     print("Socket Reconnect✅ ");
-//   }
-//
-//   void socketReconnect() {
-//     if (!_socket!.connected) {
-//       _connectToSocket(); // Ensure reconnection
-//     }
-//   }
-//
-//   @override
-//   void didChangeAppLifecycleState(AppLifecycleState state) {
-//     if (state == AppLifecycleState.resumed) {
-//       if (!_socket!.connected) {
-//         _connectToSocket(); // Reconnect when app comes to foreground
-//       }
-//     }
-//   }
-//
-//
-//   // ✅ Load custom marker function
-//   Future<void> _loadCustomMarker() async {
-//     final Uint8List markerIcon =
-//     await _getBytesFromAsset('assets/images/sales_marker.png', 200);
-//     setState(() {
-//       customIcon = BitmapDescriptor.fromBytes(markerIcon);
-//     });
-//   }
-//
-//   // ✅ Convert asset image to bytes
-//   Future<Uint8List> _getBytesFromAsset(String path, int width) async {
-//     ByteData data = await rootBundle.load(path);
-//     ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
-//         targetWidth: width);
-//     ui.FrameInfo fi = await codec.getNextFrame();
-//     ByteData? byteData =
-//     await fi.image.toByteData(format: ui.ImageByteFormat.png);
-//     return byteData!.buffer.asUint8List();
-//   }
-//
-//   double calculateBearing(LatLng start, LatLng end) {
-//     double lat1 = start.latitude * (math.pi / 180);
-//     double lat2 = end.latitude * (math.pi / 180);
-//     double longDiff = (end.longitude - start.longitude) * (math.pi / 180);
-//
-//     double x = math.sin(longDiff) * math.cos(lat2);
-//     double y = math.cos(lat1) * math.sin(lat2) -
-//         math.sin(lat1) * math.cos(lat2) * math.cos(longDiff);
-//
-//     bearing = math.atan2(x, y) * (180 / math.pi);
-//     return (bearing + 360) % 360; // Ensure positive angle
-//   }
-//
-//   void moveMarkerAlongPolyline(List<LatLng> polylinePoints) async {
-//     int index = 0;
-//     Timer.periodic(Duration(milliseconds: 300), (Timer timer) {
-//       if (index < polylinePoints.length - 1) {
-//         LatLng nextPosition = polylinePoints[index];
-//
-//         // ✅ Bearing calculate karein next point tak
-//         double newBearing =
-//         calculateBearing(_salesPersonPosition, nextPosition);
-//
-//         setState(() {
-//           _salesPersonPosition = nextPosition;
-//           bearing = newBearing; // Direction update karein
-//           _updateMarkers();
-//         });
-//
-//         index++;
-//       } else {
-//         timer.cancel(); // ✅ Stop animation when destination is reached
-//       }
-//     });
-//   }
-//
-//   /// **1️⃣ Connect to Socket.IO Server**
-//   void _connectToSocket() {
-//     _socket = IO.io("${Repository.baseUrl}", <String, dynamic>{
-//       "transports": ["websocket"],
-//       'autoConnect': true, // Ensure automatic connection
-//       'reconnection': true, // Enable auto-reconnect
-//       'reconnectionAttempts': 5, // Retry up to 5 times
-//       'reconnectionDelay': 2000, // Wait 2s before retry
-//     });
-//
-//     // print("user and sales lat long => ${StorageHelper().getUserLat()} , ${StorageHelper().getUserLong()} //// ${StorageHelper().getSalesLat()} , ${StorageHelper().getSalesLng()} ");
-//
-//     _socket!.onConnect((_) {
-//       print("Connected to Socket.IO ✅");
-//
-//       _socket!.emit("get-sales-lat-lng", {
-//         "orderDetailId": StorageHelper().getUserOrderId(),
-//       });
-//     });
-//
-//     _socket!.on("get-updated-sales-lat-lng", (data) {
-//       print("Raw Data Received: $data");
-//
-//       // Check if data is a Map before accessing values
-//       if (data is Map<String, dynamic>) {
-//         print("inside the if condition");
-//         print("Sales Latitude: ${data['sales_lat']}");
-//         print("Sales Longitude: ${data['sales_lng']}");
-//         // Convert to double if necessary
-//         double salesLat = double.tryParse(data['sales_lat'].toString()) ?? 0.0;
-//         double salesLng = double.tryParse(data['sales_lng'].toString()) ?? 0.0;
-//
-//         updateMarkerSmoothly(LatLng(salesLat, salesLng));
-//
-//         print("Sales Lat: $salesLat, Sales Lng: $salesLng");
-//         print("after getting data ");
-//         // Store in StorageHelper
-//         StorageHelper().setSalesLat(salesLat);
-//         StorageHelper().setSalesLng(salesLng);
-//         setState(() {
-//           _salesPersonPosition = LatLng(salesLat, salesLng);
-//         });
-//         // Markers aur Polylines ko setState ke baad update karein
-//         _updateMarkers();
-//         _updatePolylines();
-//         _moveCameraToSalesPerson();
-//         print(
-//             "Stored in StorageHelper: ${StorageHelper().getSalesLat()}, ${StorageHelper().getSalesLng()} /// ${StorageHelper().getUserLat()} , ${StorageHelper().getUserLong()}");
-//       } else {
-//         print("Error: Data is not in Map format -> $data");
-//       }
-//     });
-//
-//     _socket!.onDisconnect((_) {
-//       print("Disconnected from Socket.IO ❌");
-//       _reconnectSocket(); // ✅ Attempt Reconnection
-//     });
-//
-//     _socket!.onError((error) {
-//       print('Socket error ❌: $error');
-//     });
-//   }
-//
-//   void updateMarkerSmoothly(LatLng newPosition) {
-//     final GoogleMapController controller = _mapController;
-//     // ✅ Bearing calculate karein
-//     double bearing = calculateBearing(_salesPersonPosition, newPosition);
-//
-//     // Camera ko naye position pe smoothly animate karo
-//     controller.animateCamera(CameraUpdate.newLatLng(newPosition));
-//
-//     setState(() {
-//       _markers.add(
-//         Marker(
-//           markerId: MarkerId('sales_person'),
-//           position: newPosition,
-//           icon: customIcon,
-//           rotation: bearing,
-//           // ✅ Rotation apply karein
-//           anchor: Offset(0.5, 0.5), // ✅ Center se rotate hoga
-//           // icon: BitmapDescriptor.defaultMarkerWithHue(
-//           //   hasArrived ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
-//           // ),
-//         ),
-//       );
-//     });
-//   }
-//
-//   /// **2️⃣ Handle Socket Reconnection**
-//   void _reconnectSocket() {
-//     if (_socket != null && !_socket!.connected) {
-//       print("Attempting to reconnect...");
-//       _socket!.connect();
-//     }
-//   }
-//
-//   /// **3️⃣ Fetch Current Location (for salesperson)**
-//   void _startLocationUpdates() async {
-//     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-//     if (!serviceEnabled) {
-//       print("Location services are disabled.");
-//       return;
-//     }
-//
-//     LocationPermission permission = await Geolocator.checkPermission();
-//     if (permission == LocationPermission.denied) {
-//       permission = await Geolocator.requestPermission();
-//       if (permission == LocationPermission.deniedForever) {
-//         print("Location permissions are permanently denied.");
-//         return;
-//       }
-//     }
-//
-//     Geolocator.getPositionStream(
-//       locationSettings:
-//       LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 5),
-//     ).listen((Position position) {
-//       double latitude = position.latitude;
-//       double longitude = position.longitude;
-//
-//       if (mounted) {
-//         setState(() {
-//           _salesPersonPosition = LatLng(position.latitude, position.longitude);
-//         });
-//         _updateMarkers(); // ✅ Marker update here
-//         _updatePolylines();
-//       }
-//
-//       /// **4️⃣ Send Salesperson's Updated Location to Backend**
-//       // _socket!.emit("change-track-path", {
-//       //   "orderDetailId": StorageHelper().getUserOrderId(),
-//       // });
-//     });
-//   }
-//
-//   /// **3️⃣ Update Markers on Map**
-//   void _updateMarkers() {
-//     setState(() {
-//       _markers.clear();
-//       _markers.add(
-//         Marker(
-//           markerId: MarkerId('sales_person'),
-//           position: _salesPersonPosition,
-//           rotation: bearing, // ✅ Rotation apply karein
-//           icon: customIcon,
-//           // icon: BitmapDescriptor.defaultMarkerWithHue(
-//           //   hasArrived ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
-//           // ),
-//         ),
-//       );
-//       _markers.add(
-//         Marker(
-//           markerId: MarkerId('user'),
-//           position: _userPosition,
-//           icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-//         ),
-//       );
-//     });
-//   }
-//
-//   /// **5️⃣ Update Route Polyline**
-//   // void _updatePolylines() {
-//   //   setState(() {
-//   //     _polylines.clear();
-//   //     _polylines.add(
-//   //       Polyline(
-//   //         polylineId: PolylineId("route"),
-//   //         color: Colors.blue,
-//   //         width: 5,
-//   //         points: [_salesPersonPosition, _userPosition],
-//   //       ),
-//   //     );
-//   //   });
-//   // }
-//
-//   /// **🛣 Fetch Road Polyline Route**
-//   void _updatePolylines() async {
-//     List<LatLng> routeCoordinates =
-//     await getRouteCoordinates(_salesPersonPosition, _userPosition);
-//
-//     setState(() {
-//       _polylines.clear();
-//       if (routeCoordinates.isNotEmpty) {
-//         _polylines.add(
-//           Polyline(
-//             polylineId: PolylineId("route"),
-//             color: Colors.blue,
-//             width: 5,
-//             points: routeCoordinates,
-//           ),
-//         );
-//       }
-//     });
-//   }
-//
-//   Future<List<LatLng>> getRouteCoordinates(
-//       LatLng source, LatLng destination) async {
-//     const String googleAPIKey =
-//         "AIzaSyC9ZOZHwHmyTWXqACqpZY2TL7wX2_Zn05U"; // 🔹 API Key add karein
-//
-//     String url =
-//         "https://maps.googleapis.com/maps/api/directions/json?origin=${source.latitude},${source.longitude}&destination=${destination.latitude},${destination.longitude}&key=$googleAPIKey&mode=driving";
-//
-//     try {
-//       var response = await Dio().get(url);
-//       Map values = response.data;
-//       if (values['status'] == 'OK') {
-//         List<LatLng> routePoints = [];
-//         var steps = values['routes'][0]['legs'][0]['steps'];
-//
-//         for (var step in steps) {
-//           // double lat = step['end_location']['lat'];
-//           // double lng = step['end_location']['lng'];
-//           // routePoints.add(LatLng(lat, lng));
-//           double startLat = step['start_location']['lat'];
-//           double startLng = step['start_location']['lng'];
-//           double endLat = step['end_location']['lat'];
-//           double endLng = step['end_location']['lng'];
-//
-//           routePoints.add(LatLng(startLat, startLng)); // ✅ Include start point
-//           routePoints.add(LatLng(endLat, endLng)); // ✅ Include end point
-//         }
-//         return routePoints;
-//       } else {
-//         print("Google Directions API Error: ${values['status']}");
-//         return [];
-//       }
-//     } catch (e) {
-//       print("Error fetching route: $e");
-//       return [];
-//     }
-//   }
-//
-//   /// **🔹 Move Camera to Salesperson's Location**
-//   void _moveCameraToSalesPerson() {
-//     if (_mapController != null) {
-//       _mapController.animateCamera(
-//         CameraUpdate.newLatLng(_salesPersonPosition),
-//       );
-//     }
-//   }
-//
-//
-//   @override
 //   Widget build(BuildContext context) {
-//     return Consumer<SocketProvider>(
-//       builder: (context, socketProvider, child) {
-//         LatLng salesPersonPosition = socketProvider.salesPersonPosition;
+//     Future.microtask(() {
+//       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+//         statusBarColor: AppColors.primary,
+//         statusBarIconBrightness: Brightness.light, // Ensure light icons
+//       ));
+//     });
 //
-//         if (salesPersonPosition.latitude != 0 && salesPersonPosition.longitude != 0) {
-//           updateMarkerSmoothly(salesPersonPosition);
-//         }
+//     final provider = Provider.of<DeliveryOrdersProvider>(context);
+//     final orderDetail = provider.orderDetail;
 //
-//         return   Scaffold(
-//           appBar: AppBar(title: Text('Live Tracking')),
-//           body: Stack(
-//             children: [
-//               GoogleMap(
-//                 initialCameraPosition: CameraPosition(
-//                   target: _salesPersonPosition,
-//                   zoom: 15,
-//                 ),
-//                 onMapCreated: (GoogleMapController controller) {
-//                   _mapController = controller;
-//                   _updateMarkers(); // ✅ Ensure markers are set after map creation
-//                   _updatePolylines();
-//                 },
-//                 markers: _markers, // ✅ Use updated markers
-//                 polylines: _polylines,
-//               ),
-//
-//               // Bottom Status Box
-//               Align(
-//                 alignment: Alignment.bottomCenter,
-//                 child: Container(
-//                   padding: EdgeInsets.all(16),
-//                   margin: EdgeInsets.all(12),
-//                   decoration: BoxDecoration(
-//                     color: Colors.white,
-//                     borderRadius: BorderRadius.circular(12),
-//                     boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 5)],
-//                   ),
-//                   child: Column(
-//                     mainAxisSize: MainAxisSize.min,
-//                     children: [
-//                       Text(
-//                         hasArrived
-//                             ? "Salesperson has reached the destination!"
-//                             : "Salesperson is on the way...",
-//                         style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-//                       ),
-//                       SizedBox(height: 8),
-//                       Row(
-//                         mainAxisAlignment: MainAxisAlignment.center,
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       appBar: AppBar(
+//         iconTheme: IconThemeData(
+//           color: Colors.white, // Change this to your desired color
+//         ),
+//         title: Text(
+//           "Order Details",
+//           style: TextStyle(color: Colors.white),
+//         ),
+//         backgroundColor: AppColors.primary,
+//       ),
+//       body: provider.isLoading
+//           ? loadingIndicator(color: AppColors.primary)
+//           : provider.errorMessage.isNotEmpty
+//               ? Center(child: Text("Something went wrong"))
+//               : orderDetail == null
+//                   ? Center(child: Text("No order details found"))
+//                   : SingleChildScrollView(
+//                       child: Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
 //                         children: [
-//                           CircleAvatar(
-//                             backgroundColor: Colors.blueAccent,
-//                             child: Icon(Icons.person, color: Colors.white),
+//                           Container(
+//                             padding: const EdgeInsets.symmetric(
+//                                 horizontal: 16, vertical: 8),
+//                             decoration: const BoxDecoration(
+//                               border: Border(
+//                                   bottom: BorderSide(
+//                                       color: Colors.grey, width: 0.5)),
+//                             ),
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Text(
+//                                   'Order ID - ${orderDetail.data!.sId.toString()}',
+//                                   style: AppTextStyles.bodyText1(
+//                                     context,
+//                                     overrideStyle: TextStyle(
+//                                       fontSize: ResponsiveHelper.fontSize(
+//                                           context, 12),
+//                                     ),
+//                                   ),
+//                                 ),
+//                                 const SizedBox(height: 10),
+//                                 Row(
+//                                   crossAxisAlignment: CrossAxisAlignment.start,
+//                                   children: [
+//                                     Expanded(
+//                                       flex: 3,
+//                                       child: Column(
+//                                         crossAxisAlignment:
+//                                             CrossAxisAlignment.start,
+//                                         children: [
+//                                           Text(
+//                                             '${orderDetail.data!.orderName.toString()}',
+//                                             style: AppTextStyles.heading1(
+//                                               context,
+//                                               overrideStyle: TextStyle(
+//                                                 fontSize:
+//                                                     ResponsiveHelper.fontSize(
+//                                                         context, 16),
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           SizedBox(height: 5),
+//                                           Text(
+//                                             'Collection Type: ${StringUtils.capitalizeFirstLetter(orderDetail.data!.orderType.toString())}',
+//                                             style: AppTextStyles.bodyText1(
+//                                               context,
+//                                               overrideStyle: TextStyle(
+//                                                 color: Colors.black,
+//                                                 fontSize:
+//                                                     ResponsiveHelper.fontSize(
+//                                                         context, 12),
+//                                               ),
+//                                             ),
+//                                           ),
+//                                           SizedBox(height: 5),
+//                                           RichText(
+//                                             text: TextSpan(
+//                                               children: [
+//                                                 TextSpan(
+//                                                   text: "\u20B9 ", // Rupee Symbol with space
+//                                                   style: AppTextStyles.heading1(
+//                                                     context,
+//                                                     overrideStyle: TextStyle(
+//                                                       color: AppColors.primary,
+//                                                       fontSize: ResponsiveHelper.fontSize(context, 16),
+//                                                     ),
+//                                                   ),
+//                                                 ),
+//                                                 TextSpan(
+//                                                   text: orderDetail.data!.orderPrice.toString(),
+//                                                   style: AppTextStyles.heading1(
+//                                                     context,
+//                                                     overrideStyle: TextStyle(
+//                                                       color: AppColors.primary,
+//                                                       fontSize: ResponsiveHelper.fontSize(context, 16),
+//                                                     ),
+//                                                   ),
+//                                                 ),
+//                                                 TextSpan(
+//                                                   text: " /-", // Smaller "/-" Sign
+//                                                   style: AppTextStyles.heading1(
+//                                                     context,
+//                                                     overrideStyle: TextStyle(
+//                                                       color: AppColors.primary,
+//                                                       fontSize: ResponsiveHelper.fontSize(context, 14), // Smaller font size
+//                                                     ),
+//                                                   ),
+//                                                 ),
+//                                               ],
+//                                             ),
+//                                           ),
+//
+//                                           // Text(
+//                                           //   '₹${orderDetail.data!.orderPrice}/-',
+//                                           //   style: AppTextStyles.heading1(
+//                                           //     context,
+//                                           //     overrideStyle: TextStyle(
+//                                           //       color: AppColors.primary,
+//                                           //       fontSize:
+//                                           //           ResponsiveHelper.fontSize(
+//                                           //               context, 16),
+//                                           //     ),
+//                                           //   ),
+//                                           // ),
+//
+//
+//
+//
+//
+//
+//                                         ],
+//                                       ),
+//                                     ),
+//                                     // Expanded(
+//                                     //   flex: 1,
+//                                     //   child: Image.network(
+//                                     //     'https://via.placeholder.com/100',
+//                                     //     height: 60,
+//                                     //   ),
+//                                     // ),
+//                                   ],
+//                                 ),
+//                               ],
+//                             ),
 //                           ),
-//                           SizedBox(width: 10),
-//                           Column(
-//                             crossAxisAlignment: CrossAxisAlignment.start,
-//                             children: [
-//                               Text(salesPersonName,
-//                                   style: TextStyle(
-//                                       fontSize: 16, fontWeight: FontWeight.w600)),
-//                               Text(salesPersonPhone,
-//                                   style: TextStyle(
-//                                       fontSize: 14, color: Colors.grey[700])),
-//                             ],
+//                           // Container(
+//                           //   padding: const EdgeInsets.all(16),
+//                           //   decoration: BoxDecoration(
+//                           //     color: AppColors.lightBlueColor,
+//                           //     border: Border(
+//                           //         bottom: BorderSide(
+//                           //             color: Colors.grey, width: 0.5)),
+//                           //   ),
+//                           //   child: Row(
+//                           //     children: const [
+//                           //       Icon(Icons.check_circle, color: Colors.green),
+//                           //       SizedBox(width: 8),
+//                           //       Text('Delivery was made with OTP verification'),
+//                           //     ],
+//                           //   ),
+//                           // ),
+//                           Container(
+//                             padding: const EdgeInsets.all(16),
+//                             child: Column(
+//                               children: [
+//                                 Row(
+//                                   children: [
+//                                     Icon(Icons.check_circle,
+//                                         color: Colors.green),
+//                                     SizedBox(width: 8),
+//                                     Text(
+//                                         'Order Date,Time,  ${DateUtil.formatISODate(orderDetail.data!.bookingDate.toString())}, ${DateUtil.formatISOTime(orderDetail.data!.bookingDate.toString())}'),
+//                                   ],
+//                                 ),
+//                                 const SizedBox(height: 16),
+//                                 Row(
+//                                   children: [
+//                                     Icon(Icons.check_circle,
+//                                         color: Colors.green),
+//                                     SizedBox(width: 8),
+//                                     Text(
+//                                         'Test Confirmed,  ${DateUtil.formatISODate(orderDetail.data!.bookingDate.toString())}'),
+//                                   ],
+//                                 ),
+//                                 const SizedBox(height: 16),
+//                                 Row(
+//                                   children: const [
+//                                     Icon(Icons.check_circle,
+//                                         color: Colors.green),
+//                                     SizedBox(width: 8),
+//                                     Text('Delivered, Mar 18'),
+//                                   ],
+//                                 ),
+//                               ],
+//                             ),
 //                           ),
+//                           const Divider(),
+//                           Container(
+//                             padding: const EdgeInsets.all(16),
+//                             child: Column(
+//                               crossAxisAlignment: CrossAxisAlignment.start,
+//                               children: [
+//                                 Text(
+//                                   'Your details',
+//                                   style: AppTextStyles.bodyText1(
+//                                     context,
+//                                     overrideStyle: TextStyle(
+//                                       color: Colors.black,
+//                                       fontSize: ResponsiveHelper
+//                                           .fontSize(context, 12),
+//                                     ),
+//                                   ),
+//                                 ),
+//                                 SizedBox(height: 10),
+//                                 Text(
+//                                     '${orderDetail.data!.patientName.toString()}',
+//                                     style:
+//                                         TextStyle(fontWeight: FontWeight.bold)),
+//                                 SizedBox(height: 4),
+//                                 Text('615/617, Parvati Bhavan'),
+//                                 Text('Sitapur Road, Madiyava, Navbasta puliya'),
+//                                 Text('Lucknow'),
+//                                 Text('Uttar Pradesh - 226021'),
+//                                 SizedBox(height: 4),
+//                                 Text('Phone number: 7985600652, 8009711121'),
+//                               ],
+//                             ),
+//                           ),
+//                           const Divider(),
+//                           Padding(
+//                             padding: const EdgeInsets.all(8.0),
+//                             child: Row(
+//                               mainAxisAlignment: MainAxisAlignment.center,
+//                               children: [
+//                                 Flexible(
+//                                   flex: 1,
+//                                   child: OutlinedRoundedButton(
+//                                     borderRadius: 10,
+//                                     borderWidth: 1,
+//                                     borderColor: AppColors.deliveryPrimary,
+//                                     text: 'Track Order',
+//                                     onPressed: () {
+//                                       double lat = double.parse(
+//                                           orderDetail.data!.lat.toString());
+//                                       double long = double.parse(
+//                                           orderDetail.data!.lng.toString());
+//
+//                                       StorageHelper().setUserLat(lat);
+//                                       StorageHelper().setUserLong(long);
+//                                       // set the order id for tracking
+//                                       StorageHelper().setUserOrderId(
+//                                           orderDetail.data!.sId.toString());
+//
+//                                       Navigator.push(
+//                                         context,
+//                                         MaterialPageRoute(
+//                                           builder: (context) =>
+//                                               UserLiveTrackingScreen(),
+//                                         ),
+//                                       );
+//                                     },
+//                                   ),
+//                                 ),
+//                                 // const SizedBox(width: 10),
+//                                 // Flexible(
+//                                 //   flex: 1,
+//                                 //   child: StatefulBuilder(
+//                                 //     builder: (context, setState) {
+//                                 //       bool isUpdatingStatus =
+//                                 //           false; // Local state for button loader
+//                                 //
+//                                 //       return SolidRoundedButton(
+//                                 //           onPressed: () async {
+//                                 //             if (orderDetail.data != null) {
+//                                 //               String currentStatus =
+//                                 //                   orderDetail.data!.bookingStatus ??
+//                                 //                       "";
+//                                 //               String newStatus = "";
+//                                 //
+//                                 //               if (currentStatus == "confirmed") {
+//                                 //                 newStatus = "ongoing";
+//                                 //               } else if (currentStatus ==
+//                                 //                   "ongoing") {
+//                                 //                 newStatus = "completed";
+//                                 //               } else {
+//                                 //                 return; // Do nothing if already completed
+//                                 //               }
+//                                 //
+//                                 //               // Show loader on button
+//                                 //               setState(() {
+//                                 //                 isUpdatingStatus = true;
+//                                 //               });
+//                                 //
+//                                 //               // Call API to update the status
+//                                 //               bool success = await Provider.of<
+//                                 //                           DeliveryOrdersProvider>(
+//                                 //                       context,
+//                                 //                       listen: false)
+//                                 //                   .changeOrderStatus(
+//                                 //                       newStatus, widget.orderId);
+//                                 //
+//                                 //               if (success) {
+//                                 //                 // Fetch updated order details only for the button state
+//                                 //                 await Provider.of<
+//                                 //                             DeliveryOrdersProvider>(
+//                                 //                         context,
+//                                 //                         listen: false)
+//                                 //                     .fetchDeliveryBoyOrderDetails(
+//                                 //                         widget.orderId);
+//                                 //
+//                                 //                 // Update only button status
+//                                 //                 setState(() {
+//                                 //                   orderDetail.data!.bookingStatus =
+//                                 //                       newStatus;
+//                                 //                 });
+//                                 //               }
+//                                 //
+//                                 //               // Hide loader after API call
+//                                 //               setState(() {
+//                                 //                 isUpdatingStatus = false;
+//                                 //               });
+//                                 //             }
+//                                 //           },
+//                                 //           text: orderDetail.data!.bookingStatus ==
+//                                 //                   "confirmed"
+//                                 //               ? "Pending"
+//                                 //               : orderDetail.data!.bookingStatus ==
+//                                 //                       "ongoing"
+//                                 //                   ? "Ongoing"
+//                                 //                   : orderDetail.data!
+//                                 //                               .bookingStatus ==
+//                                 //                           "completed"
+//                                 //                       ? "Completed"
+//                                 //                       : "",
+//                                 //           color: AppColors.primary,
+//                                 //           borderRadius: 10.0,
+//                                 //           textStyle: AppTextStyles.heading1(
+//                                 //             context,
+//                                 //             overrideStyle: TextStyle(
+//                                 //               color: Colors.white,
+//                                 //               fontSize: ResponsiveHelper.fontSize(
+//                                 //                   context, 14),
+//                                 //             ),
+//                                 //           ));
+//                                 //     },
+//                                 //   ),
+//                                 // ),
+//                               ],
+//                             ),
+//                           ),
+//                           // const Divider(),
+//                           // Container(
+//                           //   padding: const EdgeInsets.all(16),
+//                           //   child: Column(
+//                           //     crossAxisAlignment: CrossAxisAlignment.start,
+//                           //     children: [
+//                           //       const Text('Price Details',
+//                           //           style:
+//                           //               TextStyle(fontWeight: FontWeight.bold)),
+//                           //       const SizedBox(height: 16),
+//                           //       Row(
+//                           //         mainAxisAlignment:
+//                           //             MainAxisAlignment.spaceBetween,
+//                           //         children: const [
+//                           //           Text('List price'),
+//                           //           Text('₹499'),
+//                           //         ],
+//                           //       ),
+//                           //       const SizedBox(height: 8),
+//                           //       Row(
+//                           //         mainAxisAlignment:
+//                           //             MainAxisAlignment.spaceBetween,
+//                           //         children: const [
+//                           //           Text('Selling price'),
+//                           //           Text('₹240'),
+//                           //         ],
+//                           //       ),
+//                           //       const SizedBox(height: 8),
+//                           //       Row(
+//                           //         mainAxisAlignment:
+//                           //             MainAxisAlignment.spaceBetween,
+//                           //         children: const [
+//                           //           Text('Extra Discount'),
+//                           //           Text('- ₹16',
+//                           //               style: TextStyle(color: Colors.green)),
+//                           //         ],
+//                           //       ),
+//                           //       const SizedBox(height: 8),
+//                           //       Row(
+//                           //         mainAxisAlignment:
+//                           //             MainAxisAlignment.spaceBetween,
+//                           //         children: const [
+//                           //           Text('Special Price'),
+//                           //           Text('₹224'),
+//                           //         ],
+//                           //       ),
+//                           //       const SizedBox(height: 8),
+//                           //       Row(
+//                           //         mainAxisAlignment:
+//                           //             MainAxisAlignment.spaceBetween,
+//                           //         children: const [
+//                           //           Text('Platform fee'),
+//                           //           Text('₹3'),
+//                           //         ],
+//                           //       ),
+//                           //       const SizedBox(height: 16),
+//                           //       Row(
+//                           //         mainAxisAlignment:
+//                           //             MainAxisAlignment.spaceBetween,
+//                           //         children: const [
+//                           //           Text('Total Amount',
+//                           //               style: TextStyle(
+//                           //                   fontWeight: FontWeight.bold)),
+//                           //           Text('₹227',
+//                           //               style: TextStyle(
+//                           //                   fontWeight: FontWeight.bold)),
+//                           //         ],
+//                           //       ),
+//                           //       const SizedBox(height: 16),
+//                           //       Row(
+//                           //         children: const [
+//                           //           Icon(Icons.circle, size: 6),
+//                           //           SizedBox(width: 8),
+//                           //           Text('UPI: ₹227.0'),
+//                           //         ],
+//                           //       ),
+//                           //     ],
+//                           //   ),
+//                           // ),
 //                         ],
 //                       ),
-//                       SizedBox(height: 10),
-//                       if (!hasArrived)
-//                         LinearProgressIndicator(
-//                             color: Colors.blue, backgroundColor: Colors.grey[300]),
-//                     ],
-//                   ),
-//                 ),
-//               ),
-//             ],
-//           ),
-//         );
-//       },
+//                     ),
 //     );
 //   }
 // }

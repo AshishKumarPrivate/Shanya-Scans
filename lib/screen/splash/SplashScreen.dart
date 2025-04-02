@@ -86,9 +86,20 @@ class _SplashScreenState extends State<SplashScreen> {
     // }
 
     if (userRole == "user") {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => BottomNavigationScreen()),
-      );
+      bool isOtpVerified = await StorageHelper().getOtpVerified();
+      bool isUserLoggedIn = await StorageHelper().isUserVerified();
+
+      if(isOtpVerified){
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => BottomNavigationScreen()),
+        );
+      }else{
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => UserSelectionScreen()),
+        );
+      }
+
 
     } else if (userRole == "delivery_boy") {
       Navigator.of(context).pushReplacement(

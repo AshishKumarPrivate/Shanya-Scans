@@ -32,6 +32,9 @@ class _ExpandableTextWidgetState extends State<ExpandableTextWidget> {
         color: Colors.black,
         fontSize: FontSize(ResponsiveHelper.fontSize(context, 12)),
         textAlign: TextAlign.justify,
+        lineHeight: LineHeight(1.6),
+        margin: Margins.zero, // Remove margins
+        padding: HtmlPaddings.zero,
         wordSpacing: 1, // Adjust spacing if &nbsp; is causing issues
 
       ),
@@ -41,10 +44,10 @@ class _ExpandableTextWidgetState extends State<ExpandableTextWidget> {
       "h2": Style(fontSize: FontSize(20.0), fontWeight: FontWeight.bold, color: AppColors.primary),
       "a": Style(color: AppColors.primary, textDecoration: TextDecoration.underline),
       "pre": Style(margin: Margins.zero, padding: HtmlPaddings.zero, lineHeight: LineHeight(1)),
-      "div": Style(margin: Margins.only(bottom: 5), padding: HtmlPaddings.zero),
+      "div": Style(margin: Margins.zero, padding: HtmlPaddings.zero), // No margin/padding for div
       "span": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
-      "ul": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
-      "li": Style(margin: Margins.zero, padding: HtmlPaddings.zero),
+      "ul": Style(margin: Margins.zero, padding: HtmlPaddings.zero), // No margin/padding for ul
+      "li": Style(margin: Margins.zero, padding: HtmlPaddings.zero), // No margin/padding for li
     };
 
     // Merge default styles with custom styles (if provided)

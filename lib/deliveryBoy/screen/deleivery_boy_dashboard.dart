@@ -107,6 +107,7 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
       child: Scaffold(
         backgroundColor: AppColors.deliveryPrimary, // Subtle background
         body: SafeArea(
+          bottom: false,
           child: _selectedIndex == 0
               ? _buildDashboard() // Show Dashboard if selected
               : Center(child: _screens[_selectedIndex]), // Other screens

@@ -55,6 +55,7 @@ class _DeliveryLoginScreenState extends State<DeliveryLoginScreen> {
         ),
         child: SafeArea(
           top: false,
+          bottom: false,
           child: GestureDetector(
             onTap: () => FocusScope.of(context).unfocus(),
             // ✅ Dismiss keyboard on tap
