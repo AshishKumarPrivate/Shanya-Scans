@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:healthians/ui_helper/snack_bar.dart';
 import 'package:url_launcher/url_launcher.dart';

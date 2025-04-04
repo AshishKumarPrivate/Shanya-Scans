@@ -1,17 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:healthians/base_widgets/common/custom_nav_scan_app_bar.dart';
 import 'package:healthians/base_widgets/common/scans_service_shimmer.dart';
 import 'package:healthians/screen/service/service_detail_list.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
 
-import '../../base_widgets/common/home_service_shimmer.dart';
 import '../../base_widgets/common/nav_common_app_bar.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../ui_helper/app_text_styles.dart';
-import '../../base_widgets/common/common_app_bar.dart';
 import '../nav/nav_home/home_slider_setion.dart';
 import '../service/controller/service_scans_provider.dart';
 
@@ -23,20 +19,6 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanScreenState extends State<ScanScreen> {
-  final List<Map<String, String>> items = [
-    {'image': 'assets/images/digitalpetct.png', 'title': 'Digital PET CT'},
-    {'image': 'assets/images/thyroid_service.png', 'title': 'Thyroid'},
-    {'image': 'assets/images/ct_scan.png', 'title': 'CT Scan'},
-    {'image': 'assets/images/digitalgamma.png', 'title': 'Digital Gamma'},
-    {'image': 'assets/images/dexascan.png', 'title': 'Dexa Scan'},
-    {'image': 'assets/images/mammography.png', 'title': 'Mammography'},
-    {'image': 'assets/images/theranostics.png', 'title': 'Theranostics'},
-    {'image': 'assets/images/ultrasound_service.png', 'title': 'Ultrasound'},
-    {'image': 'assets/images/cardioimaging.png', 'title': 'Cardio Imaging'},
-    {'image': 'assets/images/neuro.png', 'title': 'Neuro Imaging'},
-    {'image': 'assets/images/xray_service.png', 'title': 'Digital X-Ray '},
-    {'image': 'assets/images/pathalogy.png', 'title': 'Pathalogy'},
-  ];
 
   @override
   void initState() {
@@ -109,7 +91,7 @@ class _ScanScreenState extends State<ScanScreen> {
                           //     end: Alignment.bottomRight,
                           //   ),
                           // ),
-                          child: HomeSliderSection(bannerImageHeight: 160,),
+                          child: HomeSlider1Section(bannerImageHeight: 160,),
                         ),
                       ),
                       Padding(

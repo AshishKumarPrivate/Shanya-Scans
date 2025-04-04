@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:healthians/base_widgets/common/custom_text_field.dart';
-import 'package:healthians/screen/auth/controller/auth_provider.dart';
-import 'package:healthians/screen/auth/signup_screen.dart';
 import 'package:provider/provider.dart';
 import '../../../base_widgets/loading_indicator.dart';
 import '../../../base_widgets/solid_rounded_button.dart';
 import '../../../ui_helper/app_colors.dart';
-import '../../../ui_helper/app_text_styles.dart';
-import '../../../ui_helper/responsive_helper.dart';
 import '../../controller/delivery_boy_auth_provider.dart';
 
 class DeliveryBoyLoginFormWidget extends StatefulWidget {

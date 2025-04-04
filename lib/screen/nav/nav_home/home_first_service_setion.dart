@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:healthians/screen/other/book_a%20_test_now_screen.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/base_widgets/custom_rounded_container.dart';
-import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 
 class HomeFirstServiceSection extends StatelessWidget {
   final String phoneNumber = "9161066154";
 
-  final List<Map<String, String>> services = [
+  final List<Map<String, String>> servicesList = [
     {
       'image': "assets/images/labtest.png",
       'title': "Lab Test",
@@ -49,7 +47,7 @@ class HomeFirstServiceSection extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: services.map((service) {
+        children: servicesList.map((service) {
           return Expanded(
             child: InkWell(
               onTap: (){

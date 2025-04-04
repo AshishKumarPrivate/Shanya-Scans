@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
  import 'package:healthians/base_widgets/custom_rounded_container.dart';
 import 'package:healthians/util/phone_call_open.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../util/whatsapp_open.dart';

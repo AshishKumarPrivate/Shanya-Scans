@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../ui_helper/app_text_styles.dart';
+import '../../../ui_helper/responsive_helper.dart';
+
 class GoogleMapSearchPlacesApi extends StatefulWidget {
   const GoogleMapSearchPlacesApi({Key? key}) : super(key: key);
 
@@ -30,11 +33,6 @@ class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
   }
 
   _onChanged() {
-    if (_sessionToken == null) {
-      setState(() {
-        _sessionToken = uuid.v4();
-      });
-    }
     getSuggestion(_controller.text);
   }
 
@@ -71,7 +69,16 @@ class _GoogleMapSearchPlacesApiState extends State<GoogleMapSearchPlacesApi> {
       backgroundColor: Colors.white,
       appBar: AppBar(
         elevation: 0,
-        title: const Text('Search places Api' ,),
+        title:  Text('Choose Location' ,
+          style: AppTextStyles.heading1(
+            context,
+            overrideStyle: TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+                fontSize: ResponsiveHelper.fontSize(context, 16)),
+          ),
+
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,

@@ -3,12 +3,10 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:healthians/bottom_navigation_screen.dart';
 import 'package:healthians/deliveryBoy/controller/DeliveryOrdersProvider.dart';
 import 'package:healthians/deliveryBoy/controller/delivery_boy_auth_provider.dart';
 import 'package:healthians/deliveryBoy/controller/socket_provider.dart';
 import 'package:healthians/screen/auth/controller/auth_provider.dart';
-import 'package:healthians/screen/auth/login_screen.dart';
 import 'package:healthians/screen/cart/controller/cart_list_api_provider.dart';
 import 'package:healthians/screen/checkout/controller/checkout_api_provider.dart';
 import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/controller/frequently_pathalogy_test_provider.dart';
@@ -23,56 +21,13 @@ import 'package:healthians/screen/profile/controller/term_condition_provider.dar
 import 'package:healthians/screen/service/controller/service_scans_provider.dart';
 import 'package:healthians/screen/splash/SplashScreen.dart';
 import 'package:healthians/screen/splash/controller/network_provider_controller.dart';
-import 'package:healthians/screen/testing_file.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/storage_helper.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
-import 'firebase/FirebaseNotificationService.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
-
-  // Future<void> main() async {
-//   WidgetsFlutterBinding.ensureInitialized(); // ✅ Ensure Flutter binding is initialized
-//   await Firebase.initializeApp();
-//
-//   StorageHelper().init(); // ✅ Initialize SharedPreferences
-//   await PackageInfo.fromPlatform(); // Ensures package is loaded
-//
-//
-//   runApp(
-//     MultiProvider(
-//       providers: [
-//         ChangeNotifierProvider(create: (context) => NetworkProvider()),
-//         ChangeNotifierProvider(create: (context) => AuthApiProvider()),
-//         ChangeNotifierProvider(create: (context) => ServiceApiProvider()),
-//         ChangeNotifierProvider(create: (context) => PathalogyTestApiProvider()),
-//         ChangeNotifierProvider(create: (context) => HealthConcernApiProvider()),
-//         ChangeNotifierProvider(create: (context) => FrequentlyPathalogyTagApiProvider()),
-//         ChangeNotifierProvider(create: (context) => HealthPacakgeListApiProvider()),
-//         ChangeNotifierProvider(create: (context) => HomeBannerApiProvider()),
-//         ChangeNotifierProvider(create: (context) => CartProvider()),
-//         ChangeNotifierProvider(create: (context) => SearchProvider()),
-//         ChangeNotifierProvider(create: (context) => TermConditionPrivacyPolicyApiProvider()),
-//         ChangeNotifierProvider(create: (context) => OrderApiProvider()),
-//         ChangeNotifierProvider(create: (context) => NeedHelpApiProvider()),
-//         ChangeNotifierProvider(create: (context) => CheckoutProvider()),
-//
-//
-//         /// &&&&&&&&&&& Dellivery BOy ***********
-//         ChangeNotifierProvider(create: (context) => DeliveryOrdersProvider()),
-//         ChangeNotifierProvider(create: (context) => DeliveryBoyAuthApiProvider()),
-//         ChangeNotifierProvider(create: (context) => SocketProvider()),
-//
-//
-//       ],
-//       child: MyApp(),
-//     ),
-//   );
-// }
 
 
 Future<void> main() async {
@@ -83,35 +38,72 @@ Future<void> main() async {
   await PackageInfo.fromPlatform(); // Ensures package is loaded
 
   runApp(
-    DevicePreview(
-      enabled: !kReleaseMode, // Enable DevicePreview in non-release mode
-      builder: (context) => MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (context) => NetworkProvider()),
-          ChangeNotifierProvider(create: (context) => AuthApiProvider()),
-          ChangeNotifierProvider(create: (context) => ServiceApiProvider()),
-          ChangeNotifierProvider(create: (context) => PathalogyTestApiProvider()),
-          ChangeNotifierProvider(create: (context) => HealthConcernApiProvider()),
-          ChangeNotifierProvider(create: (context) => FrequentlyPathalogyTagApiProvider()),
-          ChangeNotifierProvider(create: (context) => HealthPacakgeListApiProvider()),
-          ChangeNotifierProvider(create: (context) => HomeBannerApiProvider()),
-          ChangeNotifierProvider(create: (context) => CartProvider()),
-          ChangeNotifierProvider(create: (context) => SearchProvider()),
-          ChangeNotifierProvider(create: (context) => TermConditionPrivacyPolicyApiProvider()),
-          ChangeNotifierProvider(create: (context) => OrderApiProvider()),
-          ChangeNotifierProvider(create: (context) => NeedHelpApiProvider()),
-          ChangeNotifierProvider(create: (context) => CheckoutProvider()),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => NetworkProvider()),
+        ChangeNotifierProvider(create: (context) => AuthApiProvider()),
+        ChangeNotifierProvider(create: (context) => ServiceApiProvider()),
+        ChangeNotifierProvider(create: (context) => PathalogyTestApiProvider()),
+        ChangeNotifierProvider(create: (context) => HealthConcernApiProvider()),
+        ChangeNotifierProvider(create: (context) => FrequentlyPathalogyTagApiProvider()),
+        ChangeNotifierProvider(create: (context) => HealthPacakgeListApiProvider()),
+        ChangeNotifierProvider(create: (context) => HomeBannerApiProvider()),
+        ChangeNotifierProvider(create: (context) => CartProvider()),
+        ChangeNotifierProvider(create: (context) => SearchProvider()),
+        ChangeNotifierProvider(create: (context) => TermConditionPrivacyPolicyApiProvider()),
+        ChangeNotifierProvider(create: (context) => OrderApiProvider()),
+        ChangeNotifierProvider(create: (context) => NeedHelpApiProvider()),
+        ChangeNotifierProvider(create: (context) => CheckoutProvider()),
 
-          /// &&&&&&&&&&& Delivery Boy ***********
-          ChangeNotifierProvider(create: (context) => DeliveryOrdersProvider()),
-          ChangeNotifierProvider(create: (context) => DeliveryBoyAuthApiProvider()),
-          ChangeNotifierProvider(create: (context) => SocketProvider()),
-        ],
-        child: MyApp(),
-      ),
+        /// &&&&&&&&&&& Delivery Boy ***********
+        ChangeNotifierProvider(create: (context) => DeliveryOrdersProvider()),
+        ChangeNotifierProvider(create: (context) => DeliveryBoyAuthApiProvider()),
+        ChangeNotifierProvider(create: (context) => SocketProvider()),
+      ],
+      child: MyApp(),
     ),
   );
 }
+
+
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized(); // ✅ Ensure Flutter binding is initialized
+//   await Firebase.initializeApp();
+//
+//   StorageHelper().init(); // ✅ Initialize SharedPreferences
+//   await PackageInfo.fromPlatform(); // Ensures package is loaded
+//
+//   runApp(
+//     DevicePreview(
+//       enabled: !kReleaseMode, // Enable DevicePreview in non-release mode
+//       builder: (context) => MultiProvider(
+//         providers: [
+//           ChangeNotifierProvider(create: (context) => NetworkProvider()),
+//           ChangeNotifierProvider(create: (context) => AuthApiProvider()),
+//           ChangeNotifierProvider(create: (context) => ServiceApiProvider()),
+//           ChangeNotifierProvider(create: (context) => PathalogyTestApiProvider()),
+//           ChangeNotifierProvider(create: (context) => HealthConcernApiProvider()),
+//           ChangeNotifierProvider(create: (context) => FrequentlyPathalogyTagApiProvider()),
+//           ChangeNotifierProvider(create: (context) => HealthPacakgeListApiProvider()),
+//           ChangeNotifierProvider(create: (context) => HomeBannerApiProvider()),
+//           ChangeNotifierProvider(create: (context) => CartProvider()),
+//           ChangeNotifierProvider(create: (context) => SearchProvider()),
+//           ChangeNotifierProvider(create: (context) => TermConditionPrivacyPolicyApiProvider()),
+//           ChangeNotifierProvider(create: (context) => OrderApiProvider()),
+//           ChangeNotifierProvider(create: (context) => NeedHelpApiProvider()),
+//           ChangeNotifierProvider(create: (context) => CheckoutProvider()),
+//
+//           /// &&&&&&&&&&& Delivery Boy ***********
+//           ChangeNotifierProvider(create: (context) => DeliveryOrdersProvider()),
+//           ChangeNotifierProvider(create: (context) => DeliveryBoyAuthApiProvider()),
+//           ChangeNotifierProvider(create: (context) => SocketProvider()),
+//         ],
+//         child: MyApp(),
+//       ),
+//     ),
+//   );
+// }
+
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -121,6 +113,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Shanya',
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       theme: ThemeData(
         brightness: Brightness.light, // Light theme
         colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),

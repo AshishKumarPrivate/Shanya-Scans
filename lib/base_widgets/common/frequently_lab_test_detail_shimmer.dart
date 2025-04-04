@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../ui_helper/responsive_helper.dart';
 
 class FrequentlyLabTestDetailShimmer extends StatelessWidget {
   @override

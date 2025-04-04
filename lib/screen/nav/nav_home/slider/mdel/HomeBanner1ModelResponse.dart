@@ -1,11 +1,11 @@
-class HomeBanner1ModelResponse {
+class HomeBanner2ModelResponse {
   bool? success;
   String? message;
   List<Data>? data;
 
-  HomeBanner1ModelResponse({this.success, this.message, this.data});
+  HomeBanner2ModelResponse({this.success, this.message, this.data});
 
-  HomeBanner1ModelResponse.fromJson(Map<String, dynamic> json) {
+  HomeBanner2ModelResponse.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     message = json['message'];
     if (json['data'] != null) {
@@ -32,6 +32,7 @@ class Data {
   String? sId;
   String? name;
   String? types;
+  String? index;
   String? createdAt;
   String? updatedAt;
   int? iV;
@@ -41,6 +42,7 @@ class Data {
         this.sId,
         this.name,
         this.types,
+        this.index,
         this.createdAt,
         this.updatedAt,
         this.iV});
@@ -50,6 +52,7 @@ class Data {
     sId = json['_id'];
     name = json['name'];
     types = json['types'];
+    index = json['index'];
     createdAt = json['createdAt'];
     updatedAt = json['updatedAt'];
     iV = json['__v'];
@@ -63,6 +66,7 @@ class Data {
     data['_id'] = this.sId;
     data['name'] = this.name;
     data['types'] = this.types;
+    data['index'] = this.index;
     data['createdAt'] = this.createdAt;
     data['updatedAt'] = this.updatedAt;
     data['__v'] = this.iV;

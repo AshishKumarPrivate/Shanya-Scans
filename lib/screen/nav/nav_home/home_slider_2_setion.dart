@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:healthians/bottom_navigation_screen.dart';
 import 'package:healthians/screen/nav/nav_home/slider/controller/home_banner_api_provider.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
+
+import '../../../bottom_navigation_screen.dart';
 
 class HomeSlider2Section extends StatefulWidget {
   @override
@@ -14,7 +14,7 @@ class HomeSlider2Section extends StatefulWidget {
 }
 
 class _HomeSlider2SectionState extends State<HomeSlider2Section> {
-  int _current = 0;
+  int currentIndex = 0;
   final CarouselSliderController _controller = CarouselSliderController();
 
   @override
@@ -26,20 +26,20 @@ class _HomeSlider2SectionState extends State<HomeSlider2Section> {
     });
   }
 
-  // void _navigateToBottomNav(int index) {
-  //   Navigator.pushReplacement(
-  //     context,
-  //     MaterialPageRoute(
-  //       builder: (context) => BottomNavigationScreen(initialPageIndex: index),
-  //     ),
-  //   );
-  // }
+  void _navigateToBottomNav(int index) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BottomNavigationScreen(initialPageIndex: index),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<HomeBannerApiProvider>(
       builder: (context, provider, child) {
-        if (provider.isLoading  && provider.homeBanner1ListModel== null ) {
+        if (provider.isLoading  && provider.homeBanner2ListModel== null ) {
           return HomeSliderShimmer();
         } else if (provider.errorMessage.isNotEmpty) {
           return SizedBox();// API error case: Hide section
@@ -56,7 +56,7 @@ class _HomeSlider2SectionState extends State<HomeSlider2Section> {
           // );
         }
 
-        final homeBannerList = provider.homeBanner1ListModel?.data ?? [];
+        final homeBannerList = provider.homeBanner2ListModel?.data ?? [];
 
         if (homeBannerList.isEmpty) {
           return SizedBox(); // **No data case: Hide section**
@@ -78,20 +78,8 @@ class _HomeSlider2SectionState extends State<HomeSlider2Section> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                // Color(0xFFe3f2fd), // Light Color
-                // Color(0xFFe3f2fd), // Soft Blue Shade
-                // Color(0xFFe0f7fa), // Light Cyan Blue
-                // Color(0xFFb2ebf2), // Sky Blue
-
-                //// is somthing best
-                // Color(0xFFe0f2f1), // Light Teal
-                // Color(0xFFb2dfdb), // Mint Green-Teal
-                // its something best
-
-                // its so looking good
-                Color(0xFFede7f6), // Light Purple
-                Color(0xFFb3e5fc), // Soft Blue
-                /// looking good
+                Color(0xFFede7f6),
+                Color(0xFFb3e5fc),
 
               ],
               begin: Alignment.topLeft,
@@ -107,12 +95,15 @@ class _HomeSlider2SectionState extends State<HomeSlider2Section> {
                     width: double.infinity,
                     margin: EdgeInsets.symmetric(horizontal: 5.0),
                     child: GestureDetector(
-                      // onTap: () {
-                      //   int targetIndex = int.tryParse(item.index.toString()) ?? 0;
-                      //   if (targetIndex >= 0 && targetIndex <= 4) {
-                      //     _navigateToBottomNav(targetIndex);
-                      //   }
-                      // },
+                      onTap: () {
+                        // int targetIndex = int.tryParse(item.index.toString()) ?? 0;
+                        int targetIndex = (int.tryParse(item.index.toString()) ?? 1) - 1;
+
+                        print("click banner2 index= ${targetIndex}");
+                        if (targetIndex >= 1 && targetIndex <= 5) {
+                          _navigateToBottomNav(targetIndex);
+                        }
+                      },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
                         child:CachedNetworkImage(
@@ -162,7 +153,7 @@ class _HomeSlider2SectionState extends State<HomeSlider2Section> {
                   enlargeCenterPage: false,
                   onPageChanged: (index, reason) {
                     setState(() {
-                      _current = index;
+                      currentIndex = index;
                     });
                   },
                 ),

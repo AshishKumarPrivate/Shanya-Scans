@@ -1,14 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/model/FrequentlyLabTestDetailModel.dart';
-import 'package:healthians/screen/nav/nav_home/health_concern/model/HealthConcernPacakageTagModel.dart';
-import 'package:healthians/screen/nav/nav_lab/model/PathalogyTestListDetailModel.dart';
-import 'package:healthians/screen/nav/nav_lab/model/PathalogyTestListModel.dart';
 import 'package:healthians/screen/packages/model/PackageListByTabIdModel.dart' as packageModel;
 import 'package:healthians/screen/packages/model/TopSellingPackagesListModel.dart';
-import 'package:healthians/screen/service/model/HomeServiceDetailModel.dart';
-import 'package:healthians/screen/service/model/HomeServiceListModel.dart';
-import 'package:healthians/screen/service/model/ServiceDetailRateListModel.dart';
 
 class HealthPacakgeListApiProvider with ChangeNotifier {
   final Repository _repository = Repository();
@@ -44,7 +37,7 @@ class HealthPacakgeListApiProvider with ChangeNotifier {
   void _setErrorState(String message) {
     _errorMessage = message;
     _setLoadingState(false);
-    notifyListeners(); // Ensure UI rebuilds
+    // notifyListeners(); // Ensure UI rebuilds
   }
 
   /// **Fetch Home Service List API**
@@ -58,7 +51,7 @@ class HealthPacakgeListApiProvider with ChangeNotifier {
       Map<String, dynamic> requestBody = {"id": packageTabId};
       var response =  await _repository.getPackageListByTabResponse(requestBody);
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response.success == true && response.data != null) {
         print("✅ Package list By Tab  Fetched Successfully");
         _PackageListByTabModel = response;
         _setLoadingState(false);
@@ -86,7 +79,7 @@ class HealthPacakgeListApiProvider with ChangeNotifier {
       Map<String, dynamic> requestBody = {"id": blankPackageId};
       var response =  await _repository.getTopSellingPackageListResponse(requestBody);
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response.success == true && response.data != null) {
         print("✅ Package list By Tab  Fetched Successfully");
         _topSellingPackageListlModel = response;
         _setLoadingState(false);
@@ -112,7 +105,7 @@ class HealthPacakgeListApiProvider with ChangeNotifier {
     try {
       var response =  await _repository.getPackageListResponse();
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response.success == true && response.data != null) {
         print("${response.data.toString()}");
         print("✅ Package list  Fetched Successfully");
         _navPackageListlModel = response;
@@ -154,7 +147,7 @@ class HealthPacakgeListApiProvider with ChangeNotifier {
     try {
       var response =  await _repository.getNavPackageListResponse();
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response.success == true && response.data != null) {
         print("✅ Package list  Fetched Successfully");
         _navPackageListlModel = response;
         // Ensure correct type conversion

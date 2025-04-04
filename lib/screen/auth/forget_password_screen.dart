@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/custom_rounded_container.dart';
-import 'package:healthians/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:healthians/screen/auth/controller/auth_provider.dart';
 import 'package:healthians/ui_helper/app_colors.dart';
 import '../../base_widgets/common/custom_text_field.dart';
 import '../../base_widgets/loading_indicator.dart';
 import '../../base_widgets/solid_rounded_button.dart';
-import '../../ui_helper/app_text_styles.dart';
 import '../../ui_helper/responsive_helper.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {

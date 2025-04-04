@@ -4,8 +4,6 @@ import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
 import '../../screen/cart/cart_list_screen.dart';
 import '../../screen/cart/controller/cart_list_api_provider.dart';
-import '../../screen/other/screen/search_screen.dart';
-import '../../screen/packages/controller/health_package_list_api_provider.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../ui_helper/app_text_styles.dart';
 

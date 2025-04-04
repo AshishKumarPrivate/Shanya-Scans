@@ -9,7 +9,6 @@ import '../../../base_widgets/product_card_bottom.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../cart/controller/cart_list_api_provider.dart';
-import '../../cart/model/CartItem.dart';
 import '../../packages/controller/health_package_list_api_provider.dart';
 import '../../packages/widget/home_health_pacakge_shimmer.dart';
 import '../../packages/widget/home_health_pacakge_tab_list_shimmer.dart';
@@ -86,8 +85,13 @@ class _HomeHealthPackageSectionState extends State<HomeHealthPackageSection> {
 
         print("Default Selected Tab: $selectedTabId");
 
-        Provider.of<HealthPacakgeListApiProvider>(context, listen: false)
-            .getPackageListByTab(context, selectedTabId!);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Provider.of<HealthPacakgeListApiProvider>(context, listen: false)
+              .getPackageListByTab(context, selectedTabId!);
+        });
+
+        // Provider.of<HealthPacakgeListApiProvider>(context, listen: false)
+        //     .getPackageListByTab(context, selectedTabId!);
       }
     }
   }

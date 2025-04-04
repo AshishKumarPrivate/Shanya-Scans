@@ -15,6 +15,17 @@ class SocketProvider with ChangeNotifier {
     _connectToSocket();
   }
 
+  void listenToSalesPersonLocation(String orderId) {
+    if (isConnected) {
+      _socket?.emit("get-sales-lat-lng", {
+        "orderDetailId": orderId,
+      });
+    } else {
+      print("Socket not connected yet, cannot emit event.");
+    }
+  }
+
+
   void _connectToSocket() {
     _socket = IO.io(Repository.baseUrl, <String, dynamic>{
       "transports": ["websocket"],
@@ -29,7 +40,7 @@ class SocketProvider with ChangeNotifier {
       isConnected = true;
       notifyListeners();  // Notify UI that socket is connected
 
-      _socket!.emit("get-sales-lat-lng", {
+      _socket?.emit("get-sales-lat-lng", {
         "orderDetailId": StorageHelper().getUserOrderId(),
       });
     });
@@ -42,12 +53,13 @@ class SocketProvider with ChangeNotifier {
         double salesLng = double.tryParse(data['sales_lng'].toString()) ?? 0.0;
 
         _salesPersonPosition = LatLng(salesLat, salesLng);
+
+        notifyListeners(); // Notify UI to update the map
         StorageHelper().setSalesLat(salesLat);
         StorageHelper().setSalesLng(salesLng);
 
         print("Updated Sales Person Location: $_salesPersonPosition");
 
-        notifyListeners(); // Notify UI to update the map
       } else {
         print("Error: Data is not in Map format -> $data");
       }

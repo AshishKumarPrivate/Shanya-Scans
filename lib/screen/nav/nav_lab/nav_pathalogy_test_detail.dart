@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../../base_widgets/InstructionCard.dart';
 import '../../../base_widgets/common/common_app_bar.dart';
 import '../../../base_widgets/common/frequently_lab_test_detail_shimmer.dart';
+import '../../../base_widgets/common/why_choose_use_section.dart';
 import '../../../base_widgets/expandable_text_widget.dart';
 import '../../../util/StringUtils.dart';
 import '../../../util/phone_call_open.dart';
@@ -730,229 +731,29 @@ class _ViewDetailPathalogyTestScreenState
                               ResponsiveHelper.sizeBoxHeightSpace(context, 1),
 
                               // ***************** Why Choose Use  start  ******************
-                              Padding(
-                                padding: ResponsiveHelper.padding(context, 4, 1),
-                                child: Container(
-                                  // height: 200,
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        "Why Choose Shanya Scans?",
-                                        maxLines: 2,
-                                        style: AppTextStyles.heading1(
-                                          context,
-                                          overrideStyle: TextStyle(
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: ResponsiveHelper.fontSize(
-                                                context, 16),
-                                          ),
-                                        ),
-                                      ),
-                                      ResponsiveHelper.sizeBoxHeightSpace(
-                                          context, 1.5),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: CustomRoundedContainer(
-                                              borderRadius: 10.0,
-                                              borderColor: Colors.white,
-                                              borderWidth: 0.0,
-                                              elevation: 5.0,
-                                              backgroundColor: Colors.white,
-                                              padding: EdgeInsets.all(10.0),
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.supervised_user_circle,
-                                                    color: AppColors.pinkColor,
-                                                    size: 30,
-                                                  ),
-                                                  ResponsiveHelper
-                                                      .sizeboxWidthlSpace(
-                                                          context, 1),
-                                                  Flexible(
-                                                    child: Text(
-                                                      "1.5 lakh+ patients test with us every month",
-                                                      maxLines: 2,
-                                                      style:
-                                                          AppTextStyles.heading1(
-                                                        context,
-                                                        overrideStyle: TextStyle(
-                                                          color: AppColors
-                                                              .txtGreyColor,
-                                                          fontSize:
-                                                              ResponsiveHelper
-                                                                  .fontSize(
-                                                                      context,
-                                                                      12),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              onTap: () {
-                                                print("Container tapped!");
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      ResponsiveHelper.sizeBoxHeightSpace(
-                                          context, 1),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: CustomRoundedContainer(
-                                              borderRadius: 10.0,
-                                              borderColor: Colors.white,
-                                              borderWidth: 0.0,
-                                              elevation: 5.0,
-                                              backgroundColor: Colors.white,
-                                              padding: EdgeInsets.all(10.0),
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.currency_rupee,
-                                                    color: AppColors.pinkColor,
-                                                    size: 30,
-                                                  ),
-                                                  ResponsiveHelper
-                                                      .sizeboxWidthlSpace(
-                                                          context, 1),
-                                                  Flexible(
-                                                    child: Text(
-                                                      "Patients save an average of ₹700 on each scan",
-                                                      maxLines: 2,
-                                                      style:
-                                                          AppTextStyles.heading1(
-                                                        context,
-                                                        overrideStyle: TextStyle(
-                                                          color: AppColors
-                                                              .txtGreyColor,
-                                                          fontSize:
-                                                              ResponsiveHelper
-                                                                  .fontSize(
-                                                                      context,
-                                                                      12),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              onTap: () {
-                                                print("Container tapped!");
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      ResponsiveHelper.sizeBoxHeightSpace(
-                                          context, 1),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: CustomRoundedContainer(
-                                              borderRadius: 10.0,
-                                              borderColor: Colors.white,
-                                              borderWidth: 0.0,
-                                              elevation: 5.0,
-                                              backgroundColor: Colors.white,
-                                              padding: EdgeInsets.all(10.0),
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.security_outlined,
-                                                    color: AppColors.pinkColor,
-                                                    size: 30,
-                                                  ),
-                                                  ResponsiveHelper
-                                                      .sizeboxWidthlSpace(
-                                                          context, 1),
-                                                  Flexible(
-                                                    child: Text(
-                                                      "ISO and NABH certified scan centers",
-                                                      maxLines: 2,
-                                                      style:
-                                                          AppTextStyles.heading1(
-                                                        context,
-                                                        overrideStyle: TextStyle(
-                                                          color: AppColors
-                                                              .txtGreyColor,
-                                                          fontSize:
-                                                              ResponsiveHelper
-                                                                  .fontSize(
-                                                                      context,
-                                                                      12),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              onTap: () {
-                                                print("Container tapped!");
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      ResponsiveHelper.sizeBoxHeightSpace(
-                                          context, 1),
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: CustomRoundedContainer(
-                                              borderRadius: 10.0,
-                                              borderColor: Colors.white,
-                                              borderWidth: 0.0,
-                                              elevation: 5.0,
-                                              backgroundColor: Colors.white,
-                                              padding: EdgeInsets.all(10.0),
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.check_circle,
-                                                    color: AppColors.pinkColor,
-                                                    size: 30,
-                                                  ),
-                                                  ResponsiveHelper
-                                                      .sizeboxWidthlSpace(
-                                                          context, 1),
-                                                  Flexible(
-                                                    child: Text(
-                                                      "100% reliable and accurate reports",
-                                                      maxLines: 2,
-                                                      style:
-                                                          AppTextStyles.heading1(
-                                                        context,
-                                                        overrideStyle: TextStyle(
-                                                          color: AppColors
-                                                              .txtGreyColor,
-                                                          fontSize:
-                                                              ResponsiveHelper
-                                                                  .fontSize(
-                                                                      context,
-                                                                      12),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              onTap: () {
-                                                print("Container tapped!");
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ],
+                              WhyChooseSection(
+                                items: [
+                                  WhyChooseItem(
+                                    icon: Icons.supervised_user_circle,
+                                    title: "Center of Excellence",
+                                    onTap: () => print("Center of Excellence tapped!"),
                                   ),
-                                ),
+                                  WhyChooseItem(
+                                    icon: Icons.currency_rupee,
+                                    title: "Affordable Pricing of Each Scan",
+                                    onTap: () => print("Affordable Pricing tapped!"),
+                                  ),
+                                  WhyChooseItem(
+                                    icon: Icons.security_outlined,
+                                    title: "ISO and NABH Certified Scan Centers",
+                                    onTap: () => print("ISO Certified tapped!"),
+                                  ),
+                                  WhyChooseItem(
+                                    icon: Icons.check_circle,
+                                    title: "100% Reliable and Accurate Reports",
+                                    onTap: () => print("Reliable Reports tapped!"),
+                                  ),
+                                ],
                               ),
                               // ***************** Why Choose Use  end ******************
 

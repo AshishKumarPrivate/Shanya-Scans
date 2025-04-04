@@ -100,7 +100,7 @@ class ServiceApiProvider with ChangeNotifier {
           print("✅ Cache Updated Successfully!");
         }
       } else {
-        _setErrorState(response?.message ?? "Failed to fetch service list");
+        _setErrorState(response.message ?? "Failed to fetch service list");
       }
     } catch (error) {
       _setErrorState("API Error: $error");
@@ -142,7 +142,7 @@ class ServiceApiProvider with ChangeNotifier {
   void _setErrorState(String message) {
     _errorMessage = message;
     _setLoadingState(false);
-    notifyListeners(); // Ensure UI rebuilds
+    // notifyListeners(); // Ensure UI rebuilds
   }
 
   /// **Fetch Home Service List API**
@@ -154,8 +154,7 @@ class ServiceApiProvider with ChangeNotifier {
     try {
       var response = await _repository.getHomeServiceModelResponse();
 
-      if (response != null &&
-          response.success == true &&
+      if (response.success == true &&
           response.data != null) {
         print("✅ Home Service List Fetched Successfully");
 
@@ -206,8 +205,7 @@ class ServiceApiProvider with ChangeNotifier {
       var response =
           await _repository.getHomeServiceDetailResponse(serviceSlug);
 
-      if (response != null &&
-          response.success == true &&
+      if (response.success == true &&
           response.data != null) {
         print("✅ Home Service Detail Fetched Successfully");
         _homeServiceDetailModel = response;
@@ -236,8 +234,7 @@ class ServiceApiProvider with ChangeNotifier {
       var response = await _repository
           .getServiceDetailRateList(serviceName);
 
-      if (response != null &&
-          response.success == true &&
+      if (response.success == true &&
           response.data != null) {
         print("✅ Service Detail Rate List Fetched Successfully");
         _serviceRateListModel = response;

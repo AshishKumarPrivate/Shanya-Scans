@@ -8,7 +8,6 @@ import '../../../base_widgets/solid_rounded_button.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../ui_helper/responsive_helper.dart';
-import '../../../util/dimensions.dart';
 import '../forget_password_screen.dart';
 
 class LoginFormWidget extends StatefulWidget {

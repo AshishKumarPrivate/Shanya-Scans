@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:healthians/screen/checkout/checkout_text_fields.dart';
-import 'package:healthians/screen/order/controller/order_provider.dart';
 import 'package:healthians/screen/order/model/OrderItem.dart';
 import 'package:healthians/screen/other/screen/search_screen.dart';
 import 'package:healthians/ui_helper/app_colors.dart';
@@ -41,8 +40,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   final TextEditingController localityController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
   final TextEditingController postalController = TextEditingController();
-  final TextEditingController cityAddressController =
-      TextEditingController(text: "Lucknow");
+  final TextEditingController cityAddressController = TextEditingController(text: "Lucknow");
 
   final _formKey = GlobalKey<FormState>(); // Add this at the class level
 
@@ -73,7 +71,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   bool isBookingExpanded = false;
   int _currentStep = 0;
 
-  String? selectedPlace;
+  String? selectedPlace=StorageHelper().getUserLiveAddress();
 
   // intialize Razer payment
 
@@ -176,6 +174,72 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     ));
   }
 
+  // validate booking forom ////////
+  bool validateBookingForm(BuildContext context) {
+    if (fullNameController.text.isEmpty) {
+      showError(context, "Please enter your full name.");
+      return false;
+    }
+    if (ageController.text.isEmpty) {
+      showError(context, "Please enter your age.");
+      return false;
+    }
+    if (phoneController.text.isEmpty) {
+      showError(context, "Please enter your phone number.");
+      return false;
+    }
+    if (phoneController.text.length != 10) {
+      showError(context, "Invalid phone number.");
+      return false;
+    }
+    if (altPhoneController.text.isEmpty) {
+      showError(context, "Please enter your alternate number.");
+      return false;
+    }
+    if (altPhoneController.text.length != 10) {
+      showError(context, "Invalid alternate number.");
+      return false;
+    }
+
+    // All validations passed
+    return true;
+  }
+
+  bool validateShippingForm(BuildContext context) {
+    if (selectedDateString == null || selectedDateString!.isEmpty) {
+      showError(context, "Please select a booking date.");
+      return false;
+    }
+    if (selectedTimeString == null || selectedTimeString!.isEmpty) {
+      showError(context, "Please select a time.");
+      return false;
+    }
+    if (cityAddressController.text.isEmpty) {
+      showError(context, "Please enter your address.");
+      return false;
+    }
+    // if (selectedGender == null || selectedGender!.isEmpty) {
+    //   showError(context, "Please select a gender.");
+    //   return false;
+    // }
+
+    // if (selectedAddressType == null || selectedAddressType!.isEmpty) {
+    //   showError(context, "Please select an address type.");
+    //   return false;
+    // }
+
+    // All validations passed
+    return true;
+  }
+
+  void showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: Colors.red),
+    );
+  }
+
+  // validate   ////////
+
   @override
   void dispose() {
     defaultStatusBarColor();
@@ -242,8 +306,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       EasyStep(title: "Payment", icon: Icon(Icons.payment)),
                       EasyStep(title: "Review", icon: Icon(Icons.receipt)),
                     ],
-                    onStepReached: (index) =>
-                        setState(() => _currentStep = index),
+                    // onStepReached: (index) =>setState(() => _currentStep = index),
                   ),
                 ),
                 Expanded(
@@ -351,38 +414,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             if (provider.isLoading) {
               return loadingIndicator(); // Show shimmer effect while loading
             }
-            // Check if there was an error
-            // if (provider.errorMessage.isNotEmpty) {
-            //   return Center(
-            //     child: SizedBox(
-            //       width:
-            //       ResponsiveHelper.containerWidth(context, 50),
-            //       height:
-            //       ResponsiveHelper.containerWidth(context, 50),
-            //       child: Image.asset(
-            //         "assets/images/img_error.jpg",
-            //         fit: BoxFit.cover,
-            //       ),
-            //     ),
-            //   ); // Show error widget if there's an error
-            // }
-
-            // Check if the data is null or empty
-            // if (provider.createOrderModelResponse?.data == null) {
-            //   return  Center(
-            //     child: SizedBox(
-            //       width: ResponsiveHelper.containerWidth(
-            //           context, 50),
-            //       height: ResponsiveHelper.containerWidth(
-            //           context, 50),
-            //       child: Image.asset(
-            //         "assets/images/img_error.jpg",
-            //         fit: BoxFit.cover,
-            //       ),
-            //     ),
-            //   ); // Show empty list widget if data is null or empty
-            // }
-            // If data is loaded, display the rate list
 
             return AnimatedOpacity(
               duration: const Duration(milliseconds: 300),
@@ -406,12 +437,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     borderRadius: 10.0,
                     onPressed: () async {
                       if (_currentStep < 3) {
+                        print("Next  button clicked");
+                        if (_currentStep == 0) {
+                          if (!validateBookingForm(context)) {
+                            print("Validation failed at step 0.");
+                            return;
+                          }
+                        }
+                        if (_currentStep == 1) {
+                          if (!validateShippingForm(context)) {
+                            print("Validation failed at step 1.");
+                            return;
+                          }
+                        }
                         setState(() {
                           _currentStep += 1;
                         });
                       } else {
                         print("Finish button clicked");
-
                         Provider.of<CheckoutProvider>(context, listen: false)
                             .createOrder(
                           context,
@@ -424,6 +467,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           altPhoneController.text.toString(),
                           selectedGender.toString(),
                           cityAddressController.text.toString(),
+                          selectedPlace.toString(),
                           selectedAddressType.toString(),
                         );
                       }
@@ -436,52 +480,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
               ),
             );
-
-            // ElevatedButton(
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: Colors.black,
-            //     padding:
-            //         const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            //     shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(8)),
-            //   ),
-            //   onPressed: () {
-            //     if (_currentStep < 3) {
-            //       setState(() {
-            //         _currentStep += 1;
-            //       });
-            //     } else {
-            //       print("finish button clicked");
-            //       // Perform checkout action
-            //       // action on finish button click to create order
-            //       Provider.of<OrderApiProvider>(context, listen: false)
-            //           .createOrder(
-            //               context,
-            //               widget.name.toString(),
-            //               selectedDateString.toString(),
-            //               selectedTimeString.toString(),
-            //               widget.categoryName,
-            //               widget.price.toString(),
-            //               StorageHelper().getEmail(),
-            //               fullNameController.text.toString(),
-            //               ageController.text.toString(),
-            //               phoneController.text.toString(),
-            //               "",
-            //               selectedGender.toString(),
-            //               cityAddressController.text.toString());
-            //     }
-            //   },
-            //   child: InkWell(
-            //     onTap: () {},
-            //     child: Text(
-            //       _currentStep == 3 ? "Finish" : "Next",
-            //       style: TextStyle(color: Colors.white),
-            //     ),
-            //   ),
-            // );
           }),
-
-          ////
         ],
       ),
     );
@@ -492,42 +491,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // buildExpandableList(
-        //     "Booking For",
-        //     bookingForOptions,
-        //     selectedBookingFor,
-        //     (value) {
-        //       setState(() {
-        //         selectedBookingFor = value;
-        //         showBookingFor = false;
-        //       });
-        //     },
-        //     showBookingFor,
-        //     () {
-        //       setState(() => showBookingFor = !showBookingFor);
-        //     }),
-
-        // buildTextField("Name", "Enter name", fullNameController,
-        //     isRequired: true),
-
         CheckoutTextField(
           label: "Name*",
           hint: "Enter name",
           controller: fullNameController,
           isRequired: true,
         ),
-
-        // buildTextField("Age", "Enter age", ageController,
-        //     keyboardType: TextInputType.number, isRequired: true),
-
         CheckoutTextField(
           label: "Age*",
           hint: "Enter age",
           controller: ageController,
           isRequired: true,
+          maxLength: 2,
           keyboardType: TextInputType.number,
         ),
-
         buildExpandableList(
             "Select Gender",
             gender,
@@ -542,7 +519,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             () {
               setState(() => showGender = !showGender);
             }),
-
         buildPhoneField(),
         buildAltPhoneField(),
       ],
@@ -553,9 +529,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // buildDropdown("Select Province", provinces, selectedProvince, (value) => setState(() => selectedProvince = value)),
-        // buildDropdown("Select City", cities, selectedCity, (value) => setState(() => selectedCity = value)),
-
         buildBookingDate(),
 
         /// **Booking Time Selection**
@@ -567,40 +540,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           icon: Icons.access_time,
           onTap: _selectTime,
         ),
-        // buildTextField("Locality*", "Enter locality", localityController),
 
-        // CheckoutTextField(
-        //   label: "Locality",
-        //   hint: "Enter locality",
-        //   controller: localityController,
-        // ),
-
-        // buildTextField("Postal Code*", "Enter postal code", postalController,
-        //     keyboardType: TextInputType.number),
-
-        // CheckoutTextField(
-        //     label: "Postal Code*",
-        //     hint: "Enter postal code",
-        //     controller: postalController,
-        //     keyboardType: TextInputType.number),
-
-        // buildTextField("House No / Flat No / Landmark*",
-        //     "House No / Flat No / Landmark", addressController),
-
-        // CheckoutTextField(
-        //   label: "House No / Flat No / Landmark*",
-        //   hint: "House No / Flat No / Landmark",
-        //   controller: addressController,
-        // ),
-
-        // buildTextField( "City , Address*", "City , Address", cityAddressController),
-
-        // CheckoutTextField(
-        //   label: "Choose Location",
-        //   hint: "Location",
-        //   controller: cityAddressController,
-        // ),
-        SizedBox(height: 5,),
+        SizedBox(
+          height: 5,
+        ),
 
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -609,21 +552,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             children: [
               Text(
                 "Choose Location",
-                style: AppTextStyles.heading1(
+                style: AppTextStyles.bodyText1(
                   context,
                   overrideStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: ResponsiveHelper.fontSize(
-                        context, 12),
-                  ),
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: ResponsiveHelper.fontSize(context, 12)),
                 ),
               ),
-              SizedBox(height: 5,),
+              SizedBox(
+                height: 5,
+              ),
               GestureDetector(
-                onTap: () async{
-                  // Navigator.push(context, MaterialPageRoute(builder: (context) => GoogleMapSearchPlacesApi()));
-
-                  // ✅ Open Search Page and Get Selected Place
+                onTap: () async {
                   final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -631,13 +572,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                   );
 
-                  // ✅ Agar user ne koi place select kiya hai to update karein
                   if (result != null) {
                     setState(() {
                       selectedPlace = result;
                     });
                   }
-
                 },
                 child: Container(
                   width: double.infinity,
@@ -657,10 +596,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             style: AppTextStyles.bodyText1(
                               context,
                               overrideStyle: TextStyle(
-                                color: Colors.black,
-                                fontSize: ResponsiveHelper.fontSize(
-                                    context, 12),
-                              ),
+                                  color: Colors.black,
+                                  fontSize: ResponsiveHelper.fontSize(context, 13)),
                             ),
                           ),
                         ),
@@ -673,7 +610,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           ),
         ),
 
-        SizedBox(height: 5,),
+        SizedBox(
+          height: 5,
+        ),
         CheckoutTextField(
           label: "Address*",
           hint: "123 Main Street, City, Country",
@@ -706,7 +645,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: AppTextStyles.bodyText1(
+              context,
+              overrideStyle: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: ResponsiveHelper.fontSize(context, 12)),
+            ),
+          ),
           const SizedBox(height: 5),
           GestureDetector(
             onTap: onTap,
@@ -721,8 +669,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(selectedValue,
-                      style: const TextStyle(color: Colors.black54)),
+                  Text(
+                    selectedValue,
+                      style: AppTextStyles.bodyText1(
+                        context,
+                        overrideStyle: TextStyle(
+                            color: Colors.black,
+                            fontSize: ResponsiveHelper.fontSize(context, 13)),
+                      ),
+                  ),
                   Icon(icon, color: Colors.black54),
                 ],
               ),
@@ -740,8 +695,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Select Booking Date",
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(
+            "Select Booking Date",
+            style: AppTextStyles.bodyText1(
+              context,
+              overrideStyle: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: ResponsiveHelper.fontSize(context, 12)),
+            ),
+          ),
           const SizedBox(height: 5),
           GestureDetector(
             onTap: _selectDate,
@@ -765,7 +728,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     //   desiredFormat: "dd-MM-yyyy",
                     // )}", // ✅ Formatted date
                     // DateFormat("dd-MM-yy").format(selectedDate), // ✅ Formatted date
-                    style: const TextStyle(color: Colors.black54, fontSize: 16),
+
+                    style: AppTextStyles.bodyText1(
+                      context,
+                      overrideStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: ResponsiveHelper.fontSize(context, 13)),
+                    ),
                   ),
                   const Icon(Icons.calendar_today, color: Colors.black54),
                 ],
@@ -830,7 +799,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            title,
+            style: AppTextStyles.bodyText1(
+              context,
+              overrideStyle: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: ResponsiveHelper.fontSize(context, 12)),
+            ),
+          ),
           const SizedBox(height: 5),
           GestureDetector(
             onTap: toggleExpand,
@@ -844,8 +822,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(selectedValue ?? title,
-                      style: TextStyle(color: Colors.black54)),
+                  Text(
+                    selectedValue ?? title,
+                    style: AppTextStyles.bodyText1(
+                      context,
+                      overrideStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: ResponsiveHelper.fontSize(context, 13)),
+                    ),
+                  ),
                   Icon(
                       isExpanded ? Icons.arrow_drop_up : Icons.arrow_drop_down),
                 ],
@@ -856,7 +841,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             Column(
               children: items
                   .map((item) => ListTile(
-                        title: Text(item),
+                        title: Text(
+                          item,
+                          style: AppTextStyles.bodyText1(
+                            context,
+                            overrideStyle: TextStyle(
+                                color: Colors.black,
+                                fontSize:
+                                    ResponsiveHelper.fontSize(context, 13)),
+                          ),
+                        ),
                         onTap: () {
                           onSelect(item);
                           print(
@@ -928,7 +922,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             decoration: BoxDecoration(
                               border: Border(
                                   bottom: BorderSide(
-                                      color: AppColors.lightBlueColor!,
+                                      color: AppColors.lightBlueColor,
                                       width: 5)),
                             ),
                             child: Row(
@@ -1365,9 +1359,15 @@ class _AddressTypeSelectorState extends State<AddressTypeSelector> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            "Select Address Type",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+           Text(            "Select Address Type",
+
+              style: AppTextStyles.bodyText1(
+                context,
+                overrideStyle: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: ResponsiveHelper.fontSize(context, 12)),
+              ),
           ),
           const SizedBox(height: 8),
           Wrap(
@@ -1376,12 +1376,16 @@ class _AddressTypeSelectorState extends State<AddressTypeSelector> {
               return ChoiceChip(
                 label: Text(type),
                 selected: _selectedType == type,
-                selectedColor: Colors.blue.shade100,
-                backgroundColor: Colors.grey.shade200,
-                labelStyle: TextStyle(
-                  color: _selectedType == type ? Colors.blue : Colors.black,
-                  fontWeight: FontWeight.bold,
+                selectedColor: AppColors.primary,
+                checkmarkColor: Colors.white,
+                labelStyle:AppTextStyles.heading1(
+                  context,
+                  overrideStyle: TextStyle(
+                      color: _selectedType == type ? AppColors.whiteColor : Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: ResponsiveHelper.fontSize(context, 12)),
                 ),
+
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20),
                 ),

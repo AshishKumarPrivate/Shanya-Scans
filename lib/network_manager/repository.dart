@@ -4,7 +4,6 @@ import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderDetailModel.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderSummaryModelResponse.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryBoyProfileSummaryModelResponse.dart';
 import 'package:healthians/deliveryBoy/model/DeliveryLoginModelResponse.dart';
-import 'package:healthians/firebase/FirebaseModel.dart';
 import 'package:healthians/screen/auth/model/LoginModel.dart';
 import 'package:healthians/screen/auth/model/UpdateProfileModel.dart';
 import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/model/FrequentlyPathalogyTagListModel.dart';
@@ -36,8 +35,7 @@ class Repository {
   static final DioHelper _dioHelper = DioHelper();
 
   // static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
-  // static const String baseUrl = "https://dbsanya.drmanasaggarwal.com";
-  static const String baseUrl = "https://db.shanyascans.com";
+   static const String baseUrl = "https://db.shanyascans.com";
 
 
   // &&&&&&&&&&& testing api Start here &&&&&&&&&&&&&&&&
@@ -367,20 +365,20 @@ class Repository {
 
 // &&&&&&&&&&& Home Banner List  &&&&&&&&&
 //GET API
-  Future<HomeBanner2ModelResponse> getHomeBanner2ModelResponse() async {
+  Future<HomeBanner1ModelResponse> getHomeBanner2ModelResponse() async {
     // var response =
     //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
     Map<String, dynamic> response =
         await _dioHelper.get(url: '$baseUrl/api/v1/banner/banner2');
-    return HomeBanner2ModelResponse.fromJson(response);
+    return HomeBanner1ModelResponse.fromJson(response);
   }
 
-  Future<HomeBanner1ModelResponse> getHomeBanner1ModelResponse() async {
+  Future<HomeBanner2ModelResponse> getHomeBanner1ModelResponse() async {
     // var response =
     //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
     Map<String, dynamic> response =
         await _dioHelper.get(url: '$baseUrl/api/v1/banner/banner1');
-    return HomeBanner1ModelResponse.fromJson(response);
+    return HomeBanner2ModelResponse.fromJson(response);
   }
 
 // &&&&&&&&&&& Terms &b condition , privacy policy , refund polciy   &&&&&&&&&
@@ -536,10 +534,6 @@ class Repository {
           url: '$baseUrl/api/v1/collection/fcm/token', requestBody: requestBody);
 
       print("✅ Send fcm token API Response: $response");
-
-      if (response == null) {
-        return {"success": false, "message": "No response from server"};
-      }
 
       return {
         "success": response["success"] ?? false,

@@ -1,15 +1,26 @@
 import 'dart:async';
-import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:healthians/network_manager/repository.dart';
+import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'dart:ui' as ui;
+import 'dart:math' as math;
+
+import '../controller/socket_provider.dart';
 
 class SalesLiveTrackingScreen extends StatefulWidget {
+
+  String? patientname;
+
+
+  SalesLiveTrackingScreen(this.patientname);
+
   @override
   _SalesLiveTrackingScreenState createState() => _SalesLiveTrackingScreenState();
 }
@@ -20,81 +31,149 @@ class _SalesLiveTrackingScreenState extends State<SalesLiveTrackingScreen> {
   LatLng _salesPersonPosition = LatLng(StorageHelper().getSalesLat(), StorageHelper().getSalesLng());
   LatLng _userPosition = LatLng(StorageHelper().getUserLat(), StorageHelper().getUserLong());
   Set<Polyline> _polylines = {};
+  Set<Marker> _markers = {}; // ✅ Marker set added
   bool hasArrived = false;
+  double bearing = 0.0;
 
   late BitmapDescriptor _salesPersonIcon;
   late BitmapDescriptor _salesPersonArrivedIcon;
-  String salesPersonName = "Rahul Sharma";
+  String? salesPersonName ;
   String salesPersonPhone = "+91 9876543210";
+  late BitmapDescriptor customIcon;
 
   @override
   void initState() {
     super.initState();
-    _connectToSocket();
+    _loadCustomMarker();
+    // _connectToSocket();
     _startLocationUpdates();
-    _updatePolylines(); // ✅ Force update on first load
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_socket == null || !_socket!.connected) {
-      _connectToSocket();
-      _startLocationUpdates();
-    }
-    _updatePolylines(); // ✅ Ensure polyline updates on every navigation
-  }
+    final socketProvider = Provider.of<SocketProvider>(context);
 
-  /// **1️⃣ Connect to Socket.IO Server**
-  void _connectToSocket() {
-    print("User and Sales lat long => "
-        "${StorageHelper().getSalesLat()}, ${StorageHelper().getSalesLng()} /// "
-        "${StorageHelper().getUserLat()}, ${StorageHelper().getUserLong()}");
-
-    _socket = IO.io("${Repository.baseUrl}", <String, dynamic>{
-      "transports": ["websocket"],
-      "autoConnect": true,
-    });
-
-    _socket!.onConnect((_) {
-      print("Connected to Socket.IO ✅");
-      _socket!.emit("join-room", {"salesId": StorageHelper().getDeliveryBoyId()});
-    });
-
-    /// **2️⃣ Listen for Salesperson's Location Updates from Backend**
-    _socket!.on("updated-track-lat-lng", (data) {
-      print("Updated Data: $data");
-
-      if (data is Map<String, dynamic>) {
-        double salesLat = data['sales_lat']?.toDouble() ?? 0.0;
-        double salesLng = data['sales_lng']?.toDouble() ?? 0.0;
-        double userLat = data['user_lat']?.toDouble() ?? 0.0;
-        double userLng = data['user_lng']?.toDouble() ?? 0.0;
-
-        StorageHelper().setSalesLat(salesLat);
-        StorageHelper().setSalesLng(salesLng);
-        StorageHelper().setUserLat(userLat);
-        StorageHelper().setUserLong(userLng);
-
-        print("Updated Sales Lat/Lng => $salesLat, $salesLng");
-
-        if (mounted) {
-          setState(() {
-            _salesPersonPosition = LatLng(salesLat, salesLng);
-            _updatePolylines(); // ✅ Update polyline immediately
-          });
-        }
+    // Add a post frame callback to ensure setState() is not called during the build phase
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (socketProvider.salesPersonPosition.latitude != 0 && socketProvider.salesPersonPosition.longitude != 0) {
+        setState(() {
+          _salesPersonPosition = socketProvider.salesPersonPosition;
+        });
+        _updateMarkers();
+        _updatePolylines();
       }
+      print("Socket Reconnect✅ ");
     });
+    print("Socket Reconnect✅ ");
+  }
 
-    _socket!.emit("change-track-path", {
-      "orderDetailId": StorageHelper().getUserOrderId(),
-    });
-
-    _socket!.onDisconnect((_) {
-      print("Disconnected from Socket.IO ❌");
+  // ✅ Load custom marker function
+  Future<void> _loadCustomMarker() async {
+    final Uint8List markerIcon =
+    await _getBytesFromAsset('assets/images/sales_marker.png', 200);
+    setState(() {
+      customIcon = BitmapDescriptor.fromBytes(markerIcon);
     });
   }
+
+  // ✅ Convert asset image to bytes
+  Future<Uint8List> _getBytesFromAsset(String path, int width) async {
+    ByteData data = await rootBundle.load(path);
+    ui.Codec codec = await ui.instantiateImageCodec(data.buffer.asUint8List(),
+        targetWidth: width);
+    ui.FrameInfo fi = await codec.getNextFrame();
+    ByteData? byteData =
+    await fi.image.toByteData(format: ui.ImageByteFormat.png);
+    return byteData!.buffer.asUint8List();
+  }
+
+  double calculateBearing(LatLng start, LatLng end) {
+    double lat1 = start.latitude * (math.pi / 180);
+    double lat2 = end.latitude * (math.pi / 180);
+    double longDiff = (end.longitude - start.longitude) * (math.pi / 180);
+
+    double x = math.sin(longDiff) * math.cos(lat2);
+    double y = math.cos(lat1) * math.sin(lat2) -
+        math.sin(lat1) * math.cos(lat2) * math.cos(longDiff);
+
+    bearing = math.atan2(x, y) * (180 / math.pi);
+    return (bearing + 360) % 360; // Ensure positive angle
+  }
+
+  // void _updateMarkers() {
+  //   setState(() {
+  //     _markers.clear();
+  //     _markers.add(
+  //       Marker(
+  //         markerId: MarkerId('sales_person'),
+  //         position: _salesPersonPosition,
+  //         rotation: bearing, // ✅ Rotation apply karein
+  //         icon: customIcon,
+  //         // icon: BitmapDescriptor.defaultMarkerWithHue(
+  //         //   hasArrived ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
+  //         // ),
+  //       ),
+  //     );
+  //     _markers.add(
+  //       Marker(
+  //         markerId: MarkerId('user'),
+  //         position: _userPosition,
+  //         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+  //       ),
+  //     );
+  //   });
+  // }
+
+  void updateMarkerSmoothly(LatLng newPosition) {
+    final GoogleMapController controller = _mapController;
+    // ✅ Bearing calculate karein
+    double bearing = calculateBearing(_salesPersonPosition, newPosition);
+
+    // Camera ko naye position pe smoothly animate karo
+    controller.animateCamera(CameraUpdate.newLatLng(newPosition));
+
+    setState(() {
+      _markers.add(
+        Marker(
+          markerId: MarkerId('sales_person'),
+          position: newPosition,
+          icon: customIcon,
+          rotation: bearing,
+          // ✅ Rotation apply karein
+          anchor: Offset(0.5, 0.5), // ✅ Center se rotate hoga
+          // icon: BitmapDescriptor.defaultMarkerWithHue(
+          //   hasArrived ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
+          // ),
+        ),
+      );
+    });
+  }
+  /// **3️⃣ Update Markers on Map**
+  void _updateMarkers() {
+    setState(() {
+      _markers.clear();
+      _markers.add(
+        Marker(
+          markerId: MarkerId('sales_person'),
+          position: _salesPersonPosition,
+          rotation: bearing, // ✅ Rotation apply karein
+          icon: customIcon,
+          // icon: BitmapDescriptor.defaultMarkerWithHue(
+          //   hasArrived ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
+          // ),
+        ),
+      );
+      _markers.add(
+        Marker(
+          markerId: MarkerId('user'),
+          position: _userPosition,
+          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+        ),
+      );
+    });
+  }
+
 
   /// **3️⃣ Fetch Current Location**
   void _startLocationUpdates() async {
@@ -129,47 +208,68 @@ class _SalesLiveTrackingScreenState extends State<SalesLiveTrackingScreen> {
   }
 
   /// **4️⃣ Update Polyline Instantly**
-  void _updatePolylines() {
-    if (hasArrived) return;
+
+  void _updatePolylines() async {
+    List<LatLng> routeCoordinates =
+    await getRouteCoordinates(_salesPersonPosition, _userPosition);
+
     setState(() {
       _polylines.clear();
-      _polylines.add(
-        Polyline(
-          polylineId: PolylineId("route"),
-          color: Colors.blue,
-          width: 5,
-          points: [_salesPersonPosition, _userPosition],
-        ),
-      );
+      if (routeCoordinates.isNotEmpty) {
+        _polylines.add(
+          Polyline(
+            polylineId: PolylineId("route"),
+            color: Colors.blue,
+            width: 5,
+            points: routeCoordinates,
+          ),
+        );
+      }
     });
   }
+  Future<List<LatLng>> getRouteCoordinates(
+      LatLng source, LatLng destination) async {
+    const String googleAPIKey = "AIzaSyC9ZOZHwHmyTWXqACqpZY2TL7wX2_Zn05U"; // 🔹 API Key add karein
+
+    String url =
+        "https://maps.googleapis.com/maps/api/directions/json?origin=${source.latitude},${source.longitude}&destination=${destination.latitude},${destination.longitude}&key=$googleAPIKey&mode=driving";
+
+    try {
+      var response = await Dio().get(url);
+      Map values = response.data;
+      if (values['status'] == 'OK') {
+        List<LatLng> routePoints = [];
+        var steps = values['routes'][0]['legs'][0]['steps'];
+
+        for (var step in steps) {
+          // double lat = step['end_location']['lat'];
+          // double lng = step['end_location']['lng'];
+          // routePoints.add(LatLng(lat, lng));
+          double startLat = step['start_location']['lat'];
+          double startLng = step['start_location']['lng'];
+          double endLat = step['end_location']['lat'];
+          double endLng = step['end_location']['lng'];
+
+          routePoints.add(LatLng(startLat, startLng)); // ✅ Include start point
+          routePoints.add(LatLng(endLat, endLng)); // ✅ Include end point
+        }
+        return routePoints;
+      } else {
+        print("Google Directions API Error: ${values['status']}");
+        return [];
+      }
+    } catch (e) {
+      print("Error fetching route: $e");
+      return [];
+    }
+  }
+
 
   @override
   void dispose() {
     _socket?.disconnect();
     _socket?.dispose();
     super.dispose();
-  }
-
-  // Load image from assets and convert to BitmapDescriptor
-  // Convert asset image to Uint8List for BitmapDescriptor
-  Future<BitmapDescriptor> _getBytesFromAsset(String path, int width) async {
-    final ByteData data = await rootBundle.load(path);
-    final Uint8List bytes = data.buffer.asUint8List();
-
-    final ui.Codec codec = await ui.instantiateImageCodec(bytes, targetWidth: width);
-    final ui.FrameInfo fi = await codec.getNextFrame();
-    final ByteData? byteData = await fi.image.toByteData(format: ui.ImageByteFormat.png);
-
-    return BitmapDescriptor.fromBytes(byteData!.buffer.asUint8List());
-  }
-
-  // Load custom icons
-  void _loadCustomIcons() async {
-    _salesPersonIcon = await _getBytesFromAsset('assets/sales_person_marker.png', 100);
-    _salesPersonArrivedIcon = await _getBytesFromAsset('assets/sales_person_arrived.png', 100);
-
-    setState(() {}); // Refresh UI after loading markers
   }
 
 
@@ -186,21 +286,10 @@ class _SalesLiveTrackingScreenState extends State<SalesLiveTrackingScreen> {
             ),
             onMapCreated: (GoogleMapController controller) {
               _mapController = controller;
+              _updateMarkers(); // ✅ Ensure markers are set after map creation
+              _updatePolylines();
             },
-            markers: {
-              Marker(
-                markerId: MarkerId('sales_person'),
-                position: _salesPersonPosition,
-                icon: BitmapDescriptor.defaultMarkerWithHue(
-                  hasArrived ? BitmapDescriptor.hueGreen : BitmapDescriptor.hueBlue,
-                ),
-              ),
-              Marker(
-                markerId: MarkerId('user'),
-                position: _userPosition,
-                icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-              ),
-            },
+            markers: _markers,
             polylines: _polylines,
           ),
 
@@ -236,12 +325,16 @@ class _SalesLiveTrackingScreenState extends State<SalesLiveTrackingScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(salesPersonName, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                          Text(widget.patientname.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                           Text(salesPersonPhone, style: TextStyle(fontSize: 14, color: Colors.grey[700])),
                         ],
                       ),
                     ],
                   ),
+                  SizedBox(height: 10),
+                  if (!hasArrived)
+                    LinearProgressIndicator(
+                        color: Colors.blue, backgroundColor: Colors.grey[300]),
                 ],
               ),
             ),

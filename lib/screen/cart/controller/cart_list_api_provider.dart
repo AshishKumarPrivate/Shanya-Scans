@@ -5,7 +5,6 @@ import 'package:healthians/screen/order/model/OrderItem.dart';
 import 'package:healthians/ui_helper/snack_bar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../model/CartItem.dart';
 
 class CartProvider with ChangeNotifier {
   List<OrderItem> _cartItems = [];

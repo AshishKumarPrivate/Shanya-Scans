@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:healthians/base_widgets/common/default_common_app_bar.dart';
-import 'package:healthians/base_widgets/solid_rounded_button.dart';
 import 'package:healthians/ui_helper/app_text_styles.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
 
-import '../../../ui_helper/app_colors.dart';
 
 class MyAppointmentsScreen extends StatelessWidget {
   @override

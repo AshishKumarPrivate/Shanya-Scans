@@ -1,11 +1,11 @@
-class HomeBanner2ModelResponse {
+class HomeBanner1ModelResponse {
   bool? success;
   String? message;
   List<Data>? data;
 
-  HomeBanner2ModelResponse({this.success, this.message, this.data});
+  HomeBanner1ModelResponse({this.success, this.message, this.data});
 
-  HomeBanner2ModelResponse.fromJson(Map<String, dynamic> json) {
+  HomeBanner1ModelResponse.fromJson(Map<String, dynamic> json) {
     success = json['success'];
     message = json['message'];
     if (json['data'] != null) {

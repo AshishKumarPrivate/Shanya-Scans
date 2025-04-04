@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
-import '../../../base_widgets/card_body.dart';
 import '../../../ui_helper/responsive_helper.dart';
 
 class HomePackageTabListShimmer extends StatelessWidget {

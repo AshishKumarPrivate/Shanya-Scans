@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/app_text_styles.dart';
 
 class DefaultCommonAppBar extends StatelessWidget implements PreferredSizeWidget {

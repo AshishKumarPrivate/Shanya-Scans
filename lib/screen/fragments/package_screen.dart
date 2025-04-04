@@ -6,10 +6,7 @@ import 'package:provider/provider.dart';
 import '../../base_widgets/common/nav_common_app_bar.dart';
 import '../../base_widgets/common/rate_list_service_shimmer.dart';
 import '../../ui_helper/app_colors.dart';
-import '../../base_widgets/common/common_app_bar.dart';
-import '../nav/nav_lab/nav_pathalogy_test_detail.dart';
 import '../packages/controller/health_package_list_api_provider.dart';
-import '../packages/widget/home_health_pacakge_tab_list_shimmer.dart';
 
 class HealthPackageScreen extends StatefulWidget {
   HealthPackageScreen({super.key});
@@ -19,55 +16,6 @@ class HealthPackageScreen extends StatefulWidget {
 }
 
 class _HealthPackageScreenState extends State<HealthPackageScreen> {
-  final List<Map<String, String>> items = [
-    {'image': 'assets/images/fullbody.png', 'title': 'Digital PET CT'},
-    {'image': 'assets/images/fullbody.png', 'title': 'Thyroid'},
-    {'image': 'assets/images/fullbody.png', 'title': 'Diabetes'},
-    {'image': 'assets/images/img.png', 'title': 'Hair & Skin'},
-    {'image': 'assets/images/img.png', 'title': 'Full Body Checkups'},
-    {'image': 'assets/images/img.png', 'title': 'Women Care'},
-    {'image': 'assets/images/img.png', 'title': 'Heart'},
-    {'image': 'assets/images/img.png', 'title': 'Bone Health'},
-  ];
-
-  final List<Map<String, dynamic>> itemsList = [
-    {
-      'title': 'Comprehensive Full Body Checkup with Vitamin D B12',
-      'price': '1199',
-      'oldPrice': '2199',
-      'tests': 'Includes 92 tests',
-      'discount': '45% OFF',
-      'fasting': 'Fasting required',
-      'reportTime': 'Reports in 15 Hrs',
-    },
-    {
-      'title': 'Senior Citizen Health Checkup',
-      'price': '999',
-      'oldPrice': '1949',
-      'tests': 'Includes 87 tests',
-      'discount': '49% OFF',
-      'fasting': 'Fasting not required',
-      'reportTime': 'Reports in 24 Hrs',
-    },
-    {
-      'title': 'Women’s Master Checkup',
-      'price': '1299',
-      'oldPrice': '2299',
-      'tests': 'Includes 93 tests',
-      'discount': '43% OFF',
-      'fasting': 'Fasting required',
-      'reportTime': 'Reports in 12 Hrs',
-    },
-    {
-      'title': 'Women’s Master Checkup',
-      'price': '1299',
-      'oldPrice': '2299',
-      'tests': 'Includes 93 tests',
-      'discount': '43% OFF',
-      'fasting': 'Fasting required',
-      'reportTime': 'Reports in 12 Hrs',
-    },
-  ];
 
   @override
   void initState() {

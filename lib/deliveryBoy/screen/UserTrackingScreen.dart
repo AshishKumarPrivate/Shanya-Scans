@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:healthians/network_manager/repository.dart';
 import 'package:provider/provider.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import 'package:healthians/ui_helper/storage_helper.dart';
@@ -45,21 +43,16 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
   @override
   void initState() {
     super.initState();
+    // Wait for the first frame to access context safely
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<SocketProvider>(context, listen: false)
+          .listenToSalesPersonLocation(StorageHelper().getUserOrderId());
+    });
     _loadCustomMarker();
     // _connectToSocket();
     _startLocationUpdates();
 
-
   }
-
-  // @override
-  // void dispose() {
-  //   // _socket?.clearListeners();
-  //   _socket?.disconnect();
-  //   _socket?.dispose();
-  //   print("Socket disconnected properly ❌");
-  //   super.dispose();
-  // }
 
   @override
   void didChangeDependencies() {
@@ -70,32 +63,16 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
 
     // Add a post frame callback to ensure setState() is not called during the build phase
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (socketProvider.salesPersonPosition.latitude != 0 && socketProvider.salesPersonPosition.longitude != 0) {
-        setState(() {
-          _salesPersonPosition = socketProvider.salesPersonPosition;
-        });
-        _updateMarkers();
-        _updatePolylines();
+      if (socketProvider.salesPersonPosition.latitude != _salesPersonPosition.latitude ||
+          socketProvider.salesPersonPosition.longitude != _salesPersonPosition.longitude) {
+        updateMarkerSmoothly(socketProvider.salesPersonPosition);
+        print("Current _salesPersonPosition: $_salesPersonPosition");
+
       }
       print("Socket Reconnect✅ ");
     });
     print("Socket Reconnect✅ ");
   }
-
-  // void socketReconnect() {
-  //   if (!_socket!.connected) {
-  //     _connectToSocket(); // Ensure reconnection
-  //   }
-  // }
-
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   if (state == AppLifecycleState.resumed) {
-  //     if (!_socket!.connected) {
-  //       _connectToSocket(); // Reconnect when app comes to foreground
-  //     }
-  //   }
-  // }
 
 
   // ✅ Load custom marker function
@@ -131,79 +108,26 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
     return (bearing + 360) % 360; // Ensure positive angle
   }
 
-
-  /// **1️⃣ Connect to Socket.IO Server**
-  // void _connectToSocket() {
-  //   _socket = IO.io("${Repository.baseUrl}", <String, dynamic>{
-  //     "transports": ["websocket"],
-  //     'autoConnect': true, // Ensure automatic connection
-  //     'reconnection': true, // Enable auto-reconnect
-  //     'reconnectionAttempts': 5, // Retry up to 5 times
-  //     'reconnectionDelay': 2000, // Wait 2s before retry
-  //   });
-  //
-  //   // print("user and sales lat long => ${StorageHelper().getUserLat()} , ${StorageHelper().getUserLong()} //// ${StorageHelper().getSalesLat()} , ${StorageHelper().getSalesLng()} ");
-  //
-  //   _socket!.onConnect((_) {
-  //     print("Connected to Socket.IO ✅");
-  //
-  //     _socket!.emit("get-sales-lat-lng", {
-  //       "orderDetailId": StorageHelper().getUserOrderId(),
-  //     });
-  //   });
-  //
-  //   _socket!.on("get-updated-sales-lat-lng", (data) {
-  //     print("Raw Data Received: $data");
-  //
-  //     // Check if data is a Map before accessing values
-  //     if (data is Map<String, dynamic>) {
-  //       print("inside the if condition");
-  //       print("Sales Latitude: ${data['sales_lat']}");
-  //       print("Sales Longitude: ${data['sales_lng']}");
-  //       // Convert to double if necessary
-  //       double salesLat = double.tryParse(data['sales_lat'].toString()) ?? 0.0;
-  //       double salesLng = double.tryParse(data['sales_lng'].toString()) ?? 0.0;
-  //
-  //       updateMarkerSmoothly(LatLng(salesLat, salesLng));
-  //
-  //       print("Sales Lat: $salesLat, Sales Lng: $salesLng");
-  //       print("after getting data ");
-  //       // Store in StorageHelper
-  //       StorageHelper().setSalesLat(salesLat);
-  //       StorageHelper().setSalesLng(salesLng);
-  //       setState(() {
-  //         _salesPersonPosition = LatLng(salesLat, salesLng);
-  //       });
-  //       // Markers aur Polylines ko setState ke baad update karein
-  //       _updateMarkers();
-  //       _updatePolylines();
-  //       _moveCameraToSalesPerson();
-  //       print(
-  //           "Stored in StorageHelper: ${StorageHelper().getSalesLat()}, ${StorageHelper().getSalesLng()} /// ${StorageHelper().getUserLat()} , ${StorageHelper().getUserLong()}");
-  //     } else {
-  //       print("Error: Data is not in Map format -> $data");
-  //     }
-  //   });
-  //
-  //   _socket!.onDisconnect((_) {
-  //     print("Disconnected from Socket.IO ❌");
-  //     _reconnectSocket(); // ✅ Attempt Reconnection
-  //   });
-  //
-  //   _socket!.onError((error) {
-  //     print('Socket error ❌: $error');
-  //   });
-  // }
-
   void updateMarkerSmoothly(LatLng newPosition) {
     final GoogleMapController controller = _mapController;
     // ✅ Bearing calculate karein
     double bearing = calculateBearing(_salesPersonPosition, newPosition);
 
-    // Camera ko naye position pe smoothly animate karo
-    controller.animateCamera(CameraUpdate.newLatLng(newPosition));
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: newPosition,
+          zoom: 16,
+          bearing: bearing, // ✅ Optional for direction facing
+          tilt: 45,         // Optional for 3D effect
+        ),
+      ),
+    );
 
     setState(() {
+      _salesPersonPosition = newPosition;
+      _markers.removeWhere((m) => m.markerId == MarkerId('sales_person'));
+
       _markers.add(
         Marker(
           markerId: MarkerId('sales_person'),
@@ -218,14 +142,9 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
         ),
       );
     });
-  }
 
-  /// **2️⃣ Handle Socket Reconnection**
-  void _reconnectSocket() {
-    if (_socket != null && !_socket!.connected) {
-      print("Attempting to reconnect...");
-      _socket!.connect();
-    }
+    // Camera ko naye position pe smoothly animate karo
+    controller.animateCamera(CameraUpdate.newLatLng(newPosition));
   }
 
   /// **3️⃣ Fetch Current Location (for salesperson)**
@@ -251,13 +170,13 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
     ).listen((Position position) {
       double latitude = position.latitude;
       double longitude = position.longitude;
-
       if (mounted) {
         setState(() {
-          _salesPersonPosition = LatLng(position.latitude, position.longitude);
+          LatLng   newPos =  _salesPersonPosition = LatLng(position.latitude, position.longitude);
+          updateMarkerSmoothly(newPos); // ✅ Marker update here
+          _updatePolylines();
         });
-        _updateMarkers(); // ✅ Marker update here
-        _updatePolylines();
+
       }
 
       /// **4️⃣ Send Salesperson's Updated Location to Backend**
@@ -292,22 +211,6 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
     });
   }
 
-  /// **5️⃣ Update Route Polyline**
-  // void _updatePolylines() {
-  //   setState(() {
-  //     _polylines.clear();
-  //     _polylines.add(
-  //       Polyline(
-  //         polylineId: PolylineId("route"),
-  //         color: Colors.blue,
-  //         width: 5,
-  //         points: [_salesPersonPosition, _userPosition],
-  //       ),
-  //     );
-  //   });
-  // }
-
-  /// **🛣 Fetch Road Polyline Route**
   void _updatePolylines() async {
     List<LatLng> routeCoordinates =
         await getRouteCoordinates(_salesPersonPosition, _userPosition);
@@ -332,7 +235,7 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
     const String googleAPIKey = "AIzaSyC9ZOZHwHmyTWXqACqpZY2TL7wX2_Zn05U"; // 🔹 API Key add karein
 
     String url =
-        "https://maps.googleapis.com/maps/api/directions/json?origin=${source.latitude},${source.longitude}&destination=${destination.latitude},${destination.longitude}&key=$googleAPIKey&mode=driving";
+        "https://maps.googleapis.com/maps/api/directions/json?origin=${destination.latitude},${destination.longitude}&destination=${source.latitude},${source.longitude}&key=$googleAPIKey&mode=driving";
 
     try {
       var response = await Dio().get(url);
@@ -366,12 +269,10 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
 
   /// **🔹 Move Camera to Salesperson's Location**
   void _moveCameraToSalesPerson() {
-    if (_mapController != null) {
-      _mapController.animateCamera(
-        CameraUpdate.newLatLng(_salesPersonPosition),
-      );
+    _mapController.animateCamera(
+      CameraUpdate.newLatLng(_salesPersonPosition),
+    );
     }
-  }
 
 
   @override
@@ -381,7 +282,8 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
         LatLng salesPersonPosition = socketProvider.salesPersonPosition;
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (socketProvider.salesPersonPosition != _salesPersonPosition) {
+          if ((socketProvider.salesPersonPosition.latitude - _salesPersonPosition.latitude).abs() > 0.0001 ||
+              (socketProvider.salesPersonPosition.longitude - _salesPersonPosition.longitude).abs() > 0.0001) {
             setState(() {
               _salesPersonPosition = socketProvider.salesPersonPosition;
             });
@@ -406,6 +308,8 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
                 },
                 markers: _markers, // ✅ Use updated markers
                 polylines: _polylines,
+                rotateGesturesEnabled: false,
+                compassEnabled: false,
               ),
 
               // Bottom Status Box

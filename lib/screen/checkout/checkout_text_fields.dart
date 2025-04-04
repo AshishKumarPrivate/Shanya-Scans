@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../../ui_helper/app_text_styles.dart';
+import '../../ui_helper/responsive_helper.dart';
+
 class CheckoutTextField extends StatelessWidget {
   final String label;
   final String hint;
@@ -25,20 +28,34 @@ class CheckoutTextField extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(
+            label,
+            style: AppTextStyles.bodyText1(
+              context,
+              overrideStyle: TextStyle(
+                color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: ResponsiveHelper.fontSize(context, 12)),
+            ),
+          ),
           const SizedBox(height: 5),
           TextFormField(
             controller: controller,
             keyboardType: keyboardType,
             maxLength: maxLength,
-
+            style: AppTextStyles.bodyText1(
+              context,
+              overrideStyle: TextStyle(
+                color: Colors.black,
+                  fontSize: ResponsiveHelper.fontSize(context, 13)),
+            ),
             validator: isRequired
                 ? (value) {
-              if (value == null || value.trim().isEmpty) {
-                return "$label is required";
-              }
-              return null;
-            }
+                    if (value == null || value.trim().isEmpty) {
+                      return "$label is required";
+                    }
+                    return null;
+                  }
                 : null,
             decoration: InputDecoration(
               hintText: hint,

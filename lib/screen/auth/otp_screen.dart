@@ -3,10 +3,8 @@ import 'package:healthians/screen/auth/controller/auth_provider.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/style.dart';
 import 'package:provider/provider.dart';
-import '../../../bottom_navigation_screen.dart';
 import '../../base_widgets/loading_indicator.dart';
 import '../../base_widgets/solid_rounded_button.dart';
-import '../../ui_helper/responsive_helper.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../ui_helper/app_text_styles.dart';
 

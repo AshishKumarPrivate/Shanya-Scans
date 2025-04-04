@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 // class ResponsiveText {
 //   /// Get responsive font size based on screen width
@@ -56,7 +55,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 //
 // }
 
-import 'package:flutter/material.dart';
 
 class ResponsiveHelper {
 

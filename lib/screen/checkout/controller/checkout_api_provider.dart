@@ -222,6 +222,7 @@ class CheckoutProvider with ChangeNotifier {
       String altPhone,
       String gender,
       String cityState,
+      String selectedPlace,
       String addressType
 
       ) async {
@@ -279,6 +280,7 @@ class CheckoutProvider with ChangeNotifier {
       Map<String, dynamic> requestBody = {
         "email": email,
         "address": cityState,
+        "selectedPlace": selectedPlace,
         "addressType": addressType,
         "phoneNumber": phone,
         "altPhoneNumber": altPhone,

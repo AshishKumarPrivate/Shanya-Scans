@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:healthians/base_widgets/common/rate_list_service_shimmer.dart';
-import 'package:healthians/base_widgets/loading_indicator.dart';
 import 'package:healthians/screen/service/model/ServiceDetailRateListModel.dart';
 import 'package:healthians/screen/service/screen/rate_list__detail.dart';
-import 'package:healthians/screen/service/service_detail_list_detail_buy_now.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:healthians/base_widgets/solid_rounded_button.dart';
 import 'package:healthians/util/StringUtils.dart';
@@ -160,7 +158,7 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
                   ),
                   SizedBox(height: 5),
                   Text(
-                    rateListItem.paramterInclude ?? "No details",
+                    "Parameter Include ${rateListItem.paramterInclude ?? "No details"}",
                     // Add null safety
                     style: AppTextStyles.bodyText1(
                       context,

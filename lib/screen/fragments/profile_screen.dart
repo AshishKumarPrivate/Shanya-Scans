@@ -15,10 +15,8 @@ import 'package:healthians/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../../base_widgets/outlined_rounded_button.dart';
-import '../../deliveryBoy/screen/deleivery_boy_dashboard.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../util/share_app_utils.dart';
-import '../testing_file.dart';
 
 class ProfileScreen extends StatelessWidget {
   // const ProfileScreen({super.key});
@@ -65,15 +63,14 @@ class ProfileScreen extends StatelessWidget {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  SizedBox(
+                                  Container(
                                     width: ResponsiveHelper.containerWidth(
                                         context, 15),
                                     height: ResponsiveHelper.containerWidth(
                                         context, 15),
                                     child: CircleAvatar(
                                       radius: 15, // Image radius
-                                      backgroundImage:
-                                          AssetImage('assets/images/user.png'),
+                                      backgroundImage:AssetImage('assets/images/user.png'),
                                     ),
                                   ),
                                   ResponsiveHelper.sizeBoxHeightSpace(

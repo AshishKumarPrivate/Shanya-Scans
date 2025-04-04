@@ -1,30 +1,22 @@
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:healthians/screen/nav/nav_home/home_ending_setion.dart';
 import 'package:healthians/screen/nav/nav_home/home_first_service_setion.dart';
-import 'package:healthians/screen/nav/nav_home/home_google_reviews_setion.dart';
 import 'package:healthians/screen/nav/nav_home/home_slider_setion.dart';
-import 'package:healthians/screen/nav/nav_home/home_stats_setion.dart';
 import 'package:healthians/screen/nav/nav_home/home_toolbar_setion.dart';
 import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
 import 'package:healthians/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../../base_widgets/common/custom_offer_dialog_popup.dart';
 import '../nav/nav_home/frquently_pathalogy_test/controller/frequently_pathalogy_test_provider.dart';
 import '../nav/nav_home/health_concern/controller/health_concern_provider.dart';
-import '../nav/nav_home/home_checkups_organs_setion.dart';
 import '../nav/nav_home/home_contact_setion.dart';
 import '../nav/nav_home/home_lab_test_setion.dart';
 import '../nav/nav_home/home_health_concern_setion.dart';
 import '../nav/nav_home/home_health_packages_setion.dart';
-import '../nav/nav_home/home_radiology_setion.dart';
 import '../nav/nav_home/home_services_setion.dart';
 import '../nav/nav_home/home_slider_2_setion.dart';
-import '../cart/cart_list_screen.dart';
 import '../nav/nav_home/slider/controller/home_banner_api_provider.dart';
 import '../service/controller/service_scans_provider.dart';
 import '../splash/controller/network_provider_controller.dart';
@@ -43,17 +35,29 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _checkAndShowDialog();
+    // _checkAndShowDialog();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
 
-    Provider.of<ServiceApiProvider>(context, listen: false).loadCachedPackages();
-    Provider.of<HomeBannerApiProvider>(context, listen: false)
-        .loadCachedBanners();
-    Provider.of<HealthConcernApiProvider>(context, listen: false)
-        .getHealthConcernTagList(context);
-    Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false)
-        .loadCachedFrequentlyHomeLabTest();
-    Provider.of<HealthConcernApiProvider>(context, listen: false)
-        .getHealthConcernTagList(context);
+      Provider.of<ServiceApiProvider>(context, listen: false).loadCachedPackages();
+      Provider.of<HomeBannerApiProvider>(context, listen: false)
+          .loadCachedBanners();
+      Provider.of<HealthConcernApiProvider>(context, listen: false)
+          .getHealthConcernTagList(context);
+      Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false)
+          .loadCachedFrequentlyHomeLabTest();
+      Provider.of<HealthConcernApiProvider>(context, listen: false)
+          .getHealthConcernTagList(context);
+    });
+
+    // Provider.of<ServiceApiProvider>(context, listen: false).loadCachedPackages();
+    // Provider.of<HomeBannerApiProvider>(context, listen: false)
+    //     .loadCachedBanners();
+    // Provider.of<HealthConcernApiProvider>(context, listen: false)
+    //     .getHealthConcernTagList(context);
+    // Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false)
+    //     .loadCachedFrequentlyHomeLabTest();
+    // Provider.of<HealthConcernApiProvider>(context, listen: false)
+    //     .getHealthConcernTagList(context);
   }
 
   Future<void> _checkAndShowDialog() async {
@@ -72,12 +76,11 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _refreshData() async {
+    await Provider.of<HomeBannerApiProvider>(context, listen: false) .getHomeBanner1List();
     await Provider.of<ServiceApiProvider>(context, listen: false).fetchScansList();
-    await Provider.of<HomeBannerApiProvider>(context, listen: false) .loadCachedBanners();
     await Provider.of<HealthConcernApiProvider>(context, listen: false).getHealthConcernTagList(context);
-    await Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false).loadCachedFrequentlyHomeLabTest();
-    await Provider.of<HealthConcernApiProvider>(context, listen: false)
-        .getHealthConcernTagList(context);
+    await Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false).getFrequentlyLabTestList();
+    await Provider.of<HealthConcernApiProvider>(context, listen: false) .getHealthConcernTagList(context);
 
 
     print("refresh data is loaded");
@@ -119,27 +122,14 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          HomeFirstServiceSection(
-                              onTabChange: widget.onTabChange),
-                          HomeSliderSection(),
+                          HomeFirstServiceSection(onTabChange: widget.onTabChange),
+                          HomeSlider1Section(),
                           HomeContactSection(),
-                          // SizedBox(height: 10),
-                          HomeServicesSection(
-                            sectionHeading: "Our Best Radiology Service",
-                          ),
-                          // SizedBox(height: 15),
-                          // Grid Title
+                          HomeServicesSection( sectionHeading: "Our Best Radiology Service",),
                           HomeSlider2Section(),
                           HealthConcernSetion(),
-                          HomeLabTestSection(
-                            sectionHeading: "Frequently Lab Test",
-                          ),
+                          HomeLabTestSection(sectionHeading: "Frequently Lab Test",),
                           HomeHealthPackageSection(),
-                          // HomeCheckupsVitalSection(),
-                          // HomeRadiologySection(),
-                          // HorizontalAutoScrollingList(),
-                          // HomeStatsSection(),
-                          // HomeGoogleReviewSection(sectionHeading: "What Ours Patients Say",),
                           HomeEndingSection()
                         ],
                       ),

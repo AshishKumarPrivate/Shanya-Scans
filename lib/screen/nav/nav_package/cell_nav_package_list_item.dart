@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/nav/nav_lab/nav_pathalogy_test_detail.dart';
 import 'package:healthians/screen/packages/model/PackageListByTabIdModel.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:healthians/base_widgets/solid_rounded_button.dart';

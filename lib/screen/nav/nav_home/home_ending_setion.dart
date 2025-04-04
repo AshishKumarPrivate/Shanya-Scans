@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/service/service_detail_list.dart';
 import 'package:healthians/base_widgets/custom_rounded_container.dart';
 import '../../../ui_helper/responsive_helper.dart';
 import '../../../ui_helper/app_colors.dart';
@@ -12,22 +11,6 @@ class HomeEndingSection extends StatelessWidget {
     Key? key,
     this.sectionHeading,
   }) : super(key: key);
-
-  final List<Map<String, String>> servicesList = [
-    {
-      'image': "assets/images/netmedsimg1.png",
-      'title': "Book Lab Tests fromCertified Lab"
-    },
-    {
-      'image': "assets/images/netmedsimg1.png",
-      'title': "500+ Tests & Packages Offered"
-    },
-    {
-      'image': "assets/images/netmedsimg1.png",
-      'title': "50+ Pincodes Serving Home|Sample Collections"
-    },
-    // {'image': "assets/images/netmedsimg1.png", 'title': "Book Test"},
-  ];
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../ui_helper/app_colors.dart';
-import '../../ui_helper/responsive_helper.dart';
 
 class RateListServiceShimmer extends StatelessWidget {
   final int itemCount;

@@ -8,7 +8,6 @@ import 'package:provider/provider.dart';
 import 'package:html/parser.dart'; // Import required package
 import '../../base_widgets/common/custom_app_bar.dart';
 import '../../base_widgets/custom_text_field.dart';
-import '../../base_widgets/gender_selection_screen.dart';
 import '../../base_widgets/loading_indicator.dart';
 import '../../base_widgets/solid_rounded_button.dart';
 import '../../ui_helper/app_colors.dart';

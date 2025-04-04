@@ -4,12 +4,10 @@ import 'package:healthians/screen/fragments/package_screen.dart';
 import 'package:healthians/screen/fragments/home_screen.dart';
 import 'package:healthians/screen/fragments/profile_screen.dart';
 import 'package:healthians/screen/fragments/scan_screen.dart';
-import 'package:healthians/screen/auth/login_screen.dart';
 import 'package:healthians/screen/fragments/nav_pathalogy_teest_screen.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:healthians/ui_helper/app_colors.dart';
 
-import 'firebase/FirebaseNotificationService.dart';
 
 class BottomNavigationScreen extends StatefulWidget {
   final int initialPageIndex;

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -83,6 +82,16 @@ class StorageHelper {
   String getUserId() {
     return sp.getString('user_id') ?? "";
   }
+
+
+  void setUserLiveAddress(String address) {
+    sp.setString('address', address);
+  }
+
+  String getUserLiveAddress() {
+    return sp.getString('address') ?? "";
+  }
+
 
   // set user order data
 

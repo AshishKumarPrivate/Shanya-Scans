@@ -7,19 +7,17 @@ import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 
-class HomeSliderSection extends StatefulWidget {
-  final double? bannerImageHeight; // ✅ Optional height parameter
+class HomeSlider1Section extends StatefulWidget {
+  final double? bannerImageHeight;
 
-  HomeSliderSection({this.bannerImageHeight, Key? key}) : super(key: key);
-
-
+  HomeSlider1Section({this.bannerImageHeight, Key? key}) : super(key: key);
 
   @override
-  State<HomeSliderSection> createState() => _HomeSliderSectionState();
+  State<HomeSlider1Section> createState() => _HomeSlider1SectionState();
 }
 
-class _HomeSliderSectionState extends State<HomeSliderSection> {
-  int _current = 0;
+class _HomeSlider1SectionState extends State<HomeSlider1Section> {
+  int currentIndex = 0;
   final CarouselSliderController _controller = CarouselSliderController();
 
   @override
@@ -48,7 +46,7 @@ class _HomeSliderSectionState extends State<HomeSliderSection> {
 
     return Consumer<HomeBannerApiProvider>(
       builder: (context, provider, child) {
-        if (provider.isLoading  && provider.homeBanner2ListModel== null ) {
+        if (provider.isLoading  && provider.homeBanner1ListModel== null ) {
           return HomeSliderShimmer();
         } else if (provider.errorMessage.isNotEmpty) {
           return Center(
@@ -63,7 +61,7 @@ class _HomeSliderSectionState extends State<HomeSliderSection> {
           );
         }
 
-        final homeBannerList = provider.homeBanner2ListModel?.data ?? [];
+        final homeBannerList = provider.homeBanner1ListModel?.data ?? [];
 
         if (homeBannerList.isEmpty) {
           return Center(
@@ -92,6 +90,8 @@ class _HomeSliderSectionState extends State<HomeSliderSection> {
                     child: GestureDetector(
                       onTap: () {
                         int targetIndex = int.tryParse(item.index.toString()) ?? 0;
+                        // int targetIndex = (int.tryParse(item.index.toString()) ?? 1) - 1;
+                        print("click banner1 index= ${targetIndex}");
                         if (targetIndex >= 0 && targetIndex <= 4) {
                           _navigateToBottomNav(targetIndex);
                         }
@@ -146,7 +146,7 @@ class _HomeSliderSectionState extends State<HomeSliderSection> {
                   enlargeCenterPage: false,
                   onPageChanged: (index, reason) {
                     setState(() {
-                      _current = index;
+                      currentIndex = index;
                     });
                   },
                 ),

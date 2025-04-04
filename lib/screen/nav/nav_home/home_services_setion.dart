@@ -37,7 +37,12 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
     super.didChangeDependencies();
     final provider = Provider.of<ServiceApiProvider>(context, listen: false);
     if (provider.scanList.isEmpty) {
-      provider.loadCachedPackages(); // Ensure data is loaded
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        provider.loadCachedPackages(); // Ensure data is loaded
+      });
+
+      // provider.loadCachedPackages(); // Ensure data is loaded
     }
   }
 

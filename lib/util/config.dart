@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:permission_handler/permission_handler.dart';
+
+import '../main.dart';
 
 class ConfigUtils {
   StreamSubscription<Position>? positionStream;
@@ -12,6 +15,20 @@ class ConfigUtils {
 
   // Request Location Permission Before Tracking
   Future<bool> _requestPermission() async {
+
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        print("❌ Location permission denied.");
+        return false;
+      }
+    }
+
+
     var status = await Permission.location.request();
     if (status.isGranted) {
       return true;
@@ -32,7 +49,21 @@ class ConfigUtils {
       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
-        return "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+
+        print("Name: ${place.name}");
+        print("Street: ${place.street}");
+        print("SubLocality: ${place.subLocality}");
+        print("Locality: ${place.locality}");
+        print("SubAdministrativeArea: ${place.subAdministrativeArea}");
+        print("AdministrativeArea: ${place.administrativeArea}");
+        print("PostalCode: ${place.postalCode}");
+        print("Country: ${place.country}");
+        print("ISO Country Code: ${place.isoCountryCode}");
+        print("Thoroughfare: ${place.thoroughfare}");
+        print("SubThoroughfare: ${place.subThoroughfare}");
+
+        return "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}";
+        return "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.administrativeArea}, ${place.country}";
       }
       return "Address Not Found";
     } catch (e) {
@@ -40,17 +71,92 @@ class ConfigUtils {
       return "Error Fetching Address";
     }
   }
+  void _showEnableLocationDialog() {
+    if (navigatorKey.currentContext == null) {
+      print("❗ navigatorKey context is null, cannot show dialog.");
+      return;
+    }
+
+    showDialog(
+      context: navigatorKey.currentContext!, // Replace with your global navigator key
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Enable Location"),
+          content: const Text("Location services are disabled. Please enable them in settings."),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Geolocator.openLocationSettings();
+              },
+              child: const Text("Open Settings"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
 
   // Start Real-Time Location Tracking (Every 5 Seconds)
   void startTracking() async {
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        print("❌ Location permission denied.");
+        return;
+      }
+    }
+
+
     bool hasPermission = await _requestPermission();
     if (!hasPermission) return;
+
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      print("⚠️ Location services are OFF. Prompting user...");
+      // Show dialog to turn on location
+      _showEnableLocationDialog();
+      // Wait and check again after user returns from settings
+      await Future.delayed(Duration(seconds: 5));
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        print("❌ Location services are still OFF.");
+        return;
+      }
+    }
+
+    // ✅ Get initial location immediately
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      String address = await _getAddressFromLatLng(position.latitude, position.longitude);
+      _locationController.add({
+        "latitude": position.latitude,
+        "longitude": position.longitude,
+        "address": address,
+      });
+
+      print("✅ Initial Location: $address");
+    } catch (e) {
+      print("⚠️ Error Getting Initial Location: $e");
+    }
 
     locationTimer = Timer.periodic(Duration(seconds: 5), (Timer t) async {
       try {
         Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
         String address = await _getAddressFromLatLng(position.latitude, position.longitude);
-
         // Emit data to listeners
         _locationController.add({
           "latitude": position.latitude,

@@ -6,7 +6,6 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../base_widgets/common/default_common_app_bar.dart';
 import '../../../ui_helper/app_colors.dart';
-import '../../../util/whatsapp_open.dart';
 
 class ReferAndEarnScreen extends StatelessWidget {
   final String referralCode = "3YWAK"; // Replace with dynamic code

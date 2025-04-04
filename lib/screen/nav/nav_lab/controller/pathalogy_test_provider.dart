@@ -6,7 +6,6 @@ import 'package:healthians/screen/nav/nav_lab/model/PathalogyTestListDetailModel
 import 'package:healthians/screen/nav/nav_lab/model/PathalogyTestListModel.dart' as pathalogyTestList;
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../../network_manager/dio_helper.dart';
 
 class PathalogyTestApiProvider with ChangeNotifier {
   final Repository _repository = Repository();
@@ -111,7 +110,7 @@ class PathalogyTestApiProvider with ChangeNotifier {
     try {
       var response = await _repository.getNavLabScanResponse();
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response.success == true && response.data != null) {
         print("✅ Pathology Test List Fetched Successfully");
 
         String newData = json.encode(response.toJson());
@@ -158,7 +157,7 @@ class PathalogyTestApiProvider with ChangeNotifier {
     try {
       var response = await _repository.getNavLabScanDetailResponse(pathalogyTestSlug);
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response.success == true && response.data != null) {
         print("✅ Home Service Detail Fetched Successfully");
         _pathalogyTestListDetailModel = response;
         _setLoadingState(false);

@@ -26,6 +26,10 @@ class Data {
   Report? report;
   String? sId;
   String? patientName;
+  String? patientAddress;
+  String? patientSelectedAddress;
+  String? patientPhoneNumber;
+  String? patientAltPhoneNumber;
   int? patientAge;
   String? patientGender;
   int? quantity;
@@ -50,6 +54,10 @@ class Data {
       {this.report,
         this.sId,
         this.patientName,
+        this.patientAddress,
+        this.patientSelectedAddress,
+        this.patientPhoneNumber,
+        this.patientAltPhoneNumber,
         this.patientAge,
         this.patientGender,
         this.quantity,
@@ -75,6 +83,10 @@ class Data {
     json['report'] != null ? new Report.fromJson(json['report']) : null;
     sId = json['_id'];
     patientName = json['patientName'];
+    patientAddress = json['patientAddress'];
+    patientSelectedAddress = json['patientSelectedAddress'];
+    patientPhoneNumber = json['patientPhoneNumber'];
+    patientAltPhoneNumber = json['patientAltPhoneNumber'];
     patientAge = json['patientAge'];
     patientGender = json['patientGender'];
     quantity = json['quantity'];
@@ -106,6 +118,10 @@ class Data {
     }
     data['_id'] = this.sId;
     data['patientName'] = this.patientName;
+    data['patientAddress'] = this.patientAddress;
+    data['patientSelectedAddress'] = this.patientSelectedAddress;
+    data['patientPhoneNumber'] = this.patientPhoneNumber;
+    data['patientAltPhoneNumber'] = this.patientAltPhoneNumber;
     data['patientAge'] = this.patientAge;
     data['patientGender'] = this.patientGender;
     data['quantity'] = this.quantity;
@@ -156,7 +172,7 @@ class UserId {
   String? sId;
   String? name;
   String? email;
-  Null? verificationCode;
+  Null verificationCode;
   bool? isVerified;
   String? password;
   List<dynamic>? member;

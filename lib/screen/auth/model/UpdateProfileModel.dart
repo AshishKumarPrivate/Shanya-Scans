@@ -26,7 +26,7 @@ class Data {
   String? sId;
   String? name;
   String? email;
-  Null? verificationCode;
+  Null verificationCode;
   bool? isVerified;
   String? password;
   List<dynamic>? member;

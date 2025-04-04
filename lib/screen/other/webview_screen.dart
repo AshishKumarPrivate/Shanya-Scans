@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:healthians/base_widgets/loading_indicator.dart';
-import 'package:healthians/base_widgets/solid_rounded_button.dart';
 import 'package:healthians/screen/profile/controller/term_condition_provider.dart';
 import 'package:healthians/ui_helper/app_text_styles.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../ui_helper/app_colors.dart';
 import '../../base_widgets/expandable_text_widget.dart';

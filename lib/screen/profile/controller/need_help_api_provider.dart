@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
 import 'package:healthians/ui_helper/storage_helper.dart';
 import '../../../network_manager/api_error_handler.dart';
 import '../../../ui_helper/snack_bar.dart';

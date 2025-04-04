@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/common/home_service_shimmer.dart';
 import 'package:healthians/base_widgets/loading_indicator.dart';
 import 'package:healthians/screen/nav/nav_lab/controller/pathalogy_test_provider.dart';
 import 'package:healthians/screen/nav/nav_lab/model/PathalogyTestListModel.dart';
 import 'package:healthians/screen/nav/nav_lab/nav_pathalogy_test_detail.dart';
-import 'package:healthians/screen/nav/nav_lab/widget/nav_lab_test_list_shimmer.dart';
-import 'package:healthians/screen/service/service_detail_list_detail_buy_now.dart';
 import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/base_widgets/solid_rounded_button.dart';
 import 'package:provider/provider.dart';
 
 import '../../../ui_helper/app_colors.dart';

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:healthians/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
 import 'package:healthians/screen/nav/nav_home/health_concern/screen/health_concern_detail.dart';
-import 'package:healthians/screen/nav/nav_lab/nav_pathalogy_test_detail.dart';
 import 'package:provider/provider.dart';
 
 import '../../../base_widgets/common/scans_service_shimmer.dart';

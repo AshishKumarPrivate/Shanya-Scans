@@ -8,7 +8,6 @@ import 'package:healthians/ui_helper/storage_helper.dart';
 import '../../../bottom_navigation_screen.dart';
 import '../../../network_manager/api_error_handler.dart';
 import '../../../ui_helper/snack_bar.dart';
-import '../login_screen.dart';
 
 class AuthApiProvider with ChangeNotifier {
   final Repository _repository = Repository();

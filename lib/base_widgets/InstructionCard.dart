@@ -4,7 +4,6 @@ import 'package:healthians/ui_helper/app_colors.dart';
 
 import '../ui_helper/app_text_styles.dart';
 import '../ui_helper/responsive_helper.dart';
-import '../util/dimensions.dart';
 
 class InstructionCard extends StatefulWidget {
   final String instructionEnglish;
@@ -122,8 +121,7 @@ class _InstructionCardState extends State<InstructionCard> {
               child: InstructionContent(
                 instructions: isHindi
                     ? widget.instructionHindi // 🔹 Show Hindi when switch is ON
-                    : widget
-                        .instructionEnglish, // 🔹 Show English when switch is OFF
+                    : widget .instructionEnglish, // 🔹 Show English when switch is OFF
               ),
             ),
           ],

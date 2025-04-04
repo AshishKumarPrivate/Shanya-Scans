@@ -3,12 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:healthians/network_manager/repository.dart';
 import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/model/FrequentlyPathalogyTagListModel.dart';
-import 'package:healthians/screen/nav/nav_home/health_concern/model/HealthConcernPacakageTagModel.dart';
-import 'package:healthians/screen/nav/nav_lab/model/PathalogyTestListDetailModel.dart';
-import 'package:healthians/screen/nav/nav_lab/model/PathalogyTestListModel.dart';
-import 'package:healthians/screen/service/model/HomeServiceDetailModel.dart';
-import 'package:healthians/screen/service/model/HomeServiceListModel.dart';
-import 'package:healthians/screen/service/model/ServiceDetailRateListModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class FrequentlyPathalogyTagApiProvider with ChangeNotifier {
@@ -32,7 +26,7 @@ class FrequentlyPathalogyTagApiProvider with ChangeNotifier {
   void _setErrorState(String message) {
     _errorMessage = message;
     _setLoadingState(false);
-    notifyListeners(); // Ensure UI rebuilds
+    // notifyListeners(); // Ensure UI rebuilds
   }
 
   /// **Load Cached Banners and Fetch API Only if Needed**
@@ -79,7 +73,7 @@ class FrequentlyPathalogyTagApiProvider with ChangeNotifier {
     try {
       var response =  await _repository.getFrequentlyLabTestListResponse();
 
-      if (response != null && response.success == true && response.data != null) {
+      if (response.success == true && response.data != null) {
         print("✅ Frequently Pathalogy Tag List Fetched Successfully");
         String newData = json.encode(response.toJson());
 

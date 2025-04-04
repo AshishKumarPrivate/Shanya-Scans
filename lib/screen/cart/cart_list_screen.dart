@@ -105,7 +105,7 @@ class _CartListScreenState extends State<CartListScreen> {
                                   decoration: BoxDecoration(
                                     border: Border(
                                         bottom: BorderSide(
-                                            color: AppColors.lightBlueColor!,
+                                            color: AppColors.lightBlueColor,
                                             width: 5)),
                                   ),
                                   child: Row(

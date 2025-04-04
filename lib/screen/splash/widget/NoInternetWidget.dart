@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/bottom_navigation_screen.dart';
 import 'package:healthians/screen/splash/SplashScreen.dart';
 import 'package:provider/provider.dart';
 import '../controller/network_provider_controller.dart';

@@ -275,8 +275,7 @@ class OrderApiProvider with ChangeNotifier {
       // Map<String, dynamic> requestBody = {"id": userId};
       var response = await _repository.getOrderHistoryResponse(userId);
 
-      if (response != null &&
-          response.success == true &&
+      if (response.success == true &&
           response.data != null) {
         print("✅ User Order History  Fetched Successfully");
         _myOrderHistoryListModel = response;

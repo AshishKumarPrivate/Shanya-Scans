@@ -5,9 +5,7 @@ import 'package:healthians/base_widgets/custom_rounded_container.dart';
 import 'package:healthians/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
 
-import '../../base_widgets/asterisk_text_widget.dart';
 import '../../base_widgets/custom_text_field.dart';
-import '../../base_widgets/gender_selection_screen.dart';
 import '../../base_widgets/loading_indicator.dart';
 import '../../base_widgets/solid_rounded_button.dart';
 import '../../ui_helper/app_colors.dart';

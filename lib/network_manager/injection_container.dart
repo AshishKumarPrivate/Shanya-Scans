@@ -1,9 +1,5 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
-import 'package:healthians/screen/auth/login_screen.dart';
-import '../main.dart';
-import '../ui_helper/storage_helper.dart';
 import '../util/print_value.dart';
 
 Dio getDio () {
