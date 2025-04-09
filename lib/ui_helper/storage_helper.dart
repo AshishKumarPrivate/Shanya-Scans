@@ -93,6 +93,15 @@ class StorageHelper {
   }
 
 
+  void setDeliveryBoyLiveAddress(String address) {
+    sp.setString('address', address);
+  }
+
+  String getDeliveryBoyLiveAddress() {
+    return sp.getString('address') ?? "";
+  }
+
+
   // set user order data
 
   /// Store order details from API response

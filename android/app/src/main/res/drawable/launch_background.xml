@@ -6,5 +6,4 @@
     <item>
         <bitmap android:gravity="center" android:src="@drawable/splash"/>
     </item>
-    <item android:drawable="@color/white"/>
 </layer-list>

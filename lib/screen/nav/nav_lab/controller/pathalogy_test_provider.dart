@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/screen/nav/nav_lab/model/PathalogyTestListDetailModel.dart';
-import 'package:healthians/screen/nav/nav_lab/model/PathalogyTestListModel.dart' as pathalogyTestList;
+import 'package:shanya_scans/network_manager/repository.dart';
+import 'package:shanya_scans/screen/nav/nav_lab/model/PathalogyTestListDetailModel.dart';
+import 'package:shanya_scans/screen/nav/nav_lab/model/PathalogyTestListModel.dart' as pathalogyTestList;
 import 'package:shared_preferences/shared_preferences.dart';
 
 

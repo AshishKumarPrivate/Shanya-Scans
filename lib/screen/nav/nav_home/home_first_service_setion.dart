@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/other/book_a%20_test_now_screen.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/screen/other/book_a%20_test_now_screen.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import '../../../ui_helper/app_text_styles.dart';
 
 class HomeFirstServiceSection extends StatelessWidget {

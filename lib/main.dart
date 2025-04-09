@@ -3,26 +3,26 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:healthians/deliveryBoy/controller/DeliveryOrdersProvider.dart';
-import 'package:healthians/deliveryBoy/controller/delivery_boy_auth_provider.dart';
-import 'package:healthians/deliveryBoy/controller/socket_provider.dart';
-import 'package:healthians/screen/auth/controller/auth_provider.dart';
-import 'package:healthians/screen/cart/controller/cart_list_api_provider.dart';
-import 'package:healthians/screen/checkout/controller/checkout_api_provider.dart';
-import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/controller/frequently_pathalogy_test_provider.dart';
-import 'package:healthians/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
-import 'package:healthians/screen/nav/nav_home/slider/controller/home_banner_api_provider.dart';
-import 'package:healthians/screen/nav/nav_lab/controller/pathalogy_test_provider.dart';
-import 'package:healthians/screen/order/controller/order_provider.dart';
-import 'package:healthians/screen/other/controller/SearchProvider.dart';
-import 'package:healthians/screen/packages/controller/health_package_list_api_provider.dart';
-import 'package:healthians/screen/profile/controller/need_help_api_provider.dart';
-import 'package:healthians/screen/profile/controller/term_condition_provider.dart';
-import 'package:healthians/screen/service/controller/service_scans_provider.dart';
-import 'package:healthians/screen/splash/SplashScreen.dart';
-import 'package:healthians/screen/splash/controller/network_provider_controller.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:shanya_scans/deliveryBoy/controller/DeliveryOrdersProvider.dart';
+import 'package:shanya_scans/deliveryBoy/controller/delivery_boy_auth_provider.dart';
+import 'package:shanya_scans/deliveryBoy/controller/socket_provider.dart';
+import 'package:shanya_scans/screen/auth/controller/auth_provider.dart';
+import 'package:shanya_scans/screen/cart/controller/cart_list_api_provider.dart';
+import 'package:shanya_scans/screen/checkout/controller/checkout_api_provider.dart';
+import 'package:shanya_scans/screen/nav/nav_home/frquently_pathalogy_test/controller/frequently_pathalogy_test_provider.dart';
+import 'package:shanya_scans/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
+import 'package:shanya_scans/screen/nav/nav_home/slider/controller/home_banner_api_provider.dart';
+import 'package:shanya_scans/screen/nav/nav_lab/controller/pathalogy_test_provider.dart';
+import 'package:shanya_scans/screen/order/controller/order_provider.dart';
+import 'package:shanya_scans/screen/other/controller/SearchProvider.dart';
+import 'package:shanya_scans/screen/packages/controller/health_package_list_api_provider.dart';
+import 'package:shanya_scans/screen/profile/controller/need_help_api_provider.dart';
+import 'package:shanya_scans/screen/profile/controller/term_condition_provider.dart';
+import 'package:shanya_scans/screen/service/controller/service_scans_provider.dart';
+import 'package:shanya_scans/screen/splash/SplashScreen.dart';
+import 'package:shanya_scans/screen/splash/controller/network_provider_controller.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 
@@ -107,11 +107,10 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Shanya',
+      title: 'Shanya Scans',
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
       theme: ThemeData(
@@ -124,22 +123,18 @@ class MyApp extends StatelessWidget {
         ),
         fontFamily: "Poppins"
       ),
-      // Agar darkTheme specify karna ho, to use bhi light theme hi rakhein
       darkTheme: ThemeData(
         brightness: Brightness.light,
       ),
       themeMode: ThemeMode.light,
-      // Hamesha light mode use karein
-
-      /// ✅ **Global Default White Status Bar for Other Screens**
       builder: (context, child) {
         return Overlay(
           initialEntries: [
             OverlayEntry(
               builder: (context) {
                 /// ✅ Har screen push hone par default white status bar
-                SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-                  statusBarColor: Color(0xFF58a9c7),
+                SystemChrome.setSystemUIOverlayStyle( SystemUiOverlayStyle(
+                  statusBarColor: AppColors.primary,
                   // statusBarColor: Colors.white,
                   statusBarIconBrightness: Brightness.light,
                 ));

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/common/custom_text_field.dart';
+import 'package:shanya_scans/base_widgets/common/custom_text_field.dart';
 import 'package:provider/provider.dart';
 import '../../../base_widgets/loading_indicator.dart';
 import '../../../base_widgets/solid_rounded_button.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/app_text_styles.dart';
 
 
 class ProductCardBottom extends StatelessWidget {
@@ -40,18 +40,6 @@ class ProductCardBottom extends StatelessWidget {
 
               ),
             ),
-            // RatingBar.builder(
-            //   initialRating: product.rating,
-            //   allowHalfRating: false,
-            //   itemCount: product.rating.toInt(),
-            //   ignoreGestures: true, // this disables the change star rating
-            //   itemSize: 20,
-            //   itemBuilder: (context, _) => Icon(
-            //     Icons.star,
-            //     color: kWhite,
-            //   ),
-            //   onRatingUpdate: (rating) {},
-            // )
           ],
         ),
       ),

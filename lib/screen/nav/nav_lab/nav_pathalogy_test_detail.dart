@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/custom_rounded_container.dart';
-import 'package:healthians/screen/nav/nav_lab/controller/pathalogy_test_provider.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/base_widgets/custom_rounded_container.dart';
+import 'package:shanya_scans/screen/nav/nav_lab/controller/pathalogy_test_provider.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/app_text_styles.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:html/parser.dart'; // Import required package
 import 'package:provider/provider.dart';
 
@@ -94,10 +94,10 @@ class _ViewDetailPathalogyTestScreenState
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
-                                    gradient: const LinearGradient(
+                                    gradient: LinearGradient(
                                       colors: [
-                                        Color(0xFF58a9c7), // Even Lighter Blue
-                                        Color(0xFF58a9c7),
+                                        AppColors.primary, // Even Lighter Blue
+                                        AppColors.primary,
                                       ],
                                       begin: Alignment.bottomLeft,
                                       end: Alignment.topRight,
@@ -111,6 +111,22 @@ class _ViewDetailPathalogyTestScreenState
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        Text(
+                                          StringUtils.toUpperCase(pathologyTestList.testDetailName.toString()),
+                                          // widget.patahlogyTestName,
+                                          style: AppTextStyles.heading1(
+                                            context,
+                                            overrideStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight:
+                                              FontWeight.bold,
+                                              fontSize: ResponsiveHelper
+                                                  .fontSize(
+                                                  context, 14),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 5,),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -124,23 +140,7 @@ class _ViewDetailPathalogyTestScreenState
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
-                                                    pathologyTestList
-                                                        .testDetailName
-                                                        .toString(),
-                                                    // widget.patahlogyTestName,
-                                                    style: AppTextStyles.heading1(
-                                                      context,
-                                                      overrideStyle: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: ResponsiveHelper
-                                                            .fontSize(
-                                                                context, 14),
-                                                      ),
-                                                    ),
-                                                  ),
+
                                                   // Added spacing to prevent text overlap
                                                   Padding(
                                                     padding:
@@ -843,7 +843,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.watch_later, color: Colors.red),
+                                Icon(Icons.watch_later, color: AppColors.primary),
                                 SizedBox(height: 3),
                                 Text(
                                   "Report Time",
@@ -891,7 +891,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                                   "assets/images/test.png",
                                   width: 24,
                                   height: 24,
-                                  color: Colors.blue,
+                                  color: AppColors.primary,
                                 ),
                                 SizedBox(height: 3),
                                 Text(
@@ -942,7 +942,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.supervised_user_circle,
-                                    color: Colors.green),
+                                    color: AppColors.primary),
                                 SizedBox(height: 3),
                                 Text(
                                   "Recommended for",
@@ -1038,7 +1038,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                                     ResponsiveHelper.padding(context, 5, 1.05),
                                 child: InkWell(
                                   onTap: () {
-                                    makePhoneCall(context);
+                                    PhoneCallHelper.makePhoneCall(context);
                                   },
                                   child: Text(
                                     "Call Us",
@@ -1121,7 +1121,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                               borderColor: Colors.white,
                               borderWidth: 0,
                               elevation: 2,
-                              backgroundColor: Colors.red,
+                              backgroundColor: AppColors.primary,
                               child: Padding(
                                 padding:
                                     ResponsiveHelper.padding(context, 4, 1),

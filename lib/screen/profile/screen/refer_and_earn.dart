@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:healthians/base_widgets/solid_rounded_button.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/base_widgets/solid_rounded_button.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../../base_widgets/common/default_common_app_bar.dart';
@@ -24,9 +25,8 @@ class ReferAndEarnScreen extends StatelessWidget {
                 context,
                 60,
               ),
-              child: Image.asset(
+              child: ImageLoaderUtil.assetImage(
                 "assets/images/referearn.jpg",
-                fit: BoxFit.fill,
               ),
             ),
             SizedBox(height: 16),

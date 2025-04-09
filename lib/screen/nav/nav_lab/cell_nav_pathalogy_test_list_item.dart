@@ -1,35 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/loading_indicator.dart';
-import 'package:healthians/screen/nav/nav_lab/controller/pathalogy_test_provider.dart';
-import 'package:healthians/screen/nav/nav_lab/model/PathalogyTestListModel.dart';
-import 'package:healthians/screen/nav/nav_lab/nav_pathalogy_test_detail.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/base_widgets/loading_indicator.dart';
+import 'package:shanya_scans/screen/nav/nav_lab/controller/pathalogy_test_provider.dart';
+import 'package:shanya_scans/screen/nav/nav_lab/model/PathalogyTestListModel.dart';
+import 'package:shanya_scans/screen/nav/nav_lab/nav_pathalogy_test_detail.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/StringUtils.dart';
 
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 
 class CellNavLabListItem extends StatefulWidget {
-  // final double borderRadius;
-  // final double elevation;
-  // final Color backgroundColor;
-  // final Color borderColor; // New for stroke color
-  // final double borderWidth; // New for stroke width
-  // final EdgeInsetsGeometry? padding;
-  // final EdgeInsetsGeometry? margin;
-  // final GestureTapCallback? onTap;
-  //
-  // const CellNavLabListItem({
-  //   Key? key,
-  //   required this.borderRadius,
-  //   required this.elevation,
-  //   required this.backgroundColor,
-  //   required this.borderColor,
-  //   required this.borderWidth,
-  //   this.padding,
-  //   this.margin,
-  //   this.onTap,
-  // }) : super(key: key);
+
 
   @override
   State<CellNavLabListItem> createState() => _CellNavLabListItemState();
@@ -148,8 +130,6 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
               return Center(child: CircularProgressIndicator()); // Show loader
             }
             final item = provider.filteredPathalogyTest[index];
-            // final item = pathalogyTestList[index];
-            // ✅ Calculate dynamic padding
             EdgeInsets itemPadding = EdgeInsets.only(
               top: index == 0 ? 8.0 : 0.0,
               // Extra padding for first item
@@ -194,9 +174,17 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
                     padding: const EdgeInsets.only(left: 5.0),
                     child: Container(
                       decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             // color: AppColors.pinkColor,
                             colors: [Color(0xFFF9F7F4), Color(0xFFF1FBFC)],
+
+
+                            // [Colors.blue.shade50, Colors.blue.shade100],
+                            // [Colors.teal.shade50, Colors.teal.shade100],
+                            // [Colors.green.shade50, Colors.green.shade100],
+                            // [Colors.amber.shade50, Colors.amber.shade100],
+                            // [Colors.purple.shade50, Colors.purple.shade100],
+
                             // Lighter shades
                             begin: Alignment.bottomLeft,
                             end: Alignment.topRight,
@@ -214,7 +202,7 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 8.0, vertical: 15),
                         child: Text(
-                          item.testDetailName.toString(),
+                          StringUtils.toUpperCase(item.testDetailName.toString()),
                           // '${category['title']} (${category['count']})',
                           style: AppTextStyles.heading1(context,
                               overrideStyle: TextStyle(

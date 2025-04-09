@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
-import 'package:healthians/screen/nav/nav_home/health_concern/screen/health_concern_detail.dart';
+import 'package:shanya_scans/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
+import 'package:shanya_scans/screen/nav/nav_home/health_concern/screen/health_concern_detail.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../../../base_widgets/common/scans_service_shimmer.dart';
 import '../../../ui_helper/app_colors.dart';
@@ -19,7 +21,7 @@ class _HealthConcernSetionState extends State<HealthConcernSetion> {
     super.initState();
     Future.microtask(() {
       Provider.of<HealthConcernApiProvider>(context, listen: false)
-          .getHealthConcernTagList(context);
+          .loadCachedHomeHealthConcern();
     });
   }
 
@@ -63,10 +65,8 @@ class _HealthConcernSetionState extends State<HealthConcernSetion> {
               else if (provider.errorMessage.isNotEmpty) {
                 return Center(
                   child: SizedBox(
-                    width: ResponsiveHelper.containerWidth(
-                        context, 50),
-                    height: ResponsiveHelper.containerWidth(
-                        context, 50),
+                    width: ResponsiveHelper.containerWidth( context, 50),
+                    height: ResponsiveHelper.containerWidth(context, 50),
                     child: Image.asset(
                       "assets/images/img_error.jpg",
                       fit: BoxFit.cover,
@@ -129,12 +129,32 @@ class _HealthConcernSetionState extends State<HealthConcernSetion> {
                             child: Padding(
                               padding: const EdgeInsets.all(15.0),
                               child: ClipOval(
-                                child: Image.network(
-                                  item.icon?.secureUrl ?? '', // ✅ Null-safe access
-                                  fit: BoxFit.fill,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      Icon(Icons.broken_image, size: 40),
-                                ),
+                                child: ImageLoaderUtil.cacheNetworkImage(item.icon!.secureUrl.toString())
+                                // CachedNetworkImage(
+                                //   imageUrl: item.icon?.secureUrl.toString() ?? "",
+                                //   fit: BoxFit.cover,
+                                //   placeholder: (context, url) =>
+                                //       Center(
+                                //         child: Image.asset( "assets/images/img_placeholder.jpeg"), // Placeholder while loading
+                                //       ),
+                                //   errorWidget: (context, url, error) =>
+                                //   const Icon(
+                                //     Icons.error,
+                                //     color: Colors .red, // Show error icon if image fails
+                                //   ),
+                                //   fadeInDuration: const Duration(  milliseconds: 500),
+                                //   fadeOutDuration: const Duration( milliseconds: 300),
+                                // )
+
+                                // Image.network(
+                                //   item.icon?.secureUrl ?? '', // ✅ Null-safe access
+                                //   fit: BoxFit.fill,
+                                //   errorBuilder: (context, error, stackTrace) =>
+                                //       Icon(Icons.broken_image, size: 40),
+                                // ),
+                                //
+
+
                               ),
                             ),
                           ),

@@ -1,9 +1,9 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:healthians/deliveryBoy/screen/deleivery_boy_dashboard.dart';
-import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:shanya_scans/deliveryBoy/screen/deleivery_boy_dashboard.dart';
+import 'package:shanya_scans/network_manager/repository.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import '../../../network_manager/api_error_handler.dart';
 import '../../../ui_helper/snack_bar.dart';
 import '../../screen/other/screen/user_selection_screen.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/other/service_detail_user_form.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
+import 'package:shanya_scans/screen/other/service_detail_user_form.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/ui_helper/app_text_styles.dart';
 import '../../base_widgets/common/common_app_bar.dart';
 import '../../base_widgets/expandable_text_widget.dart';
 import '../../ui_helper/app_colors.dart';

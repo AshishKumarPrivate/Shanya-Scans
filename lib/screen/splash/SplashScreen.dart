@@ -1,8 +1,8 @@
 
 import 'package:flutter/material.dart';
-import 'package:healthians/deliveryBoy/screen/deleivery_boy_dashboard.dart';
-import 'package:healthians/screen/other/screen/user_selection_screen.dart';
-import 'package:healthians/screen/splash/screen/NoInternetScreen.dart';
+import 'package:shanya_scans/deliveryBoy/screen/deleivery_boy_dashboard.dart';
+import 'package:shanya_scans/screen/other/screen/user_selection_screen.dart';
+import 'package:shanya_scans/screen/splash/screen/NoInternetScreen.dart';
 import 'package:provider/provider.dart';
 
 import '../../bottom_navigation_screen.dart';
@@ -25,95 +25,33 @@ class _SplashScreenState extends State<SplashScreen> {
     super.initState();
     _checkConnectivity();
   }
-  void _checkConnectivity() {
-    Future.delayed(Duration(seconds: 3), () {
-      bool isConnected = Provider.of<NetworkProvider>(context, listen: false).isConnected;
-      if (isConnected) {
+  void _checkConnectivity() async {
+    await Future.delayed(const Duration(seconds: 2));
 
-        ///&&&&&&&&&&&&& Delivery boy login &&&&&&&&&&
-        /// Navigator.of(context).pushReplacement(
-        ///   MaterialPageRoute(builder: (context) => DeliveryBoyDashboard()), // Replace with your home screen
-        /// );
-        ///&&&&&&&&&&&&& Delivery boy login &&&&&&&&&&
+    bool isConnected = Provider.of<NetworkProvider>(context, listen: false).isConnected;
 
-
-        //  _navigateToNextScreen(); this will working for user login
-        _navigateToNextScreen();
+    if (!isConnected) {
+      _navigateTo(NoInternetScreen());
+      return;
+    }
+    await Provider.of<CartProvider>(context, listen: false).loadCartItems();
+    final userRole = StorageHelper().getRole();
+    if (userRole == "user") {
+      final isOtpVerified = await StorageHelper().getOtpVerified();
+      if (isOtpVerified) {
+        _navigateTo(const BottomNavigationScreen());
       } else {
-        Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => NoInternetScreen()));
+        _navigateTo( UserSelectionScreen());
       }
-    });
+    } else if (userRole == "delivery_boy") {
+      _navigateTo( DeliveryBoyDashboardScreen());
+    } else {
+      _navigateTo( UserSelectionScreen());
+    }
   }
 
-
-  /// ✅ **Check if the user email is stored, then navigate accordingly**
-  Future<void> _navigateToNextScreen() async {
-
-
-    await Provider.of<CartProvider>(context, listen: false).loadCartItems(); // ✅ Load cart
-    await Future.delayed(Duration(seconds: 3)); // Splash delay
-    String userEmail = StorageHelper().getEmail(); // Fetch stored email
-    String userToken = StorageHelper().getUserAccessToken(); // Get stored token
-    String? userRole = StorageHelper().getRole(); // Get stored role
-    // if (userEmail.isNotEmpty) {
-    //   // Navigator.of(context).pushReplacement(
-    //   //   MaterialPageRoute(builder: (context) => BottomNavigationScreen()), // Replace with your home screen
-    //   // );
-    //
-    //   if (userRole == "user") {
-    //     Navigator.of(context).pushReplacement(
-    //       MaterialPageRoute(builder: (context) => BottomNavigationScreen()),
-    //     );
-    //
-    //   } else if (userRole == "delivery_boy") {
-    //     Navigator.of(context).pushReplacement(
-    //       MaterialPageRoute(builder: (context) => DeliveryBoyDashboardScreen()),
-    //     );
-    //
-    //   } else {
-    //     Navigator.pushReplacement(
-    //       context,
-    //       MaterialPageRoute(builder: (context) => UserSelectionScreen()),
-    //     );
-    //   }
-    // } else {
-    //   Navigator.of(context).pushReplacement(
-    //     MaterialPageRoute(builder: (context) => UserSelectionScreen()),
-    //     // MaterialPageRoute(builder: (context) => LoginScreen()),
-    //   );
-    // }
-
-    if (userRole == "user") {
-      bool isOtpVerified = await StorageHelper().getOtpVerified();
-      bool isUserLoggedIn = await StorageHelper().isUserVerified();
-
-      if(isOtpVerified){
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => BottomNavigationScreen()),
-        );
-      }else{
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => UserSelectionScreen()),
-        );
-      }
-
-
-    } else if (userRole == "delivery_boy") {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => DeliveryBoyDashboardScreen()),
-      );
-
-    } else {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => UserSelectionScreen()),
-      );
-    }
-
-
-
-
+  void _navigateTo(Widget screen) {
+    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => screen));
   }
 
   @override
@@ -122,15 +60,6 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: AppColors.whiteColor,
       body: Stack(
         children: [
-          /// ✅ **Background Image Full-Screen**
-          // Positioned.fill(
-          //   child: Image.asset(
-          //     "assets/images/splash_bg.png",
-          //     fit: BoxFit.cover, // ✅ **Full-screen background**
-          //   ),
-          // ),
-
-          /// ✅ **Logo Center Mein**
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -142,14 +71,6 @@ class _SplashScreenState extends State<SplashScreen> {
                   height: ResponsiveHelper.containerWidth(context, 40),
                 ),
               ),
-              // Text(
-              //   "Shanya Scans",
-              //   style: AppTextStyles.heading1(
-              //     context,
-              //     overrideStyle:
-              //     TextStyle(fontSize: ResponsiveHelper.fontSize(context, 20)),
-              //   ),
-              // ),
             ],
           ),
         ],

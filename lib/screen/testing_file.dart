@@ -1,310 +1,133 @@
 // import 'package:flutter/material.dart';
-// import 'package:flutter/services.dart';
-// import 'package:healthians/base_widgets/loading_indicator.dart';
-// import 'package:healthians/deliveryBoy/controller/DeliveryOrdersProvider.dart';
-// import 'package:healthians/ui_helper/app_colors.dart';
-// import 'package:provider/provider.dart';
-// import '../../ui_helper/app_text_styles.dart';
-// import '../../ui_helper/responsive_helper.dart';
-// import '../../ui_helper/storage_helper.dart';
-// import '../../util/date_formate.dart';
 //
-// class DeliveryBoyOrderDetailScreen extends StatefulWidget {
-//   final String orderId;
-//
-//   const DeliveryBoyOrderDetailScreen({Key? key, required this.orderId})
-//       : super(key: key);
-//
+// class DeliveryDashboardScreen extends StatefulWidget {
 //   @override
-//   _DeliveryBoyOrderDetailScreenState createState() =>
-//       _DeliveryBoyOrderDetailScreenState();
+//   State<DeliveryDashboardScreen> createState() => _DeliveryDashboardScreenState();
 // }
 //
-// class _DeliveryBoyOrderDetailScreenState
-//     extends State<DeliveryBoyOrderDetailScreen> {
-//   @override
-//   void initState() {
-//     super.initState();
-//     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-//       statusBarColor: AppColors.deliveryPrimary,
-//       statusBarIconBrightness: Brightness.light,
-//     ));
-//     Future.microtask(() {
-//       final provider =
-//       Provider.of<DeliveryOrdersProvider>(context, listen: false);
-//       provider.fetchDeliveryBoyOrderDetails(widget.orderId);
-//     });
-//   }
-//
-//   @override
-//   void dispose() {
-//     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-//       statusBarColor: AppColors.deliveryPrimary,
-//       statusBarIconBrightness: Brightness.light,
-//     ));
-//     super.dispose();
-//   }
+// class _DeliveryDashboardScreenState extends State<DeliveryDashboardScreen> {
+//   bool isOnline = true;
 //
 //   @override
 //   Widget build(BuildContext context) {
-//     Future.microtask(() {
-//       SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-//         statusBarColor: AppColors.deliveryPrimary,
-//         statusBarIconBrightness: Brightness.light, // Ensure light icons
-//       ));
-//     });
-//
-//     final provider = Provider.of<DeliveryOrdersProvider>(context);
-//     final orderDetail = provider.orderDetail;
-//
 //     return Scaffold(
 //       appBar: AppBar(
-//         iconTheme: IconThemeData(
-//           color: Colors.white, // Change this to your desired color
-//         ),
-//         title: Text("Order Details",style: TextStyle(color: Colors.white),),
-//         backgroundColor: AppColors.deliveryPrimary,
+//         title: Text("Dashboard"),
+//         leading: Icon(Icons.menu),
+//         actions: [
+//           IconButton(
+//             icon: Icon(Icons.notifications_none),
+//             onPressed: () {},
+//           ),
+//         ],
 //       ),
-//       body: provider.isLoading
-//           ? Center(child: loadingIndicator(color: AppColors.deliveryPrimary))
-//           : provider.errorMessage.isNotEmpty
-//           ? Center(child: Text(provider.errorMessage))
-//           : orderDetail == null
-//           ? Center(child: Text("No order details found"))
-//           : SingleChildScrollView(
-//         padding: EdgeInsets.all(16.0),
-//         child: Card(
-//           color: Colors.white,
-//           shape: RoundedRectangleBorder( borderRadius: BorderRadius.circular(12), ),
-//           elevation: 4,
-//           child: Padding(
-//             padding: const EdgeInsets.all(16.0),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 _buildInfoRow("Order Name",
-//                     orderDetail.data!.orderName.toString()),
-//                 _buildInfoRow("Status",
-//                     orderDetail.data!.bookingStatus.toString(),
-//                     status: true),
-//                 _buildInfoRow("Patient Name",
-//                     orderDetail.data!.patientName.toString()),
-//                 _buildInfoRow(
-//                     "Date",
-//                     DateUtil.formatISODate(orderDetail
-//                         .data!.bookingDate
-//                         .toString())),
-//                 _buildInfoRow(
-//                     "Time",
-//                     DateUtil.formatISOTime(orderDetail
-//                         .data!.bookingTime
-//                         .toString())),
-//                 _buildInfoRow(
-//                     "Address",
-//                     DateUtil.formatISOTime(orderDetail
-//                         .data!.bookingTime
-//                         .toString())),
-//
-//                 _buildInfoRow(
-//                     "Report Status",
-//                     orderDetail.data!.reportStatus == "not ready"
-//                         ? "Not Ready"
-//                         : "Pending"),
-//                 _buildInfoRow("Total Price",
-//                     "₹ ${orderDetail.data!.orderPrice}",
-//                     price: true),
-//                 SizedBox(height: 16),
-//                 Row(
-//                   mainAxisAlignment:
-//                   MainAxisAlignment.spaceBetween,
+//       body: SingleChildScrollView(
+//         padding: EdgeInsets.all(16),
+//         child: Column(
+//           children: [
+//             /// Profile Card
+//             Card(
+//               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+//               child: Padding(
+//                 padding: const EdgeInsets.all(16),
+//                 child: Row(
 //                   children: [
-//                     ElevatedButton.icon(
-//                       onPressed: () {
-//
-//                         StorageHelper().setUserOrderId(orderDetail.data!.sId.toString());
-//                         StorageHelper().setUserLat(double.parse(orderDetail.data!.lat.toString()));
-//                         StorageHelper().setUserLong(double.parse(orderDetail.data!.lng.toString()));
-//
-//                         // Start live tracking
-//                         Navigator.push(
-//                           context,
-//                           MaterialPageRoute(
-//                             builder: (context) => SalesLiveTrackingScreen(),
-//                           ),
-//                         );
-//
-//                         /// Stop tracking (if needed)
-//                         //    ConfigUtils().stopTracking();
-//
-//
-//                       },
-//                       icon: Icon(Icons.call, color: Colors.white),
-//                       label: Text(
-//                         "${orderDetail.data!.userId?.phoneNumber ?? "N/A"}",
-//                         style: AppTextStyles.heading1(
-//                           context,
-//                           overrideStyle: TextStyle(
-//                             color: Colors.white,
-//                             fontSize: ResponsiveHelper.fontSize(
-//                                 context, 14),
-//                           ),
-//                         ),
-//                       ),
-//                       style: ElevatedButton.styleFrom(
-//                           backgroundColor: Colors.green),
-//                     ),
-//                     StatefulBuilder(
-//                       builder: (context, setState) {
-//                         bool isUpdatingStatus = false; // Local state for button loader
-//
-//                         return ElevatedButton.icon(
-//                           onPressed: () async {
-//                             if (orderDetail.data != null) {
-//                               String currentStatus = orderDetail.data!.bookingStatus ?? "";
-//                               String newStatus = "";
-//
-//                               if (currentStatus == "confirmed") {
-//                                 newStatus = "ongoing";
-//                               } else if (currentStatus == "ongoing") {
-//                                 newStatus = "completed";
-//                               } else {
-//                                 return; // Do nothing if already completed
-//                               }
-//
-//                               // Show loader on button
-//                               setState(() {
-//                                 isUpdatingStatus = true;
-//                               });
-//
-//                               // Call API to update the status
-//                               bool success = await Provider.of<DeliveryOrdersProvider>(context, listen: false)
-//                                   .changeOrderStatus(newStatus,widget.orderId);
-//
-//                               if (success) {
-//                                 // Fetch updated order details only for the button state
-//                                 await Provider.of<DeliveryOrdersProvider>(context, listen: false)
-//                                     .fetchDeliveryBoyOrderDetails(widget.orderId);
-//
-//                                 // Update only button status
-//                                 setState(() {
-//                                   orderDetail.data!.bookingStatus = newStatus;
-//                                 });
-//                               }
-//
-//                               // Hide loader after API call
-//                               setState(() {
-//                                 isUpdatingStatus = false;
-//                               });
-//                             }
-//                           },
-//                           icon: isUpdatingStatus
-//                               ? SizedBox(
-//                             width: 20,
-//                             height: 20,
-//                             child: CircularProgressIndicator(
-//                               color: Colors.white,
-//                               strokeWidth: 2,
-//                             ),
-//                           )
-//                               : Icon(Icons.navigation, color: Colors.white),
-//                           label: Text(
-//                             orderDetail.data!.bookingStatus == "confirmed"
-//                                 ? "Pending"
-//                                 : orderDetail.data!.bookingStatus == "ongoing"
-//                                 ? "Ongoing"
-//                                 : orderDetail.data!.bookingStatus == "completed"
-//                                 ? "Completed"
-//                                 : "",
-//                             style: AppTextStyles.heading1(
-//                               context,
-//                               overrideStyle: TextStyle(
-//                                 color: Colors.white,
-//                                 fontSize: ResponsiveHelper.fontSize(context, 14),
+//                     Expanded(
+//                       child: Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           Text("John Doe", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+//                           SizedBox(height: 4),
+//                           Text("johndoe@webkul.com", style: TextStyle(color: Colors.grey[700])),
+//                           SizedBox(height: 2),
+//                           Text("+919876543210", style: TextStyle(color: Colors.grey[700])),
+//                           SizedBox(height: 12),
+//                           Row(
+//                             children: [
+//                               Text("Your Presence Online", style: TextStyle(fontSize: 14)),
+//                               Spacer(),
+//                               Switch(
+//                                 value: isOnline,
+//                                 onChanged: (val) {
+//                                   setState(() {
+//                                     isOnline = val;
+//                                   });
+//                                 },
+//                                 activeColor: Colors.green,
 //                               ),
-//                             ),
+//                             ],
 //                           ),
-//                           style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-//                         );
-//                       },
+//                         ],
+//                       ),
 //                     ),
-//
-//
+//                     Image.asset(
+//                       'assets/images/delivery.png',
+//                       height: 60,
+//                       width: 60,
+//                     )
 //                   ],
-//                 )
+//                 ),
+//               ),
+//             ),
+//             SizedBox(height: 20),
+//
+//             /// Menu Options
+//             _buildMenuItem("Accept Orders", Icons.arrow_forward_ios),
+//             _buildMenuItem("Pending Orders", Icons.access_time),
+//             _buildMenuItem("Completed Orders", Icons.check_circle_outline),
+//             SizedBox(height: 20),
+//
+//             /// Summary Cards
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               children: [
+//                 _buildSummaryCard("\$16.0", "Due Amount", Colors.red.shade100),
+//                 _buildSummaryCard("231", "Orders Delivered", Colors.green.shade100),
+//                 _buildSummaryCard("\$118.0", "Total Earning", Colors.yellow.shade100),
 //               ],
 //             ),
-//           ),
+//           ],
 //         ),
 //       ),
 //     );
 //   }
 //
-//   Widget _buildInfoRow(String title, String value,
-//       {bool status = false, bool price = false}) {
-//     return Padding(
-//       padding: const EdgeInsets.symmetric(vertical: 6.0),
+//   Widget _buildMenuItem(String title, IconData icon) {
+//     return Container(
+//       margin: EdgeInsets.only(bottom: 12),
+//       padding: EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(10),
+//         border: Border.all(color: Colors.grey.shade300),
+//       ),
 //       child: Row(
-//         mainAxisAlignment: MainAxisAlignment.spaceBetween,
 //         children: [
-//           Text(
-//             title,
-//             style: TextStyle(
-//                 fontSize: 14,
-//                 fontWeight: FontWeight.w500,
-//                 color: Colors.grey[700]),
-//           ),
-//           Container(
-//             padding: EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-//             decoration: status
-//                 ? BoxDecoration(
-//               color: _getStatusColor(value),
-//               borderRadius: BorderRadius.circular(6),
-//             )
-//                 : null,
-//             child: Text(
-//               value,
-//               style: TextStyle(
-//                 fontSize: 14,
-//                 fontWeight: price ? FontWeight.bold : FontWeight.w400,
-//                 color: status ? Colors.white : Colors.black,
-//               ),
-//             ),
-//           ),
+//           Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+//           Spacer(),
+//           Icon(icon, size: 18, color: Colors.black),
 //         ],
 //       ),
 //     );
 //   }
 //
-//   Widget _buildActionButtons() {
-//     return Row(
-//       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//       children: [
-//         ElevatedButton.icon(
-//           onPressed: () {},
-//           icon: Icon(Icons.call, color: Colors.white),
-//           label: Text("Call Customer"),
-//           style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+//   Widget _buildSummaryCard(String value, String label, Color bgColor) {
+//     return Expanded(
+//       child: Container(
+//         margin: EdgeInsets.symmetric(horizontal: 4),
+//         padding: EdgeInsets.all(12),
+//         decoration: BoxDecoration(
+//           color: bgColor,
+//           borderRadius: BorderRadius.circular(12),
 //         ),
-//         ElevatedButton.icon(
-//           onPressed: () {},
-//           icon: Icon(Icons.navigation, color: Colors.white),
-//           label: Text("Navigate"),
-//           style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
+//         child: Column(
+//           children: [
+//             Text(value, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+//             SizedBox(height: 4),
+//             Text(label, textAlign: TextAlign.center, style: TextStyle(fontSize: 12)),
+//           ],
 //         ),
-//       ],
+//       ),
 //     );
-//   }
-//
-//   Color _getStatusColor(String status) {
-//     switch (status.toLowerCase()) {
-//       case "pending":
-//         return Colors.orange;
-//       case "ongoing":
-//         return Colors.blue;
-//       case "delivered":
-//         return Colors.green;
-//       default:
-//         return Colors.grey;
-//     }
 //   }
 // }

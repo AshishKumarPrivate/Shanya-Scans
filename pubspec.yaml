@@ -1,4 +1,4 @@
-name: healthians
+name: shanya_scans
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: ^3.6.0
@@ -83,11 +83,14 @@ dev_dependencies:
 #  flutter_local_notifications: ^18.0.1
 
 flutter_native_splash:
-  color: "#FFFFFF"  # Change to your splash background color
-  image: assets/images/logo.png  # Your splash screen logo
+  color: "#ffffff" # Background color of splash (white or your app bg)
+  image: assets/images/logo.png # Path to your splash image
+  branding: null
   android: true
   ios: true
-  web : true
+  fullscreen: true
+  android_gravity: center # Image center aligned
+#  web : true
 
 flutter_launcher_icons:
   android: true
@@ -103,7 +106,7 @@ flutter_launcher_icons:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^5.0.0
+#  flutter_lints: ^5.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

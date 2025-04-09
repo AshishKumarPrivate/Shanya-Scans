@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/nav/nav_package/cell_nav_package_list_item.dart';
-import 'package:healthians/screen/nav/nav_package/nav_package_detail.dart';
+import 'package:shanya_scans/screen/nav/nav_package/cell_nav_package_list_item.dart';
+import 'package:shanya_scans/screen/nav/nav_package/nav_package_detail.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../../base_widgets/common/nav_common_app_bar.dart';
 import '../../base_widgets/common/rate_list_service_shimmer.dart';
 import '../../ui_helper/app_colors.dart';
+import '../../ui_helper/responsive_helper.dart';
 import '../packages/controller/health_package_list_api_provider.dart';
 
 class HealthPackageScreen extends StatefulWidget {
@@ -75,8 +77,14 @@ class _HealthPackageScreenState extends State<HealthPackageScreen> {
                       }
                       if (provider.errorMessage.isNotEmpty) {
                         return Center(
-                            child: Text(provider.errorMessage,
-                                style: TextStyle(color: Colors.red)));
+                          child: SizedBox(
+                            width: ResponsiveHelper.containerWidth( context, 50),
+                            height: ResponsiveHelper.containerWidth(context, 50),
+                            child: ImageLoaderUtil.assetImage("assets/images/img_error.jpg"),
+
+
+                          ),
+                        );
                       }
                       // final packageList =
                       //     provider.navPackageListlModel?.data ?? [];

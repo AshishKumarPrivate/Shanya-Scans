@@ -50,17 +50,17 @@ class ConfigUtils {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
 
-        print("Name: ${place.name}");
-        print("Street: ${place.street}");
-        print("SubLocality: ${place.subLocality}");
-        print("Locality: ${place.locality}");
-        print("SubAdministrativeArea: ${place.subAdministrativeArea}");
-        print("AdministrativeArea: ${place.administrativeArea}");
-        print("PostalCode: ${place.postalCode}");
-        print("Country: ${place.country}");
-        print("ISO Country Code: ${place.isoCountryCode}");
-        print("Thoroughfare: ${place.thoroughfare}");
-        print("SubThoroughfare: ${place.subThoroughfare}");
+        // print("Name: ${place.name}");
+        // print("Street: ${place.street}");
+        // print("SubLocality: ${place.subLocality}");
+        // print("Locality: ${place.locality}");
+        // print("SubAdministrativeArea: ${place.subAdministrativeArea}");
+        // print("AdministrativeArea: ${place.administrativeArea}");
+        // print("PostalCode: ${place.postalCode}");
+        // print("Country: ${place.country}");
+        // print("ISO Country Code: ${place.isoCountryCode}");
+        // print("Thoroughfare: ${place.thoroughfare}");
+        // print("SubThoroughfare: ${place.subThoroughfare}");
 
         return "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}";
         return "${place.street}, ${place.subLocality}, ${place.locality}, ${place.postalCode}, ${place.administrativeArea}, ${place.country}";
@@ -81,6 +81,8 @@ class ConfigUtils {
       context: navigatorKey.currentContext!, // Replace with your global navigator key
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
           title: const Text("Enable Location"),
           content: const Text("Location services are disabled. Please enable them in settings."),
           actions: [
@@ -105,29 +107,84 @@ class ConfigUtils {
 
 
   // Start Real-Time Location Tracking (Every 5 Seconds)
+  // void startTracking() async {
+  //
+  //   bool hasPermission = await _requestPermission();
+  //   if (!hasPermission) return;
+  //
+  //   LocationPermission permission = await Geolocator.checkPermission();
+  //   if (permission == LocationPermission.denied ||
+  //       permission == LocationPermission.deniedForever) {
+  //     permission = await Geolocator.requestPermission();
+  //     if (permission == LocationPermission.denied ||
+  //         permission == LocationPermission.deniedForever) {
+  //       print("❌ Location permission denied.");
+  //       return;
+  //     }
+  //   }
+  //
+  //
+  //
+  //   bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //   if (!serviceEnabled) {
+  //     print("⚠️ Location services are OFF. Prompting user...");
+  //     // Show dialog to turn on location
+  //     _showEnableLocationDialog();
+  //     // Wait and check again after user returns from settings
+  //     await Future.delayed(Duration(seconds: 5));
+  //     serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  //     if (!serviceEnabled) {
+  //       print("❌ Location services are still OFF.");
+  //       return;
+  //     }
+  //   }
+  //
+  //   // ✅ Get initial location immediately
+  //   try {
+  //     Position position = await Geolocator.getCurrentPosition(
+  //       desiredAccuracy: LocationAccuracy.high,
+  //     );
+  //     String address = await _getAddressFromLatLng(position.latitude, position.longitude);
+  //     _locationController.add({
+  //       "latitude": position.latitude,
+  //       "longitude": position.longitude,
+  //       "address": address,
+  //     });
+  //
+  //     print("✅ Initial Location: $address");
+  //   } catch (e) {
+  //     print("⚠️ Error Getting Initial Location: $e");
+  //   }
+  //
+  //   locationTimer = Timer.periodic(Duration(seconds: 5), (Timer t) async {
+  //     try {
+  //       Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+  //       String address = await _getAddressFromLatLng(position.latitude, position.longitude);
+  //       // Emit data to listeners
+  //       _locationController.add({
+  //         "latitude": position.latitude,
+  //         "longitude": position.longitude,
+  //         "address": address
+  //       });
+  //
+  //
+  //       print("📍 Live Location: Lat: ${position.latitude}, Lng: ${position.longitude} 🏠 Address: $address");
+  //       // print("🏠 Address: $address");
+  //     } catch (e) {
+  //       print("⚠️ Error Fetching Location: $e");
+  //     }
+  //   });
+  // }
+
+  // Stop Location Tracking
   void startTracking() async {
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied ||
-        permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        print("❌ Location permission denied.");
-        return;
-      }
-    }
-
-
     bool hasPermission = await _requestPermission();
     if (!hasPermission) return;
 
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       print("⚠️ Location services are OFF. Prompting user...");
-      // Show dialog to turn on location
       _showEnableLocationDialog();
-      // Wait and check again after user returns from settings
       await Future.delayed(Duration(seconds: 5));
       serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
@@ -136,15 +193,15 @@ class ConfigUtils {
       }
     }
 
-    // ✅ Get initial location immediately
+    // Get initial position
     try {
-      Position position = await Geolocator.getCurrentPosition(
+      Position initialPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      String address = await _getAddressFromLatLng(position.latitude, position.longitude);
+      String address = await _getAddressFromLatLng(initialPosition.latitude, initialPosition.longitude);
       _locationController.add({
-        "latitude": position.latitude,
-        "longitude": position.longitude,
+        "latitude": initialPosition.latitude,
+        "longitude": initialPosition.longitude,
         "address": address,
       });
 
@@ -153,27 +210,61 @@ class ConfigUtils {
       print("⚠️ Error Getting Initial Location: $e");
     }
 
-    locationTimer = Timer.periodic(Duration(seconds: 5), (Timer t) async {
+    // Stream for continuous updates
+    positionStream = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 1, // get update every 10 meters
+      ),
+    ).listen((Position position) async {
       try {
-        Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
         String address = await _getAddressFromLatLng(position.latitude, position.longitude);
-        // Emit data to listeners
         _locationController.add({
           "latitude": position.latitude,
           "longitude": position.longitude,
-          "address": address
+          "address": address,
         });
 
-
-        print("📍 Live Location: Lat: ${position.latitude}, Lng: ${position.longitude} 🏠 Address: $address");
-        // print("🏠 Address: $address");
+        print("📍 Live Location: Lat: ${position.latitude}, Lng: ${position.longitude} 🏠 $address");
       } catch (e) {
-        print("⚠️ Error Fetching Location: $e");
+        print("⚠️ Error in location stream: $e");
       }
     });
   }
+  // get location at once
 
-  // Stop Location Tracking
+  Future<Map<String, dynamic>> getSingleLocation() async {
+    bool hasPermission = await _requestPermission();
+    if (!hasPermission) return {};
+
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _showEnableLocationDialog();
+      await Future.delayed(Duration(seconds: 5));
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return {};
+      }
+    }
+
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      String address = await _getAddressFromLatLng(position.latitude, position.longitude);
+      return {
+        "latitude": position.latitude,
+        "longitude": position.longitude,
+        "address": address,
+      };
+    } catch (e) {
+      print("⚠️ Error getting single location: $e");
+      return {};
+    }
+  }
+
+
+
   void stopTracking() {
     locationTimer?.cancel();
     positionStream?.cancel();

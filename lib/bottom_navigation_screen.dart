@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:healthians/screen/fragments/package_screen.dart';
-import 'package:healthians/screen/fragments/home_screen.dart';
-import 'package:healthians/screen/fragments/profile_screen.dart';
-import 'package:healthians/screen/fragments/scan_screen.dart';
-import 'package:healthians/screen/fragments/nav_pathalogy_teest_screen.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
+import 'package:shanya_scans/screen/fragments/package_screen.dart';
+import 'package:shanya_scans/screen/fragments/home_screen.dart';
+import 'package:shanya_scans/screen/fragments/profile_screen.dart';
+import 'package:shanya_scans/screen/fragments/scan_screen.dart';
+import 'package:shanya_scans/screen/fragments/nav_pathalogy_teest_screen.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
 
 
 class BottomNavigationScreen extends StatefulWidget {

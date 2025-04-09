@@ -1,4 +1,4 @@
-package com.example.shanyascans
+package com.shanyascans.app
 
 import io.flutter.embedding.android.FlutterActivity
 

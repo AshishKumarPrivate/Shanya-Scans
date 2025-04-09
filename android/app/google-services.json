@@ -7,9 +7,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1000716877402:android:cf21d65a290314d4412263",
+        "mobilesdk_app_id": "1:1000716877402:android:1879d50dd081f57d412263",
         "android_client_info": {
-          "package_name": "com.example.shanyascans"
+          "package_name": "com.shanyascans.app"
         }
       },
       "oauth_client": [],

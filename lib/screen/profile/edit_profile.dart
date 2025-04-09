@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
-import 'package:healthians/base_widgets/custom_rounded_container.dart';
-import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/ui_helper/app_text_styles.dart';
+import 'package:shanya_scans/base_widgets/custom_rounded_container.dart';
+import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../../base_widgets/custom_text_field.dart';

@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/common/rate_list_service_shimmer.dart';
-import 'package:healthians/screen/service/model/ServiceDetailRateListModel.dart';
-import 'package:healthians/screen/service/screen/rate_list__detail.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/base_widgets/solid_rounded_button.dart';
-import 'package:healthians/util/StringUtils.dart';
+import 'package:shanya_scans/base_widgets/common/rate_list_service_shimmer.dart';
+import 'package:shanya_scans/screen/service/model/ServiceDetailRateListModel.dart';
+import 'package:shanya_scans/screen/service/screen/rate_list__detail.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/base_widgets/solid_rounded_button.dart';
+import 'package:shanya_scans/util/StringUtils.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
@@ -92,9 +93,8 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
       child: SizedBox(
         width: ResponsiveHelper.containerWidth(context, 50),
         height: ResponsiveHelper.containerWidth(context, 50),
-        child: Image.asset(
+        child: ImageLoaderUtil.assetImage(
           "assets/images/img_error.jpg",
-          fit: BoxFit.cover,
         ),
       ),
     );
@@ -106,9 +106,8 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
       child: SizedBox(
         width: ResponsiveHelper.containerWidth(context, 50),
         height: ResponsiveHelper.containerWidth(context, 50),
-        child: Image.asset(
+        child:ImageLoaderUtil.assetImage(
           "assets/images/img_error.jpg",
-          fit: BoxFit.cover,
         ),
       ),
     );

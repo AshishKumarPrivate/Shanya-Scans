@@ -2,11 +2,11 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/screen/order/model/MyOrderHistoryListModel.dart';
-import 'package:healthians/screen/order/model/OrderItem.dart';
-import 'package:healthians/screen/order/screen/OrderSuccessScreen.dart';
-import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:shanya_scans/network_manager/repository.dart';
+import 'package:shanya_scans/screen/order/model/MyOrderHistoryListModel.dart';
+import 'package:shanya_scans/screen/order/model/OrderItem.dart';
+import 'package:shanya_scans/screen/order/screen/OrderSuccessScreen.dart';
+import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../network_manager/api_error_handler.dart';

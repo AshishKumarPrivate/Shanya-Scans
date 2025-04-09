@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/order/model/OrderItem.dart';
-import 'package:healthians/ui_helper/snack_bar.dart';
-import 'package:healthians/util/StringUtils.dart';
+import 'package:shanya_scans/screen/order/model/OrderItem.dart';
+import 'package:shanya_scans/ui_helper/snack_bar.dart';
+import 'package:shanya_scans/util/StringUtils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../network_manager/api_error_handler.dart';

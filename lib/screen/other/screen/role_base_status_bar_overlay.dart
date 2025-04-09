@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
 
 import '../../../ui_helper/storage_helper.dart';
 
@@ -25,7 +25,7 @@ class RoleBasedOverlay extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-            statusBarColor: snapshot.data ?? Color(0xFF58a9c7),
+            statusBarColor: snapshot.data ?? AppColors.primary,
             statusBarIconBrightness: Brightness.light,
           ));
         }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
 
 class ProfileListTile extends StatelessWidget {
   final String title;

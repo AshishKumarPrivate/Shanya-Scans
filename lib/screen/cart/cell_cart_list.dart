@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/cart/widget/BottomSheetWithCartPatientList.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/screen/cart/widget/BottomSheetWithCartPatientList.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 
 import '../../base_widgets/custom_rounded_container.dart';
 import '../../ui_helper/app_colors.dart';

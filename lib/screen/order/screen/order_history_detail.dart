@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:healthians/util/StringUtils.dart';
+import 'package:shanya_scans/util/StringUtils.dart';
 import 'package:provider/provider.dart';
 
 import '../../../base_widgets/loading_indicator.dart';

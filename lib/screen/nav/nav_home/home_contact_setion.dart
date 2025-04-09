@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
- import 'package:healthians/base_widgets/custom_rounded_container.dart';
-import 'package:healthians/util/phone_call_open.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+ import 'package:shanya_scans/base_widgets/custom_rounded_container.dart';
+import 'package:shanya_scans/util/phone_call_open.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../util/whatsapp_open.dart';
@@ -17,28 +17,6 @@ class HomeContactSection extends StatelessWidget {
       child: Column(
         // mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          // Row(
-          //   children: [
-          //     Spacer(),
-          //     Divider(
-          //       color: Colors.black,
-          //       thickness: 1,
-          //       height: 1,
-          //     ),
-          //     Text(
-          //       "Contact Us Via",
-          //       style: AppTextStyles.bodyText1(context,overrideStyle: new TextStyle(
-          //         fontSize: 14
-          //       ))
-          //     ),
-          //     Spacer(),
-          //     Divider(
-          //       color: Colors.black,
-          //       thickness: 1,
-          //       height: 1,
-          //     ),
-          //   ],
-          // ),
           Text(
               "Contact Us Via",
               style: AppTextStyles.bodyText1(context,overrideStyle: new TextStyle(
@@ -82,7 +60,7 @@ class HomeContactSection extends StatelessWidget {
                             "assets/images/whatsapp.png",
                             width: 20,
                             height: 20,
-                            color: Colors.green,
+                            color: AppColors.primary,
                           ),
                           const SizedBox(width: 5),
                           Text(
@@ -102,7 +80,7 @@ class HomeContactSection extends StatelessWidget {
                 Expanded(
                   child: CustomRoundedContainer(
                     onTap: (){
-                      makePhoneCall(context);
+                      PhoneCallHelper.makePhoneCall(context);
                     },
                     borderRadius: 10,
                     borderColor: AppColors.txtGreyColor,
@@ -114,7 +92,7 @@ class HomeContactSection extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.call_rounded, size: 20),
+                          Icon(Icons.call_rounded, size: 20,color: AppColors.primary,),
                           const SizedBox(width: 5),
                           Text(
                             "Call",

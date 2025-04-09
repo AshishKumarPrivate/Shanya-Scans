@@ -1,14 +1,16 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/order/screen/order_history_detail.dart';
+import 'package:shanya_scans/screen/order/screen/order_history_detail.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 import '../../../base_widgets/common/default_common_app_bar.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../ui_helper/responsive_helper.dart';
 import '../../../util/date_formate.dart';
 import '../controller/order_provider.dart';
 import '../model/MyOrderHistoryListModel.dart';
-import 'package:healthians/base_widgets/loading_indicator.dart';
+import 'package:shanya_scans/base_widgets/loading_indicator.dart';
 
 class OrderListScreen extends StatefulWidget {
   @override
@@ -20,7 +22,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final orderProvider = Provider.of<OrderApiProvider>(context, listen: false);
+      final orderProvider =
+          Provider.of<OrderApiProvider>(context, listen: false);
       orderProvider.getOrderHistory(context);
     });
   }
@@ -29,22 +32,39 @@ class _OrderListScreenState extends State<OrderListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: DefaultCommonAppBar(activityName: "Your Orders"),
+      appBar: DefaultCommonAppBar(
+        activityName: "Your Orders",
+        backgroundColor: AppColors.primary,
+      ),
       body: Consumer<OrderApiProvider>(
         builder: (context, orderProvider, child) {
           if (orderProvider.isLoading) {
             return loadingIndicator();
           } else if (orderProvider.errorMessage.isNotEmpty) {
             return Center(
-                child: Text(orderProvider.errorMessage,
-                    style: TextStyle(color: Colors.red)));
+              child: SizedBox(
+                width: ResponsiveHelper.containerWidth(context, 50),
+                height: ResponsiveHelper.containerWidth(context, 50),
+                child:ImageLoaderUtil.assetImage(
+                  "assets/images/img_error.jpg",
+                ),
+              ),
+            );
           } else {
-            final orderHistoryList = orderProvider.myOrderHistoryListModel?.data;
+            final orderHistoryList =
+                orderProvider.myOrderHistoryListModel?.data;
             if (orderHistoryList == null || orderHistoryList.isEmpty) {
               return Center(
-                child: Text("No orders found",
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: Text(
+                  "No Orders Found",
+                    style: AppTextStyles.bodyText1(
+                      context,
+                      overrideStyle: TextStyle(
+                        fontSize: ResponsiveHelper.fontSize(
+                            context, 16),
+                      ),
+                    ),
+                ),
               );
             }
 
@@ -89,15 +109,17 @@ class OrderCard extends StatelessWidget {
       padding: const EdgeInsets.only(top: 0.0, bottom: 0.0, left: 5, right: 5),
       child: Padding(
         padding: EdgeInsets.all(10),
-        child:  InkWell(
-          onTap: (){
+        child: InkWell(
+          onTap: () {
             print("Navigating to order history detail with ID: ${order.sId}");
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) =>  UserOrderHistoryDetailScreen(orderId: order.sId.toString(),)),
+              MaterialPageRoute(
+                  builder: (context) => UserOrderHistoryDetailScreen(
+                        orderId: order.sId.toString(),
+                      )),
               // MaterialPageRoute(builder: (context) =>  OrderDetailsPage(orderId: order.sId.toString(),)),
             );
-
           },
           child: Container(
             width: double.infinity,
@@ -126,8 +148,8 @@ class OrderCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           "${order.orderName}",
-                          style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold),
                           maxLines: 2, // Limits to 2 lines
                           overflow: TextOverflow
                               .ellipsis, // Adds "..." if text is too long
@@ -149,7 +171,8 @@ class OrderCard extends StatelessWidget {
                               context,
                               overrideStyle: TextStyle(
                                 color: Colors.black,
-                                fontSize: ResponsiveHelper.fontSize(context, 12),
+                                fontSize:
+                                    ResponsiveHelper.fontSize(context, 12),
                               ),
                             ),
                           ),
@@ -158,7 +181,8 @@ class OrderCard extends StatelessWidget {
                             style: AppTextStyles.bodyText1(
                               context,
                               overrideStyle: TextStyle(
-                                fontSize: ResponsiveHelper.fontSize(context, 12),
+                                fontSize:
+                                    ResponsiveHelper.fontSize(context, 12),
                               ),
                             ),
                           ),
@@ -186,7 +210,8 @@ class OrderCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           "${DateUtil.formatISODate(order.bookingDate.toString())}",
-                          style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                          style:
+                              TextStyle(fontSize: 13, color: Colors.grey[700]),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -201,7 +226,8 @@ class OrderCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           "${DateUtil.formatISOTime(order.bookingDate.toString())}",
-                          style: TextStyle(fontSize: 13, color: Colors.grey[700]),
+                          style:
+                              TextStyle(fontSize: 13, color: Colors.grey[700]),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -312,7 +338,6 @@ class OrderCard extends StatelessWidget {
     );
   }
 
-
   // Status Badge Design
   Widget _buildStatusBadge(String status) {
     Color badgeColor;
@@ -321,7 +346,7 @@ class OrderCard extends StatelessWidget {
         badgeColor = Colors.orange;
         break;
       case "ongoing":
-        badgeColor = Colors.blue;
+        badgeColor = AppColors.primary;
         break;
       case "completed":
         badgeColor = Colors.green;
@@ -345,13 +370,13 @@ class OrderCard extends StatelessWidget {
         //     ? "Completed"
         //     : "",
 
-        status== "confirmed"
+        status == "confirmed"
             ? "Confirmed"
             : status == "ongoing"
-            ? "Ongoing"
-            : status == "completed"
-            ? "Completed"
-            : "",
+                ? "Ongoing"
+                : status == "completed"
+                    ? "Completed"
+                    : "",
 
         style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
       ),

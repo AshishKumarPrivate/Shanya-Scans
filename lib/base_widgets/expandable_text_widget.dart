@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
 
 class ExpandableTextWidget extends StatefulWidget {
   final String text;
@@ -52,6 +52,7 @@ class _ExpandableTextWidgetState extends State<ExpandableTextWidget> {
 
     // Merge default styles with custom styles (if provided)
     final mergedStyles = {...defaultStyles, ...?widget.customStyles};
+    final cleanedHtml = widget.text.replaceAll(RegExp(r'<br\s*/?>', caseSensitive: false), '');
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,7 +60,7 @@ class _ExpandableTextWidgetState extends State<ExpandableTextWidget> {
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 0.0),
           child: Html(
-            data: widget.text,
+            data: cleanedHtml,
             style: mergedStyles, // Apply the merged styles
           ),
         ),

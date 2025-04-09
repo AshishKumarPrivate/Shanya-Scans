@@ -1,24 +1,24 @@
 import 'package:dio/dio.dart';
-import 'package:healthians/deliveryBoy/model/ChangeOrderStatusModelResponse.dart';
-import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderDetailModel.dart';
-import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderSummaryModelResponse.dart';
-import 'package:healthians/deliveryBoy/model/DeliveryBoyProfileSummaryModelResponse.dart';
-import 'package:healthians/deliveryBoy/model/DeliveryLoginModelResponse.dart';
-import 'package:healthians/screen/auth/model/LoginModel.dart';
-import 'package:healthians/screen/auth/model/UpdateProfileModel.dart';
-import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/model/FrequentlyPathalogyTagListModel.dart';
-import 'package:healthians/screen/nav/nav_home/health_concern/model/HealthConcernPacakageTagModel.dart';
-import 'package:healthians/screen/nav/nav_home/slider/mdel/HomeBanner1ModelResponse.dart';
-import 'package:healthians/screen/nav/nav_home/slider/mdel/HomeBanner2ModelResponse.dart';
-import 'package:healthians/screen/order/model/CreateOrder2ModelResponse.dart';
-import 'package:healthians/screen/order/model/MyOrderHistoryListModel.dart';
-import 'package:healthians/screen/packages/model/PackageListByTabIdModel.dart';
-import 'package:healthians/screen/packages/model/TopSellingPackagesListModel.dart';
-import 'package:healthians/screen/profile/model/enquiry_need_help_model.dart';
-import 'package:healthians/screen/profile/termsConditionPrivacyPollicy/terms_conditions_privacy_refund_policy_model.dart';
-import 'package:healthians/screen/service/model/HomeServiceDetailModel.dart';
-import 'package:healthians/screen/service/model/HomeServiceListModel.dart';
-import 'package:healthians/screen/service/model/ServiceDetailRateListModel.dart';
+import 'package:shanya_scans/deliveryBoy/model/ChangeOrderStatusModelResponse.dart';
+import 'package:shanya_scans/deliveryBoy/model/DeliveryBoyOrderDetailModel.dart';
+import 'package:shanya_scans/deliveryBoy/model/DeliveryBoyOrderSummaryModelResponse.dart';
+import 'package:shanya_scans/deliveryBoy/model/DeliveryBoyProfileSummaryModelResponse.dart';
+import 'package:shanya_scans/deliveryBoy/model/DeliveryLoginModelResponse.dart';
+import 'package:shanya_scans/screen/auth/model/LoginModel.dart';
+import 'package:shanya_scans/screen/auth/model/UpdateProfileModel.dart';
+import 'package:shanya_scans/screen/nav/nav_home/frquently_pathalogy_test/model/FrequentlyPathalogyTagListModel.dart';
+import 'package:shanya_scans/screen/nav/nav_home/health_concern/model/HealthConcernPacakageTagModel.dart';
+import 'package:shanya_scans/screen/nav/nav_home/slider/mdel/HomeBanner1ModelResponse.dart';
+import 'package:shanya_scans/screen/nav/nav_home/slider/mdel/HomeBanner2ModelResponse.dart';
+import 'package:shanya_scans/screen/order/model/CreateOrder2ModelResponse.dart';
+import 'package:shanya_scans/screen/order/model/MyOrderHistoryListModel.dart';
+import 'package:shanya_scans/screen/packages/model/PackageListByTabIdModel.dart';
+import 'package:shanya_scans/screen/packages/model/TopSellingPackagesListModel.dart';
+import 'package:shanya_scans/screen/profile/model/enquiry_need_help_model.dart';
+import 'package:shanya_scans/screen/profile/termsConditionPrivacyPollicy/terms_conditions_privacy_refund_policy_model.dart';
+import 'package:shanya_scans/screen/service/model/HomeServiceDetailModel.dart';
+import 'package:shanya_scans/screen/service/model/HomeServiceListModel.dart';
+import 'package:shanya_scans/screen/service/model/ServiceDetailRateListModel.dart';
 
 import '../deliveryBoy/model/DeliveryOrderLIstModel.dart';
 import '../screen/auth/model/CreateUser.dart';
@@ -66,7 +66,7 @@ class Repository {
 
   // ******************************  Shanya Scans API  **************************************
   Future<SignUpModel> userSignUp(Map<String, dynamic> requestBody) async {
-    // try {
+    try {
       print("📤 Sending Signup Request: $requestBody");
 
       Map<String, dynamic>? response = await _dioHelper.post(
@@ -78,28 +78,62 @@ class Repository {
         print("❌ API returned null response!");
         return SignUpModel(success: false, message: "No response from server");
       }
-
       print("✅ Signup API Response: $response");
 
       // ✅ Handle API returning `success: false`
-      if (response["success"] == false) {
-        String errorMessage = response["message"] ?? "User already exists!";
-        return SignUpModel(success: false, message: errorMessage);
-      }
+      // if (response["success"] == false) {
+      //   return SignUpModel(success: false, message: response["message"] ?? "Signup failed");
+      // }
 
+      if (response is Map<String, dynamic>) {
+        // 🟢 Response is in expected format
+        return SignUpModel.fromJson(response);
+      } else if (response is String) {
+        // 🔴 String error (like "Bad Request")
+        return SignUpModel(success: false, message: "response");
+      } else {
+        // 🔴 Unexpected format
+        return SignUpModel(success: false, message: "Unexpected error occurred.");
+      }
       // ✅ Convert API response into Model
       return SignUpModel.fromJson(response);
+    } catch (e) {
+
+      print("❌ Error parsing signup response: $e");
+      return SignUpModel(success: false, message: "Parsing failed: ${e.toString()}");
+
+    }
     // }
     // on DioException catch (e) {
-    //   if (e.response != null) {
-    //     print("❌ API Error: ${e.response?.data}");
-    //     String errorMessage =
-    //         e.response?.data["message"] ?? "Something went wrong";
+    //   final statusCode = e.response?.statusCode;
+    //   final responseData = e.response?.data;
     //
-    //     return SignUpModel(success: false, message: errorMessage);
+    //   print("❌ DioException caught: Status Code = $statusCode");
+    //   print("❌ DioException Data = $responseData");
+    //
+    //   if (statusCode == 400) {
+    //     return SignUpModel(success: false, message: "User already exists");
+    //   } else if (statusCode == 401) {
+    //     return SignUpModel(success: false, message: "Unauthorized access");
+    //   } else if (statusCode == 403) {
+    //     return SignUpModel(success: false, message: "Forbidden: Access denied");
+    //   } else if (statusCode == 404) {
+    //     return SignUpModel(success: false, message: "API endpoint not found");
+    //   } else if (statusCode == 409) {
+    //     return SignUpModel(success: false, message: "Conflict: Duplicate data");
+    //   } else if (statusCode == 500) {
+    //     return SignUpModel(success: false, message: "Server error. Please try again later");
     //   } else {
-    //     print("❌ Network Error: ${e.message}");
-    //     return SignUpModel(success: false, message: "No Internet Connection");
+    //     // Handle all other status codes and fallback cases
+    //     String fallbackMessage = "Something went wrong";
+    //
+    //     try {
+    //       if (responseData is Map && responseData.containsKey("message")) {
+    //         fallbackMessage = responseData["message"];
+    //       }
+    //     } catch (_) {}
+    //
+    //     return SignUpModel(success: false, message: fallbackMessage);
     //   }
     // } catch (e) {
     //   print("❌ Unexpected Error: $e");

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/auth/widget/login_form_widget.dart';
-import 'package:healthians/util/dimensions.dart';
+import 'package:shanya_scans/screen/auth/widget/login_form_widget.dart';
+import 'package:shanya_scans/util/dimensions.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../ui_helper/responsive_helper.dart';
 import '../../ui_helper/app_colors.dart';
@@ -22,6 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
       throw Exception('Could not launch $_url');
     }
   }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -84,33 +86,23 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              height: ResponsiveHelper.containerHeight(context, 15),
-              child:  Image.asset('assets/images/loginimage.png',width: ResponsiveHelper.containerWidth(context, 40),height:  ResponsiveHelper.containerWidth(context, 60),fit: BoxFit.fill,),
-
-              // PageView(
-              //   controller: _pageController,
-              //   onPageChanged: (int page) {
-              //     setState(() {
-              //       _currentPage = page;
-              //     });
-              //   },
-              //   children: [
-              //     Image.asset('assets/images/loginimage.png',width: 100,height: 100,),
-              //     // Image.asset('assets/images/user.png'),
-              //     // Image.asset('assets/images/user.png'),
-              //   ],
-              // ),
-            ),
+                height: ResponsiveHelper.containerHeight(context, 15),
+                child: ImageLoaderUtil.assetImage(
+                    'assets/images/loginimage.png',
+                    width: ResponsiveHelper.containerWidth(context, 40),
+                    height: ResponsiveHelper.containerWidth(context, 60))
+                ),
             ResponsiveHelper.sizeBoxHeightSpace(
                 context, Dimensions.sizeBoxVerticalSpace_2),
             Padding(
               padding: ResponsiveHelper.padding(
                   context, Dimensions.paddingHorizontalSmall_5, 0),
               child: Text(
-                "Join over 8 million satisfied users who trust us for accurate and reliable health tests",
+                "Join over 10000+ satisfied users who trust us for accurate and reliable health tests",
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  fontSize: ResponsiveHelper.fontSize(context, Dimensions.fontSize14),
+                  fontSize:
+                      ResponsiveHelper.fontSize(context, Dimensions.fontSize14),
                   fontWeight: FontWeight.w500,
                   color: Colors.black87,
                 ),
@@ -169,7 +161,8 @@ class _LoginScreenState extends State<LoginScreen> {
             },
             child: Container(
               width: ResponsiveHelper.containerWidth(context, 20),
-              child: Image.asset("assets/images/code_crafter_logo.png"),
+              child: ImageLoaderUtil.assetImage("assets/images/code_crafter_logo.png")
+
             ),
           ),
         ],

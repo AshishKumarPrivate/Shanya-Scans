@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/screen/packages/model/PackageListByTabIdModel.dart' as packageModel;
-import 'package:healthians/screen/packages/model/TopSellingPackagesListModel.dart';
+import 'package:shanya_scans/network_manager/repository.dart';
+import 'package:shanya_scans/screen/packages/model/PackageListByTabIdModel.dart' as packageModel;
+import 'package:shanya_scans/screen/packages/model/TopSellingPackagesListModel.dart';
 
 class HealthPacakgeListApiProvider with ChangeNotifier {
   final Repository _repository = Repository();

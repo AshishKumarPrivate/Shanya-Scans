@@ -1,46 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/splash/SplashScreen.dart';
 import 'package:provider/provider.dart';
 import '../controller/network_provider_controller.dart';
 
-class NoInternetWidget extends StatelessWidget {
+class NoInternetOverlay extends StatelessWidget {
+  final Widget child;
+
+  const NoInternetOverlay({required this.child});
+
   @override
   Widget build(BuildContext context) {
-    return Consumer<NetworkProvider>(
-      builder: (context, networkProvider, child) {
-        if (networkProvider.isConnected) {
-          return SizedBox(); // Hide if internet is available
-        }
-        return Container(
-          width: double.infinity,
-          color: Colors.red,
-          padding: EdgeInsets.all(12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.wifi_off, size: 250), // Show No Internet Image
-              // Image.asset("assets/images/no_internet.png", width: 250), // Show No Internet Image
-              SizedBox(height: 20),
-              Text(
-                "No Internet Connection!",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    final isConnected = Provider.of<NetworkProvider>(context).isConnected;
+
+    return Stack(
+      children: [
+        child,
+        if (!isConnected)
+          Positioned.fill(
+            child: Container(
+              color: Colors.white.withOpacity(0.95),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.wifi_off, size: 70, color: Colors.red),
+                  const SizedBox(height: 20),
+                  const Text(
+                    'No Internet Connection',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Provider.of<NetworkProvider>(context, listen: false)
+                          .checkConnection(context);
+                    },
+                    icon: Icon(Icons.refresh),
+                    label: Text("Reconnect"),
+                  ),
+                ],
               ),
-              SizedBox(height: 10),
-              Text("Please check your network and try again."),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () {
-                  bool isConnected = Provider.of<NetworkProvider>(context, listen: false).isConnected;
-                  if (isConnected) {
-                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => SplashScreen()));
-                  }
-                },
-                child: Text("Retry"),
-              ),
-            ],
-          ),
-        );
-      },
+            ),
+          )
+      ],
     );
   }
 }

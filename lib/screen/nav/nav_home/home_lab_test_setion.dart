@@ -1,10 +1,11 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/controller/frequently_pathalogy_test_provider.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
+import 'package:shanya_scans/screen/nav/nav_home/frquently_pathalogy_test/controller/frequently_pathalogy_test_provider.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/app_text_styles.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../../../base_widgets/common/frequently_lab_test_shimmer.dart';
 import '../nav_lab/nav_pathalogy_test_detail.dart';
@@ -39,8 +40,13 @@ class _HomeLabTestSectionState extends State<HomeLabTestSection> {
           return FrequentlyLabTestShimmer();
         } else if (provider.errorMessage.isNotEmpty) {
           return Center(
-              child: Text(provider.errorMessage,
-                  style: TextStyle(color: Colors.red)));
+            child: SizedBox(
+              width: ResponsiveHelper.containerWidth( context, 50),
+              height: ResponsiveHelper.containerWidth(context, 50),
+              child: ImageLoaderUtil.assetImage(  "assets/images/img_error.jpg")
+
+            ),
+          );
         }
 
         final pathologyTestList =

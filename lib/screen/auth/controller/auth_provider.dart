@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/screen/auth/otp_screen.dart';
-import 'package:healthians/screen/other/screen/user_selection_screen.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:shanya_scans/network_manager/repository.dart';
+import 'package:shanya_scans/screen/auth/otp_screen.dart';
+import 'package:shanya_scans/screen/other/screen/user_selection_screen.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import '../../../bottom_navigation_screen.dart';
 import '../../../network_manager/api_error_handler.dart';
 import '../../../ui_helper/snack_bar.dart';
@@ -52,27 +52,33 @@ class AuthApiProvider with ChangeNotifier {
       }
     } on DioException catch (e) {
       print("❌ DioException occurred: $e");
-      String errorMessage = ApiErrorHandler.handleError(e);
+      int? statusCode = e.response?.statusCode;
+
+      String message = "Something went wrong";
+      if (statusCode == 400) {
+        message = "User already exists";
+      } else if (statusCode == 500) {
+        message = "Server error. Please try again later.";
+      } else {
+        message = ApiErrorHandler.handleError(e);
+      }
+
       showCustomSnackbarHelper.showSnackbar(
         context: context,
-        message: errorMessage,
+        message: message,
         backgroundColor: Colors.red,
         duration: Duration(seconds: 3),
       );
     } catch (e) {
-      // print("Stacktrace: $stacktrace");
-      // showCustomSnackbarHelper.showSnackbar(
-      //   context: context,
-      //   message: "Account already exists! Try logging in",
-      //   backgroundColor: Colors.red,
-      //   duration: Duration(seconds: 3),
-      // );
-      _handleUnexpectedErrors(context, e, "Account already exists! Try logging in");
-    }
-    // finally {
-    //   print("finalyy block ");
+      print("❌ Unexpected error occurred: $e");
+      _handleUnexpectedErrors(
+        context,
+        e,
+        "User Already Exist! ",
+      );
+    } finally {
       _setLoading(false);
-    // }
+    }
   }
 
   Future<bool> getOtp(BuildContext context, String email, String otp) async {
@@ -84,10 +90,10 @@ class AuthApiProvider with ChangeNotifier {
       if (response.success == true) {
         await StorageHelper().setOtpVerified(true);
         await _storeUserData(response);
-        Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
+        Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
         return true;
       } else {
+        await StorageHelper().setOtpVerified(false);
         showCustomSnackbarHelper.showSnackbar(
           context: context,
           message: "Invalid OTP!",
@@ -102,6 +108,7 @@ class AuthApiProvider with ChangeNotifier {
     } finally {
       _setLoading(false);
     }
+    await StorageHelper().setOtpVerified(false);
     return false;
   }
 
@@ -169,6 +176,11 @@ class AuthApiProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // ✅ Reset method
+  void resetForgotPassword() {
+    _isOtpSent = false;
+    notifyListeners();
+  }
 
   Future<bool> forgetPassword(BuildContext context, String email) async {
     _setLoading(true);
@@ -264,8 +276,7 @@ class AuthApiProvider with ChangeNotifier {
       StorageHelper().setEmail(response.data!.email.toString());
       StorageHelper().setPassword(response.data!.password.toString());
       StorageHelper().setPhoneNumber(response.data!.phoneNumber.toString());
-      StorageHelper()
-          .setWhatsappNumber(response.data!.whatsappNumber.toString());
+      StorageHelper() .setWhatsappNumber(response.data!.whatsappNumber.toString());
       await StorageHelper().saveOrderListFromApi(response);
     } else {
       await StorageHelper().clearOrderList();

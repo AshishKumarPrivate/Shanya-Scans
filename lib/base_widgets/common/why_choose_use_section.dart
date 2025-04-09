@@ -52,7 +52,7 @@ class WhyChooseSection extends StatelessWidget {
                   children: [
                     Icon(
                       item.icon,
-                      color: AppColors.pinkColor,
+                      color: AppColors.yellowColor,
                       size: 30,
                     ),
                     ResponsiveHelper.sizeboxWidthlSpace(context, 1),

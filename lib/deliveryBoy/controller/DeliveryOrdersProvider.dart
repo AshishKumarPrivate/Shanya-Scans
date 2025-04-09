@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:healthians/deliveryBoy/model/ChangeOrderStatusModelResponse.dart';
-import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderDetailModel.dart';
-import 'package:healthians/deliveryBoy/model/DeliveryBoyOrderSummaryModelResponse.dart';
-import 'package:healthians/deliveryBoy/model/DeliveryBoyProfileSummaryModelResponse.dart';
-import 'package:healthians/deliveryBoy/model/DeliveryOrderLIstModel.dart'
+import 'package:shanya_scans/deliveryBoy/model/ChangeOrderStatusModelResponse.dart';
+import 'package:shanya_scans/deliveryBoy/model/DeliveryBoyOrderDetailModel.dart';
+import 'package:shanya_scans/deliveryBoy/model/DeliveryBoyOrderSummaryModelResponse.dart';
+import 'package:shanya_scans/deliveryBoy/model/DeliveryBoyProfileSummaryModelResponse.dart';
+import 'package:shanya_scans/deliveryBoy/model/DeliveryOrderLIstModel.dart'
     as deliveryBoyOrder;
-import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import '../../network_manager/api_error_handler.dart';
 import '../../network_manager/repository.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;

@@ -1,11 +1,11 @@
 
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/nav/nav_home/home_ending_setion.dart';
-import 'package:healthians/screen/nav/nav_home/home_first_service_setion.dart';
-import 'package:healthians/screen/nav/nav_home/home_slider_setion.dart';
-import 'package:healthians/screen/nav/nav_home/home_toolbar_setion.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:shanya_scans/screen/nav/nav_home/home_ending_setion.dart';
+import 'package:shanya_scans/screen/nav/nav_home/home_first_service_setion.dart';
+import 'package:shanya_scans/screen/nav/nav_home/home_slider_setion.dart';
+import 'package:shanya_scans/screen/nav/nav_home/home_toolbar_setion.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../../base_widgets/common/custom_offer_dialog_popup.dart';
@@ -31,23 +31,40 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool _isInternetAvailable = true;
+
+  void _loadCachedData() {
+    Provider.of<ServiceApiProvider>(context, listen: false).loadCachedPackages();
+    Provider.of<HomeBannerApiProvider>(context, listen: false).loadCachedBanners();
+    Provider.of<HealthConcernApiProvider>(context, listen: false).loadCachedHomeHealthConcern();
+    Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false).loadCachedFrequentlyHomeLabTest();
+  }
+
+
+  Future<void> _initializeNetworkAndLoadData() async {
+    final networkProvider = Provider.of<NetworkProvider>(context, listen: false);
+    // Initialize connectivity listener
+    networkProvider.initializeConnectivityListener(context);
+    // Await the async connection check
+    await networkProvider.checkConnection(context);
+    // Now check the updated connection state
+    final isConnected = networkProvider.isConnected;
+    if (isConnected) {
+      _loadCachedData();
+    }
+    setState(() {
+      _isInternetAvailable = isConnected;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
     // _checkAndShowDialog();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-
-      Provider.of<ServiceApiProvider>(context, listen: false).loadCachedPackages();
-      Provider.of<HomeBannerApiProvider>(context, listen: false)
-          .loadCachedBanners();
-      Provider.of<HealthConcernApiProvider>(context, listen: false)
-          .getHealthConcernTagList(context);
-      Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false)
-          .loadCachedFrequentlyHomeLabTest();
-      Provider.of<HealthConcernApiProvider>(context, listen: false)
-          .getHealthConcernTagList(context);
+      _initializeNetworkAndLoadData();
     });
+
 
     // Provider.of<ServiceApiProvider>(context, listen: false).loadCachedPackages();
     // Provider.of<HomeBannerApiProvider>(context, listen: false)
@@ -60,52 +77,30 @@ class _HomeScreenState extends State<HomeScreen> {
     //     .getHealthConcernTagList(context);
   }
 
-  Future<void> _checkAndShowDialog() async {
-    bool isDialogShown = StorageHelper().getDialogShown();
-    if (!isDialogShown) {
-      if (mounted) {
-        await Future.delayed(
-            Duration(milliseconds: 500)); // Delay to allow UI rendering
-        showSpecialOfferDialog(
-            context); // Show dialog only if it hasn't been shown
-        StorageHelper().setDialogShown(true); // Mark dialog as shown
-      }
-    }
-    // await Future.delayed(Duration(milliseconds: 500)); // Small delay
-    // showSpecialOfferDialog(context); // Show dialog only if it hasn't been shown
-  }
-
   Future<void> _refreshData() async {
+    final isConnected = Provider.of<NetworkProvider>(context, listen: false).isConnected;
+    if (!isConnected) return;
+
     await Provider.of<HomeBannerApiProvider>(context, listen: false) .getHomeBanner1List();
     await Provider.of<ServiceApiProvider>(context, listen: false).fetchScansList();
-    await Provider.of<HealthConcernApiProvider>(context, listen: false).getHealthConcernTagList(context);
-    await Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false).getFrequentlyLabTestList();
-    await Provider.of<HealthConcernApiProvider>(context, listen: false) .getHealthConcernTagList(context);
+    await Provider.of<HealthConcernApiProvider>(context, listen: false).loadCachedHomeHealthConcern(forceRefresh: true);
+    await Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false).loadCachedFrequentlyHomeLabTest(forceRefresh: true);
 
 
     print("refresh data is loaded");
 
   }
-  // Method to check the network connection using NetworkProvider
-  Future<void> _checkConnection() async {
-    // Access the network provider to check connectivity
-    bool isConnected = Provider.of<NetworkProvider>(context, listen: false).isConnected;
-    if (!isConnected) {
-      // Show a message to the user that the internet is not connected
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("No internet connection. Please try again.")),
-      );
-    }
-  }
+
 
   @override
   Widget build(BuildContext context) {
-    // _checkConnection();
+    _isInternetAvailable = Provider.of<NetworkProvider>(context).isConnected;
+
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
         child: Container(
-          color: Colors.pink,
+          // color: Colors.pink,
           // padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
               HomeToolbarSection(),
               // Banner Section
               Expanded(
-                child: RefreshIndicator(
+                child:_isInternetAvailable
+                    ? RefreshIndicator(
                   onRefresh: _refreshData,
                   child: SingleChildScrollView(
                     physics: AlwaysScrollableScrollPhysics(),
@@ -135,7 +131,24 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ),
-                ),
+                ) :  Center(
+              child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.wifi_off, size: 80, color: Colors.grey),
+                  SizedBox(height: 20),
+                  Text("No internet connection", style: TextStyle(fontSize: 18)),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Provider.of<NetworkProvider>(context, listen: false).checkConnection(context);
+                    },
+                    child: Text("Retry"),
+                  ),
+                ],
+              ),
+        ),
+
               ),
             ],
           ),

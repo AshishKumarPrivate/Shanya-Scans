@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/splash/controller/network_provider_controller.dart';
+import 'package:shanya_scans/screen/splash/controller/network_provider_controller.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../SplashScreen.dart';
 
@@ -14,7 +15,7 @@ class NoInternetScreen extends StatelessWidget {
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset("assets/images/no_internet.png", width: 250), // Show No Internet Image
+          ImageLoaderUtil.assetImage("assets/images/no_internet.png", width: 250), // Show No Internet Image
           SizedBox(height: 20),
           Text(
             "No Internet Connection!",

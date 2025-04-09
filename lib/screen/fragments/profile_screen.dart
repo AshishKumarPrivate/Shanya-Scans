@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:healthians/screen/auth/controller/auth_provider.dart';
-import 'package:healthians/screen/auth/forget_password_screen.dart';
-import 'package:healthians/screen/cart/cart_list_screen.dart';
-import 'package:healthians/screen/nav/nav_profile/cell_profile_list_tile.dart';
-import 'package:healthians/screen/order/screen/order_list_screen.dart';
-import 'package:healthians/screen/other/webview_screen.dart';
-import 'package:healthians/screen/profile/edit_profile.dart';
-import 'package:healthians/screen/profile/screen/need_help_screen.dart';
-import 'package:healthians/screen/profile/screen/refer_and_earn.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:shanya_scans/screen/auth/controller/auth_provider.dart';
+import 'package:shanya_scans/screen/auth/forget_password_screen.dart';
+import 'package:shanya_scans/screen/cart/cart_list_screen.dart';
+import 'package:shanya_scans/screen/nav/nav_profile/cell_profile_list_tile.dart';
+import 'package:shanya_scans/screen/order/screen/order_list_screen.dart';
+import 'package:shanya_scans/screen/other/webview_screen.dart';
+import 'package:shanya_scans/screen/profile/edit_profile.dart';
+import 'package:shanya_scans/screen/profile/screen/need_help_screen.dart';
+import 'package:shanya_scans/screen/profile/screen/refer_and_earn.dart';
+import 'package:shanya_scans/ui_helper/app_text_styles.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
 
 import '../../base_widgets/outlined_rounded_button.dart';
@@ -63,14 +64,18 @@ class ProfileScreen extends StatelessWidget {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
+                                  SizedBox(height: 10,),
                                   Container(
-                                    width: ResponsiveHelper.containerWidth(
-                                        context, 15),
-                                    height: ResponsiveHelper.containerWidth(
-                                        context, 15),
-                                    child: CircleAvatar(
-                                      radius: 15, // Image radius
-                                      backgroundImage:AssetImage('assets/images/user.png'),
+                                    padding: EdgeInsets.all(2),
+                                    width: ResponsiveHelper.containerWidth( context, 12),
+                                    height: ResponsiveHelper.containerWidth( context, 12),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white, // Fill color of the circle
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: SvgPicture.asset(                                      
+                                      "assets/svg/profile_icon.svg",
+                                      colorFilter: ColorFilter.mode(AppColors.txtGreyColor, BlendMode.srcIn),
                                     ),
                                   ),
                                   ResponsiveHelper.sizeBoxHeightSpace(
@@ -166,22 +171,22 @@ class ProfileScreen extends StatelessWidget {
                           SizedBox(
                             height: 15,
                           ),
-                          ProfileListTile(
-                            title: "Refer & Earn",
-                            onTap: () {
-                              print("Tapped on Account Settings");
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => ReferAndEarnScreen(),
-                                ),
-                              );
-                            },
-                            leadingAssetImage: "assets/svg/refer_earn.svg",
-                          ),
-                          SizedBox(
-                            height: 15,
-                          ),
+                          // ProfileListTile(
+                          //   title: "Refer & Earn",
+                          //   onTap: () {
+                          //     print("Tapped on Account Settings");
+                          //     Navigator.push(
+                          //       context,
+                          //       MaterialPageRoute(
+                          //         builder: (context) => ReferAndEarnScreen(),
+                          //       ),
+                          //     );
+                          //   },
+                          //   leadingAssetImage: "assets/svg/refer_earn.svg",
+                          // ),
+                          // SizedBox(
+                          //   height: 15,
+                          // ),
                           ProfileListTile(
                             title: "Need Help",
                             onTap: () {

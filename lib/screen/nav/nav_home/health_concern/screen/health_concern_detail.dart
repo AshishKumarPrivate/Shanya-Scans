@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:healthians/base_widgets/InstructionCard.dart';
-import 'package:healthians/base_widgets/common/health_concern_detail_page_shimmer.dart';
-import 'package:healthians/base_widgets/common/why_choose_use_section.dart';
-import 'package:healthians/base_widgets/custom_rounded_container.dart';
-import 'package:healthians/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/base_widgets/InstructionCard.dart';
+import 'package:shanya_scans/base_widgets/common/health_concern_detail_page_shimmer.dart';
+import 'package:shanya_scans/base_widgets/common/why_choose_use_section.dart';
+import 'package:shanya_scans/base_widgets/custom_rounded_container.dart';
+import 'package:shanya_scans/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/app_text_styles.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:html/parser.dart'; // Import required package
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../../../../../base_widgets/common/common_app_bar.dart';
 import '../../../../../base_widgets/expandable_text_widget.dart';
@@ -33,6 +34,8 @@ class _ViewDetailHealthConcernScreenState
     extends State<ViewDetailHealthConcernScreen> {
   bool isEnglish = true;
 
+  final GlobalKey section2Key = GlobalKey();
+
   @override
   void initState() {
     print("healthconcernslug =>${widget.packageSlug}");
@@ -42,6 +45,14 @@ class _ViewDetailHealthConcernScreenState
           .getHealthConcernListDetail(context, widget.packageSlug);
     });
     super.initState();
+  }
+
+  void _scrollToSection(GlobalKey key) {
+    Scrollable.ensureVisible(
+      key.currentContext!,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -133,8 +144,8 @@ class _ViewDetailHealthConcernScreenState
                                     // ),
                                     gradient: LinearGradient(
                                       colors: [
-                                        Color(0xFF58a9c7),
-                                        Color(0xFF58a9c7)
+                                        AppColors.primary, // Even Lighter Blue
+                                        AppColors.primary,
                                       ],
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
@@ -143,14 +154,29 @@ class _ViewDetailHealthConcernScreenState
                                   child: Padding(
                                     padding: const EdgeInsets.all(5.0),
                                     child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment:CrossAxisAlignment.start,
                                       children: [
+
+                                        Text(
+                                          "${healthConcernModel.packageName}",
+                                          style:
+                                          AppTextStyles.heading1(
+                                            context,
+                                            overrideStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight:
+                                              FontWeight.bold,
+                                              fontSize:
+                                              ResponsiveHelper
+                                                  .fontSize(
+                                                  context,
+                                                  16),
+                                            ),
+                                          ),
+                                        ),
                                         Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
                                           // Ensure text doesn't overflow
                                           children: [
                                             Expanded(
@@ -159,23 +185,6 @@ class _ViewDetailHealthConcernScreenState
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
-                                                    "${healthConcernModel.packageName}",
-                                                    style:
-                                                        AppTextStyles.heading1(
-                                                      context,
-                                                      overrideStyle: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize:
-                                                            ResponsiveHelper
-                                                                .fontSize(
-                                                                    context,
-                                                                    16),
-                                                      ),
-                                                    ),
-                                                  ),
                                                   // Added spacing to prevent text overlap
                                                   Padding(
                                                     padding:
@@ -447,15 +456,13 @@ class _ViewDetailHealthConcernScreenState
                                               // crossAxisAlignment: CrossAxisAlignment.center,
                                               // mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                Image.asset(
+                                                ImageLoaderUtil.assetImage(
                                                   "assets/images/img_pathalogytestparamter.png",
-                                                  width: ResponsiveHelper
-                                                      .containerWidth(
-                                                          context, 6),
-                                                  height: ResponsiveHelper
-                                                      .containerWidth(
-                                                          context, 6),
-                                                ),
+                                                  width: ResponsiveHelper .containerWidth( context, 6),
+                                                  height: ResponsiveHelper .containerWidth( context, 6),),
+
+
+
                                                 ResponsiveHelper
                                                     .sizeboxWidthlSpace(
                                                         context, 2),
@@ -500,6 +507,7 @@ class _ViewDetailHealthConcernScreenState
                                             ),
                                             onTap: () {
                                               print("Container tapped!");
+                                              _scrollToSection(section2Key);
                                             },
                                           ),
                                         ),
@@ -520,15 +528,13 @@ class _ViewDetailHealthConcernScreenState
                                               // crossAxisAlignment: CrossAxisAlignment.center,
                                               // mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                Image.asset(
+
+                                                ImageLoaderUtil.assetImage(
                                                   "assets/images/img_pathalogytestparamter.png",
-                                                  width: ResponsiveHelper
-                                                      .containerWidth(
-                                                          context, 6),
-                                                  height: ResponsiveHelper
-                                                      .containerWidth(
-                                                          context, 6),
-                                                ),
+                                                  width: ResponsiveHelper.containerWidth(context, 6),
+                                                  height: ResponsiveHelper.containerWidth(context, 6),),
+
+
                                                 ResponsiveHelper
                                                     .sizeboxWidthlSpace(
                                                         context, 2),
@@ -611,15 +617,12 @@ class _ViewDetailHealthConcernScreenState
                                               // crossAxisAlignment: CrossAxisAlignment.center,
                                               // mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                Image.asset(
+
+                                                ImageLoaderUtil.assetImage(
                                                   "assets/images/img_pathalogytestparamter.png",
-                                                  width: ResponsiveHelper
-                                                      .containerWidth(
-                                                          context, 6),
-                                                  height: ResponsiveHelper
-                                                      .containerWidth(
-                                                          context, 6),
-                                                ),
+                                                  width: ResponsiveHelper.containerWidth( context, 6),
+                                                  height: ResponsiveHelper.containerWidth( context, 6),),
+
                                                 ResponsiveHelper
                                                     .sizeboxWidthlSpace(
                                                         context, 2),
@@ -681,14 +684,10 @@ class _ViewDetailHealthConcernScreenState
                                               // crossAxisAlignment: CrossAxisAlignment.center,
                                               // mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                Image.asset(
+                                                ImageLoaderUtil.assetImage(
                                                   "assets/images/img_pathalogytestparamter.png",
-                                                  width: ResponsiveHelper
-                                                      .containerWidth(
-                                                          context, 6),
-                                                  height: ResponsiveHelper
-                                                      .containerWidth(
-                                                          context, 6),
+                                                  width: ResponsiveHelper.containerWidth( context, 6),
+                                                  height: ResponsiveHelper .containerWidth( context, 6),
                                                 ),
                                                 ResponsiveHelper
                                                     .sizeboxWidthlSpace(
@@ -764,6 +763,8 @@ class _ViewDetailHealthConcernScreenState
                                   serviceCategory: healthConcernModel
                                       .packageCategory
                                       .toString(),
+                                  section2Key: section2Key,
+
                                 ),
                               ),
 
@@ -839,6 +840,8 @@ class _buildExpandableTestSections extends StatelessWidget {
       packageName,
       packageRate;
 
+  GlobalKey? section2Key;
+
   // _buildExpandableTestSections({required this.serviceData});
 
   _buildExpandableTestSections({
@@ -848,29 +851,21 @@ class _buildExpandableTestSections extends StatelessWidget {
     required this.packageOverView,
     required this.packageName,
     required this.packageRate,
+    this.section2Key,
   });
 
   @override
   Widget build(BuildContext context) {
-    final testCategories = [
-      {'title': '*Serum Electrolytes profile(03)', 'count': 12},
-      {'title': '*Iron Studies(03', 'count': 11},
-      {'title': '*LIVER Function Test(11', 'count': 21},
-      {'title': '*Thyroid Profile(03', 'count': 24},
-      {'title': '*Kidney Profile(07)', 'count': 1},
-      {'title': '*CBC(28)', 'count': 1},
-    ];
-
     return Container(
+      key: section2Key,
       color: Color(0xffF3F4F6),
       alignment: Alignment.topCenter, // Ensures it wraps content
       child: Stack(
         children: [
           Positioned.fill(
             // Ensures image covers full width & height of Stack
-            child: Image.asset(
+            child: ImageLoaderUtil.assetImage(
               "assets/images/pattern7.png",
-              fit: BoxFit.cover, // Covers full Stack width and height
             ),
           ),
           Padding(
@@ -897,7 +892,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.watch_later, color: Colors.red),
+                                Icon(Icons.watch_later, color: AppColors.primary),
                                 SizedBox(height: 3),
                                 Text(
                                   "Report Time",
@@ -945,7 +940,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                                   "assets/images/test.png",
                                   width: 24,
                                   height: 24,
-                                  color: Colors.blue,
+                                  color: AppColors.primary,
                                 ),
                                 SizedBox(height: 3),
                                 Text(
@@ -996,7 +991,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.supervised_user_circle,
-                                    color: Colors.green),
+                                    color: AppColors.primary),
                                 SizedBox(height: 3),
                                 SizedBox(height: 3),
                                 Text(
@@ -1093,7 +1088,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                                     ResponsiveHelper.padding(context, 5, 1.05),
                                 child: InkWell(
                                   onTap: () {
-                                    makePhoneCall(context);
+                                    PhoneCallHelper.makePhoneCall(context);
                                   },
                                   child: Text(
                                     "Call Us",
@@ -1171,10 +1166,10 @@ class _buildExpandableTestSections extends StatelessWidget {
                             },
                             child: CustomRoundedContainer(
                               borderRadius: 20,
-                              borderColor: Colors.white,
+                              borderColor: AppColors.primary,
                               borderWidth: 0,
                               elevation: 2,
-                              backgroundColor: Colors.red,
+                              backgroundColor: AppColors.primary,
                               child: Padding(
                                 padding:
                                     ResponsiveHelper.padding(context, 4, 1),

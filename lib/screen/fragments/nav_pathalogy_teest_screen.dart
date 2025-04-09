@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/common/nav_common_app_bar.dart';
-import 'package:healthians/screen/nav/nav_lab/cell_nav_pathalogy_test_list_item.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
+import 'package:shanya_scans/base_widgets/common/nav_common_app_bar.dart';
+import 'package:shanya_scans/screen/nav/nav_lab/cell_nav_pathalogy_test_list_item.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
 import 'package:provider/provider.dart';
 
 import '../nav/nav_lab/controller/pathalogy_test_provider.dart';

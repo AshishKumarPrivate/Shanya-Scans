@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/screen/profile/termsConditionPrivacyPollicy/terms_conditions_privacy_refund_policy_model.dart';
+import 'package:shanya_scans/network_manager/repository.dart';
+import 'package:shanya_scans/screen/profile/termsConditionPrivacyPollicy/terms_conditions_privacy_refund_policy_model.dart';
 
 
 class TermConditionPrivacyPolicyApiProvider with ChangeNotifier {

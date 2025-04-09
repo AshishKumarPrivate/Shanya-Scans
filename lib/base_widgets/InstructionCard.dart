@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
 
 import '../ui_helper/app_text_styles.dart';
 import '../ui_helper/responsive_helper.dart';

@@ -2,13 +2,15 @@ import 'package:easy_stepper/easy_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:healthians/screen/checkout/checkout_text_fields.dart';
-import 'package:healthians/screen/order/model/OrderItem.dart';
-import 'package:healthians/screen/other/screen/search_screen.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:shanya_scans/screen/checkout/checkout_text_fields.dart';
+import 'package:shanya_scans/screen/order/model/OrderItem.dart';
+import 'package:shanya_scans/screen/other/screen/search_screen.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:shanya_scans/util/StringUtils.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../../base_widgets/custom_rounded_container.dart';
 import '../../base_widgets/loading_indicator.dart';
@@ -81,8 +83,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   void initState() {
     super.initState();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.white,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarColor: AppColors.primary,
+      statusBarIconBrightness: Brightness.light,
     ));
 
     // WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -176,6 +178,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   // validate booking forom ////////
   bool validateBookingForm(BuildContext context) {
+    final phoneRegex = RegExp(r'^[6-9]\d{9}$'); // Indian 10-digit mobile number
+
     if (fullNameController.text.isEmpty) {
       showError(context, "Please enter your full name.");
       return false;
@@ -188,12 +192,20 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       showError(context, "Please enter your phone number.");
       return false;
     }
+    if (!phoneRegex.hasMatch(phoneController.text)) {
+      showError(context, "Enter a valid 10-digit phone number starting with 6-9.");
+      return false;
+    }
     if (phoneController.text.length != 10) {
       showError(context, "Invalid phone number.");
       return false;
     }
     if (altPhoneController.text.isEmpty) {
       showError(context, "Please enter your alternate number.");
+      return false;
+    }
+    if (!phoneRegex.hasMatch(altPhoneController.text)) {
+      showError(context, "Enter a valid 10-digit alternate number.");
       return false;
     }
     if (altPhoneController.text.length != 10) {
@@ -433,7 +445,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   width: ResponsiveHelper.containerWidth(context, 30),
                   child: SolidRoundedButton(
                     text: _currentStep == 3 ? "Finish" : "Next",
-                    color: Colors.black,
+                    color: AppColors.primary,
                     borderRadius: 10.0,
                     onPressed: () async {
                       if (_currentStep < 3) {
@@ -896,7 +908,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             // ✅ Calculate dynamic cart total
             double cartTotal = checkoutItemsProvider.checkoutItems
                 .fold(0, (sum, item) => sum + ((item.price) * item.quantity));
-            double discount = 399.00;
+            double discount = 0.00;
             double orderTotal = cartTotal - discount;
 
             return Stack(
@@ -974,7 +986,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        orserItem.name,
+                                        StringUtils.toUpperCase(orserItem.name),
                                         maxLines: 2,
                                         style: AppTextStyles.heading1(
                                           context,
@@ -1176,10 +1188,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                                     label: 'Cart Value', value: '₹$cartTotal'),
                                 SummaryRow(
                                     label: 'Coupon Discount',
-                                    value: '-₹$discount'),
-                                SummaryRow(
-                                    label: 'Sample Collection Charges',
-                                    value: '₹250.00 Free'),
+                                    value: '₹$discount'),
+                                // SummaryRow(
+                                //     label: 'Sample Collection Charges',
+                                //     value: '₹250.00 Free'),
                                 Divider(),
                                 SummaryRow(
                                     label: 'Amount Payable',
@@ -1493,7 +1505,7 @@ class _PaymentSelectionWidgetState extends State<PaymentSelectionWidget> {
         child: Row(
           children: [
             // ✅ Payment Icon
-            Image.asset(image, width: 40, height: 40),
+            ImageLoaderUtil.assetImage(image, width: 40, height: 40),
             SizedBox(width: 12),
 
             // ✅ Payment Details

@@ -1,15 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/common/scans_service_shimmer.dart';
-import 'package:healthians/screen/service/service_detail_list.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/base_widgets/common/scans_service_shimmer.dart';
+import 'package:shanya_scans/screen/service/service_detail_list.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../../base_widgets/common/nav_common_app_bar.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../ui_helper/app_text_styles.dart';
 import '../nav/nav_home/home_slider_setion.dart';
 import '../service/controller/service_scans_provider.dart';
+import '../splash/controller/network_provider_controller.dart';
 
 class ScanScreen extends StatefulWidget {
   ScanScreen({super.key});
@@ -19,14 +21,10 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanScreenState extends State<ScanScreen> {
-
   @override
   void initState() {
     super.initState();
-    // Fetch API data when the widget is initialized
-    // Future.microtask(() =>
-    //     Provider.of<ServiceApiProvider>(context, listen: false)
-    //         .checkCachedData());
+
     Future.microtask(() =>
         Provider.of<ServiceApiProvider>(context, listen: false)
             .loadCachedPackages());
@@ -39,8 +37,9 @@ class _ScanScreenState extends State<ScanScreen> {
     final provider = Provider.of<ServiceApiProvider>(context);
     // final services = provider.homeServiceListModel?.data ?? []; // API response
     final services = provider.scanList;
+    bool isConnected = Provider.of<NetworkProvider>(context, listen: false).isConnected;
 
-    return Scaffold(
+  return isConnected ? Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
         child: Container(
@@ -91,7 +90,9 @@ class _ScanScreenState extends State<ScanScreen> {
                           //     end: Alignment.bottomRight,
                           //   ),
                           // ),
-                          child: HomeSlider1Section(bannerImageHeight: 160,),
+                          child: HomeSlider1Section(
+                            bannerImageHeight: 160,
+                          ),
                         ),
                       ),
                       Padding(
@@ -102,7 +103,17 @@ class _ScanScreenState extends State<ScanScreen> {
                                 itemCount:
                                     10) // ✅ Show shimmer only when no cache
                             : provider.errorMessage.isNotEmpty
-                                ? Center(child: Text(provider.errorMessage))
+                                ? Center(
+                                    child: SizedBox(
+                                      width: ResponsiveHelper.containerWidth(
+                                          context, 50),
+                                      height: ResponsiveHelper.containerWidth(
+                                          context, 50),
+                                      child:ImageLoaderUtil.assetImage( "assets/images/img_error.jpg")
+
+
+                                    ),
+                                  )
                                 : GridView.builder(
                                     shrinkWrap: true,
                                     physics: NeverScrollableScrollPhysics(),
@@ -186,37 +197,37 @@ class _ScanScreenState extends State<ScanScreen> {
                                                       color: Colors.white,
                                                     ),
                                                     child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.all(
-                                                              5),
-                                                      child: CachedNetworkImage(
-                                                        imageUrl: item
-                                                            .iconPhoto!
-                                                            .secureUrl
-                                                            .toString(),
-                                                        fit: BoxFit.fill,
-                                                        placeholder:
-                                                            (context, url) =>
-                                                                Center(
-                                                          child: Image.asset(
-                                                              "assets/images/img_placeholder.jpeg"), // Placeholder while loading
-                                                        ),
-                                                        errorWidget: (context,
-                                                                url, error) =>
-                                                            Center(
-                                                          child: Image.asset(
-                                                              "assets/images/img_placeholder.jpeg"), // Placeholder while loading
-                                                        ),
-                                                        fadeInDuration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    500),
-                                                        // Smooth fade-in effect
-                                                        fadeOutDuration:
-                                                            const Duration(
-                                                                milliseconds:
-                                                                    300),
-                                                      ),
+                                                      padding: const EdgeInsets.all( 5),
+                                                      child:ImageLoaderUtil.cacheNetworkImage(item.iconPhoto!.secureUrl.toString())
+
+                                                      // CachedNetworkImage(
+                                                      //   imageUrl: item
+                                                      //       .iconPhoto!
+                                                      //       .secureUrl
+                                                      //       .toString(),
+                                                      //   fit: BoxFit.fill,
+                                                      //   placeholder:
+                                                      //       (context, url) =>
+                                                      //           Center(
+                                                      //     child: Image.asset(
+                                                      //         "assets/images/img_placeholder.jpeg"), // Placeholder while loading
+                                                      //   ),
+                                                      //   errorWidget: (context,
+                                                      //           url, error) =>
+                                                      //       Center(
+                                                      //     child: Image.asset(
+                                                      //         "assets/images/img_placeholder.jpeg"), // Placeholder while loading
+                                                      //   ),
+                                                      //   fadeInDuration:
+                                                      //       const Duration(
+                                                      //           milliseconds:
+                                                      //               500),
+                                                      //   // Smooth fade-in effect
+                                                      //   fadeOutDuration:
+                                                      //       const Duration(
+                                                      //           milliseconds:
+                                                      //               300),
+                                                      // ),
 
                                                       // DecoratedBox(
                                                       //   decoration: ShapeDecoration(
@@ -273,6 +284,18 @@ class _ScanScreenState extends State<ScanScreen> {
           ),
         ),
       ),
-    );
+    ) : Center(
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        ImageLoaderUtil.assetImage("assets/images/img_error.jpg", width: 150, height: 150),
+        SizedBox(height: 20),
+        Text(
+          "No Internet Connection",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        ),
+      ],
+    ),
+  ) ;
   }
 }

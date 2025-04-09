@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:healthians/deliveryBoy/screen/widget/delivery_boy_login_form_widget.dart';
-import 'package:healthians/util/dimensions.dart';
+import 'package:shanya_scans/deliveryBoy/screen/widget/delivery_boy_login_form_widget.dart';
+import 'package:shanya_scans/util/dimensions.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../ui_helper/responsive_helper.dart';
 import '../../ui_helper/app_colors.dart';
@@ -35,7 +36,7 @@ class _DeliveryLoginScreenState extends State<DeliveryLoginScreen> {
   @override
   void dispose() {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Color(0xFF58a9c7),
+      statusBarColor: AppColors.deliveryPrimary,
       statusBarIconBrightness: Brightness.light,
     ));
     _pageController.dispose();
@@ -161,7 +162,7 @@ class _DeliveryLoginScreenState extends State<DeliveryLoginScreen> {
             onTap: _launchURL,
             child: Container(
               width: ResponsiveHelper.containerWidth(context, 20),
-              child: Image.asset("assets/images/code_crafter_logo.png"),
+              child: ImageLoaderUtil.assetImage("assets/images/code_crafter_logo.png")
             ),
           ),
         ],

@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/screen/nav/nav_home/slider/mdel/HomeBanner1ModelResponse.dart';
-import 'package:healthians/screen/nav/nav_home/slider/mdel/HomeBanner2ModelResponse.dart';
+import 'package:shanya_scans/network_manager/repository.dart';
+import 'package:shanya_scans/screen/nav/nav_home/slider/mdel/HomeBanner1ModelResponse.dart';
+import 'package:shanya_scans/screen/nav/nav_home/slider/mdel/HomeBanner2ModelResponse.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeBannerApiProvider with ChangeNotifier {

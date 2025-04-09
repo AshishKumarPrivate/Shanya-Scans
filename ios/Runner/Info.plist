@@ -2,32 +2,23 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 	<dict>
-	    <key>NSLocationWhenInUseUsageDescription</key>
-        <string>We need your location to track the sales person.</string>
-        <key>NSLocationAlwaysUsageDescription</key>
-        <string>We need your location even in the background.</string>
-
-
-        <key>FirebaseAppDelegateProxyEnabled</key>
-        <false/>
-        <key>NSAppTransportSecurity</key>
-        <dict>
-            <key>NSAllowsArbitraryLoads</key>
-            <true/>
-        </dict>
-        <key>NSPushNotificationUsageDescription</key>
-        <string>We would like to send you push notifications.</string>
-
-        <key>NSLocationWhenInUseUsageDescription</key>
-        <string>We need your location to show places nearby</string>
-
-        <key>NSLocationAlwaysUsageDescription</key>
-        <string>We need your location for better experience</string>
-
-
-
-
-
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>We need your location to track the sales person.</string>
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>We need your location even in the background.</string>
+		<key>FirebaseAppDelegateProxyEnabled</key>
+		<false/>
+		<key>NSAppTransportSecurity</key>
+		<dict>
+			<key>NSAllowsArbitraryLoads</key>
+			<true/>
+		</dict>
+		<key>NSPushNotificationUsageDescription</key>
+		<string>We would like to send you push notifications.</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>We need your location to show places nearby</string>
+		<key>NSLocationAlwaysUsageDescription</key>
+		<string>We need your location for better experience</string>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
@@ -39,7 +30,7 @@
 		<key>CFBundleInfoDictionaryVersion</key>
 		<string>6.0</string>
 		<key>CFBundleName</key>
-		<string>healthians</string>
+		<string>shanya_scans</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>
@@ -72,6 +63,8 @@
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
 		<key>UIStatusBarHidden</key>
+		<true/>
+		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
 	</dict>
 </plist>

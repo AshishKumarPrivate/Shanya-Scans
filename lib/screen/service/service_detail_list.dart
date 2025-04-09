@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/service/cell_service_list_item.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
-import 'package:healthians/util/dimensions.dart';
+import 'package:shanya_scans/screen/service/cell_service_list_item.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/ui_helper/app_text_styles.dart';
+import 'package:shanya_scans/util/dimensions.dart';
 import '../../base_widgets/common/common_app_bar.dart';
 import '../../base_widgets/expandable_text_widget.dart';
 import '../../ui_helper/app_colors.dart';
@@ -91,7 +91,7 @@ class _AllServicesDetailListScreenState
                             ResponsiveHelper.sizeBoxHeightSpace(context, 0.5),
                             ExpandableTextWidget(
                                 text: "${widget.serviceDescription}"
-                                // "Healthians' brings forth a detailed health checkup to ensure you lead a healthy life. The package includes a series of testsHealthians' brings forth a detailed health checkup to ensure you lead a healthy life. The package includes a series of tests...",
+                                // "shanya_scans' brings forth a detailed health checkup to ensure you lead a healthy life. The package includes a series of testsHealthians' brings forth a detailed health checkup to ensure you lead a healthy life. The package includes a series of tests...",
                                 ),
 
                             ResponsiveHelper.sizeBoxHeightSpace(

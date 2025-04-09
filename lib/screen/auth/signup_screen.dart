@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/auth/widget/signup_form_widget.dart';
+import 'package:shanya_scans/screen/auth/widget/signup_form_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../ui_helper/responsive_helper.dart';

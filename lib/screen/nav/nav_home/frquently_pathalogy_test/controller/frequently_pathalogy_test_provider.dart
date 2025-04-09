@@ -1,9 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/screen/nav/nav_home/frquently_pathalogy_test/model/FrequentlyPathalogyTagListModel.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shanya_scans/network_manager/repository.dart';
+import 'package:shanya_scans/screen/nav/nav_home/frquently_pathalogy_test/model/FrequentlyPathalogyTagListModel.dart';
 
 class FrequentlyPathalogyTagApiProvider with ChangeNotifier {
   final Repository _repository = Repository();
@@ -11,91 +10,92 @@ class FrequentlyPathalogyTagApiProvider with ChangeNotifier {
   bool _isLoading = false;
   String _errorMessage = "";
   FrequentlyTagListModel? _frequentlyPathalogyTagListModel;
-  // Getters for UI
+
   bool get isLoading => _isLoading;
   String get errorMessage => _errorMessage;
   FrequentlyTagListModel? get frequentlyPathalogyTagListModel => _frequentlyPathalogyTagListModel;
 
-  /// **Set Loading State for UI**
+  static const String _cacheKey = 'cached_home_lab_test';
+  static const String _cacheTimeKey = 'cached_home_lab_test_time';
+
   void _setLoadingState(bool loading) {
     _isLoading = loading;
     notifyListeners();
   }
 
-  /// **Set Error State for UI**
   void _setErrorState(String message) {
     _errorMessage = message;
     _setLoadingState(false);
-    // notifyListeners(); // Ensure UI rebuilds
   }
 
-  /// **Load Cached Banners and Fetch API Only if Needed**
-  Future<void> loadCachedFrequentlyHomeLabTest() async {
+  /// Load cache first, then decide to fetch from API
+  Future<void> loadCachedFrequentlyHomeLabTest({bool forceRefresh = false}) async {
     _setLoadingState(true);
     final prefs = await SharedPreferences.getInstance();
-    final cachedData = prefs.getString('cached_home_lab_test');
+
+    final cachedData = prefs.getString(_cacheKey);
+    final cachedTime = prefs.getInt(_cacheTimeKey);
 
     if (cachedData != null) {
       try {
-        print("✅ Cache Found: Loading cached banners...");
-        _frequentlyPathalogyTagListModel =
-            FrequentlyTagListModel.fromJson(json.decode(cachedData));
-        print("✅ Cache Loaded Successfully!");
+        _frequentlyPathalogyTagListModel = FrequentlyTagListModel.fromJson(json.decode(cachedData));
+        print("✅ Loaded from Cache");
         notifyListeners();
       } catch (e) {
-        _frequentlyPathalogyTagListModel = null;
-        print("⚠️ Cache Parsing Error: $e");
+        print("⚠️ Error parsing cached data: $e");
       }
-    } else {
-      print("⚠️ No Cached Data Found!");
     }
 
-    // Fetch from API only if cache is empty or outdated
-    await getFrequentlyLabTestList();
-  }
-  /// **Clear Cache**
-  Future<void> clearCache() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('cached_home_lab_test');
-    print("🗑 Cache Cleared!");
+    // Optional: Add cache expiry logic (e.g. 24 hours = 86400 sec)
+    final isExpired = cachedTime == null || DateTime.now().millisecondsSinceEpoch - cachedTime > 86400000;
+
+    if (forceRefresh || cachedData == null || isExpired) {
+      print("⏳ Cache expired or force refresh. Fetching new data...");
+      await getFrequentlyLabTestList();
+    } else {
+      _setLoadingState(false);
+      print("✅ Cache is fresh. Skipping API call.");
+    }
   }
 
-  /// **Fetch Home Service List API**
+  /// Clear cache manually
+  Future<void> clearCache() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_cacheKey);
+    await prefs.remove(_cacheTimeKey);
+    print("🗑 Cache cleared!");
+  }
+
+  /// Fetch API and cache response
   Future<bool> getFrequentlyLabTestList() async {
     _setLoadingState(true);
     _errorMessage = "";
 
     final prefs = await SharedPreferences.getInstance();
-    final cachedData = prefs.getString('cached_home_lab_test');
-
-    _frequentlyPathalogyTagListModel = null;
+    final oldCache = prefs.getString(_cacheKey);
 
     try {
-      var response =  await _repository.getFrequentlyLabTestListResponse();
+      final response = await _repository.getFrequentlyLabTestListResponse();
 
       if (response.success == true && response.data != null) {
-        print("✅ Frequently Pathalogy Tag List Fetched Successfully");
-        String newData = json.encode(response.toJson());
+        final newData = json.encode(response.toJson());
 
-        // Compare new data with cached data
-        if (cachedData != null && cachedData == newData) {
-          print("🔄 No Changes in API Data. Cache is Up-to-date!");
+        if (oldCache == null || oldCache != newData) {
+          await prefs.setString(_cacheKey, newData);
+          await prefs.setInt(_cacheTimeKey, DateTime.now().millisecondsSinceEpoch);
+          print("✅ New data cached successfully!");
         } else {
-          print("📁 API Data Changed! Updating Cache...");
-          await prefs.setString('cached_home_lab_test', newData);
-          print("✅ Cache Updated Successfully!");
+          print("🔁 Data unchanged. Using existing cache.");
         }
 
         _frequentlyPathalogyTagListModel = response;
         _setLoadingState(false);
         return true;
       } else {
-        _frequentlyPathalogyTagListModel = null;
-        _setErrorState(response.message ?? "Failed to fetch service list");
+        _setErrorState(response.message ?? "Failed to fetch frequently test list.");
       }
-    } catch (error) {
-      _frequentlyPathalogyTagListModel = null;
-      _setErrorState("⚠️ API Error: $error");
+    } catch (e) {
+      _setErrorState("⚠️ API error: $e");
     }
 
     return false;

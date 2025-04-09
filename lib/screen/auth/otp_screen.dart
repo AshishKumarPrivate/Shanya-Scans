@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/auth/controller/auth_provider.dart';
+import 'package:shanya_scans/screen/auth/controller/auth_provider.dart';
 import 'package:otp_text_field/otp_field.dart';
 import 'package:otp_text_field/style.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 import '../../base_widgets/loading_indicator.dart';
 import '../../base_widgets/solid_rounded_button.dart';
 import '../../ui_helper/app_colors.dart';
@@ -48,7 +49,7 @@ class _OTPScreenState extends State<OTPScreen> {
                           //   ),
                           // ),
                           // SizedBox(height: 20),
-                          Image.asset('assets/images/otp_image.png', height: 120),
+                          ImageLoaderUtil.assetImage('assets/images/otp_image.png', height: 120),
                           Text('Verification', style: AppTextStyles.heading1(context)),
                           SizedBox(height: 10),
                           Text("Otp has been sent to", style: AppTextStyles.bodyText1(context), textAlign: TextAlign.center),

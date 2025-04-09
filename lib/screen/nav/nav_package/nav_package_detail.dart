@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/custom_rounded_container.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/base_widgets/custom_rounded_container.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/app_text_styles.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:html/parser.dart'; // Import required package
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../../../base_widgets/InstructionCard.dart';
 import '../../../base_widgets/common/common_app_bar.dart';
@@ -32,6 +33,18 @@ class ViewDetailBottomNavPackageScreen extends StatefulWidget {
 class _ViewDetailBottomNavPackageScreenState
     extends State<ViewDetailBottomNavPackageScreen> {
   bool isEnglish = false;
+
+  final GlobalKey section2Key = GlobalKey();
+
+  void _scrollToSection(GlobalKey key) {
+    Scrollable.ensureVisible(
+      key.currentContext!,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
+
   @override
   void initState() {
     Future.microtask(() {
@@ -93,10 +106,10 @@ class _ViewDetailBottomNavPackageScreenState
                                   width: double.infinity,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(5),
-                                    gradient: const LinearGradient(
+                                    gradient:  LinearGradient(
                                       colors: [
-                                        Color(0xFF58a9c7), // Even Lighter Blue
-                                        Color(0xFF58a9c7),
+                                       AppColors.primary, // Even Lighter Blue
+                                        AppColors.primary,
                                       ],
                                       begin: Alignment.bottomLeft,
                                       end: Alignment.topRight,
@@ -110,6 +123,21 @@ class _ViewDetailBottomNavPackageScreenState
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
+                                        Text(
+                                          widget.packagetName,
+                                          style: AppTextStyles.heading1(
+                                            context,
+                                            overrideStyle: TextStyle(
+                                              color: Colors.white,
+                                              fontWeight:
+                                              FontWeight.bold,
+                                              fontSize: ResponsiveHelper
+                                                  .fontSize(
+                                                  context, 14),
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(height: 5,),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
@@ -123,20 +151,7 @@ class _ViewDetailBottomNavPackageScreenState
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.start,
                                                 children: [
-                                                  Text(
-                                                    widget.packagetName,
-                                                    style: AppTextStyles.heading1(
-                                                      context,
-                                                      overrideStyle: TextStyle(
-                                                        color: Colors.white,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: ResponsiveHelper
-                                                            .fontSize(
-                                                                context, 14),
-                                                      ),
-                                                    ),
-                                                  ),
+
                                                   // Added spacing to prevent text overlap
                                                   Padding(
                                                     padding:
@@ -417,7 +432,7 @@ class _ViewDetailBottomNavPackageScreenState
                                               // crossAxisAlignment: CrossAxisAlignment.center,
                                               // mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                Image.asset(
+                                               ImageLoaderUtil.assetImage(
                                                   "assets/images/img_pathalogytestparamter.png",
                                                   width: ResponsiveHelper
                                                       .containerWidth(context, 6),
@@ -466,6 +481,7 @@ class _ViewDetailBottomNavPackageScreenState
                                             ),
                                             onTap: () {
                                               print("Container tapped!");
+                                              _scrollToSection(section2Key);
                                             },
                                           ),
                                         ),
@@ -485,7 +501,7 @@ class _ViewDetailBottomNavPackageScreenState
                                               // crossAxisAlignment: CrossAxisAlignment.center,
                                               // mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                Image.asset(
+                                               ImageLoaderUtil.assetImage(
                                                   "assets/images/img_pathalogytestparamter.png",
                                                   width: ResponsiveHelper
                                                       .containerWidth(context, 6),
@@ -573,7 +589,7 @@ class _ViewDetailBottomNavPackageScreenState
                                               // crossAxisAlignment: CrossAxisAlignment.center,
                                               // mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                Image.asset(
+                                                 ImageLoaderUtil.assetImage(
                                                   "assets/images/img_pathalogytestparamter.png",
                                                   width: ResponsiveHelper
                                                       .containerWidth(context, 6),
@@ -639,7 +655,7 @@ class _ViewDetailBottomNavPackageScreenState
                                               // crossAxisAlignment: CrossAxisAlignment.center,
                                               // mainAxisAlignment: MainAxisAlignment.center,
                                               children: [
-                                                Image.asset(
+                                                ImageLoaderUtil.assetImage(
                                                   "assets/images/img_pathalogytestparamter.png",
                                                   width: ResponsiveHelper
                                                       .containerWidth(context, 6),
@@ -715,8 +731,8 @@ class _ViewDetailBottomNavPackageScreenState
                                   packageOverView:
                                       packageList.packageOverview.toString(),
                                   packageRate: packageList.packageRate.toString(),
-                                  packageCategory:
-                                      packageList.packageCategory.toString(),
+                                  packageCategory:packageList.packageCategory.toString(),
+                                  section2Key: section2Key,
                                 ),
                               ),
 
@@ -788,6 +804,7 @@ class _buildExpandableTestSections extends StatelessWidget {
       packageName,
       packageRate;
 
+  GlobalKey? section2Key;
   // _buildExpandableTestSections({required this.serviceData});
 
   _buildExpandableTestSections({
@@ -797,29 +814,22 @@ class _buildExpandableTestSections extends StatelessWidget {
     required this.packageOverView,
     required this.packageName,
     required this.packageRate,
+    this.section2Key,
   });
 
   @override
   Widget build(BuildContext context) {
-    final testCategories = [
-      {'title': '*Serum Electrolytes profile(03)', 'count': 12},
-      {'title': '*Iron Studies(03', 'count': 11},
-      {'title': '*LIVER Function Test(11', 'count': 21},
-      {'title': '*Thyroid Profile(03', 'count': 24},
-      {'title': '*Kidney Profile(07)', 'count': 1},
-      {'title': '*CBC(28)', 'count': 1},
-    ];
 
     return Container(
+      key: section2Key,
       color: Color(0xffF3F4F6),
       alignment: Alignment.topCenter, // Ensures it wraps content
       child: Stack(
         children: [
           Positioned.fill(
             // Ensures image covers full width & height of Stack
-            child: Image.asset(
+            child: ImageLoaderUtil.assetImage(
               "assets/images/pattern7.png",
-              fit: BoxFit.cover, // Covers full Stack width and height
             ),
           ),
           Padding(
@@ -846,7 +856,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.watch_later, color: Colors.red),
+                                Icon(Icons.watch_later, color: AppColors.primary),
                                 SizedBox(height: 3),
                                 Text(
                                   "Report Time",
@@ -894,7 +904,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                                   "assets/images/test.png",
                                   width: 24,
                                   height: 24,
-                                  color: Colors.blue,
+                                  color:AppColors.primary,
                                 ),
                                 SizedBox(height: 3),
                                 Text(
@@ -945,7 +955,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Icon(Icons.supervised_user_circle,
-                                    color: Colors.green),
+                                    color: AppColors.primary),
                                 SizedBox(height: 3),
                                 Text(
                                   "Recommended for",
@@ -1041,7 +1051,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                                     ResponsiveHelper.padding(context, 5, 1.05),
                                 child: InkWell(
                                   onTap: () {
-                                    makePhoneCall(context);
+                                    PhoneCallHelper.makePhoneCall(context);
                                   },
                                   child: Text(
                                     "Call Us",
@@ -1132,7 +1142,7 @@ class _buildExpandableTestSections extends StatelessWidget {
                               borderColor: Colors.white,
                               borderWidth: 0,
                               elevation: 2,
-                              backgroundColor: Colors.red,
+                              backgroundColor: AppColors.primary,
                               child: Padding(
                                 padding:
                                     ResponsiveHelper.padding(context, 4, 1),

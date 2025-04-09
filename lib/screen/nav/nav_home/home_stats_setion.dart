@@ -1,7 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/nav/nav_home/slider/controller/home_banner_api_provider.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/screen/nav/nav_home/slider/controller/home_banner_api_provider.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 

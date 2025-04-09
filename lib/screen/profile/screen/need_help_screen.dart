@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../base_widgets/common/default_common_app_bar.dart';
 import '../../../util/dimensions.dart';
 import '../controller/need_help_api_provider.dart';
 import '../../../base_widgets/custom_text_field.dart';
@@ -45,7 +46,9 @@ class _NeedHelpScreenState extends State<NeedHelpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(title: Text("Need Help",style: TextStyle(fontSize: 18),)),
+      // appBar: AppBar(title: Text("Need Help",style: TextStyle(fontSize: 18),)),
+      appBar: DefaultCommonAppBar(activityName: "Need Help",backgroundColor: AppColors.primary,),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
@@ -6,18 +7,49 @@ class NetworkProvider with ChangeNotifier {
   bool _isConnected = true;
   bool get isConnected => _isConnected;
 
-  // Constructor doesn't start connectivity check anymore
-  NetworkProvider();
+
+
+  // 🟢 Listen to changes continuously
+  void initializeConnectivityListener(BuildContext context) {
+    Connectivity().onConnectivityChanged.listen((_) async {
+      bool previousStatus = _isConnected;
+
+      // Use the improved connection check
+      bool isNotConnected = true;
+      try {
+        final result = await InternetAddress.lookup('example.com');
+        if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+          isNotConnected = false;
+        }
+      } on SocketException catch (_) {
+        isNotConnected = true;
+      }
+
+      _isConnected = !isNotConnected;
+
+      if (previousStatus != _isConnected) {
+        notifyListeners();
+        _showNetworkStatusSnackBar(context, isNotConnected);
+      }
+    });
+  }
+
 
   // Method to manually check the network status
   Future<void> checkConnection(BuildContext context) async {
-    // Check the current connectivity status
-    List<ConnectivityResult> result = await Connectivity().checkConnectivity();
-    bool isNotConnected = result == ConnectivityResult.none;
-    _isConnected = !isNotConnected;
-    notifyListeners();  // Notify listeners to update the UI
+    bool isNotConnected = true;
 
-    // Show the network status via Snackbar after checking
+    try {
+      final result = await InternetAddress.lookup('example.com'); // You can use 'google.com' too
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        isNotConnected = false;
+      }
+    } on SocketException catch (_) {
+      isNotConnected = true;
+    }
+
+    _isConnected = !isNotConnected;
+    notifyListeners();
     _showNetworkStatusSnackBar(context, isNotConnected);
   }
 

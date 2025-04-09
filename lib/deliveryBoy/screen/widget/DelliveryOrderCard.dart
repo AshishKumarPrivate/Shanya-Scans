@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/deliveryBoy/model/DeliveryOrderLIstModel.dart';
-import 'package:healthians/util/date_formate.dart';
+import 'package:shanya_scans/deliveryBoy/model/DeliveryOrderLIstModel.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/util/date_formate.dart';
 
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../ui_helper/responsive_helper.dart';
@@ -20,7 +21,6 @@ class DeliveryOrderCard extends StatelessWidget {
           context,
           MaterialPageRoute(builder: (context) =>  DeliveryBoyOrderDetailScreen(orderId: order.sId.toString(),)),
         );
-
 
       },
       child: Container(
@@ -188,13 +188,66 @@ class DeliveryOrderCard extends StatelessWidget {
                     style: TextStyle(
                         color: Colors.green, fontWeight: FontWeight.w600),
                   ),
-                  Text(
-                    "\u20B9 ${order.orderPrice}",
-                    style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600),
+                  // Text(
+                  //   "\u20B9 ${order.orderPrice}",
+                  //   style: TextStyle(
+                  //       color: Colors.blue,
+                  //       fontSize: 18,
+                  //       fontWeight: FontWeight.w600),
+                  // ),
+
+                  RichText(
+                    text: TextSpan(
+                      children: [
+                        TextSpan(
+                          text:
+                          "\u20B9 ", // Rupee Symbol with space
+                          style: AppTextStyles.heading1(
+                            context,
+                            overrideStyle: TextStyle(
+                              color: AppColors.primary,
+                              fontSize: ResponsiveHelper
+                                  .fontSize(
+                                  context, 16),
+                            ),
+                          ),
+                        ),
+                        TextSpan(
+                          text:order.orderPrice.toString(),
+                          style: AppTextStyles.heading1(
+                            context,
+                            overrideStyle: TextStyle(
+                              color: AppColors.primary,
+                              fontSize: ResponsiveHelper
+                                  .fontSize(
+                                  context, 16),
+                            ),
+                          ),
+                        ),
+                        TextSpan(
+                          text:
+                          " /-", // Smaller "/-" Sign
+                          style: AppTextStyles.heading1(
+                            context,
+                            overrideStyle: TextStyle(
+                              color: AppColors.primary,
+                              fontSize: ResponsiveHelper
+                                  .fontSize(context,
+                                  14), // Smaller font size
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+
+
+
+
+
+
+
+
                 ],
               ),
             ],
@@ -212,7 +265,7 @@ class DeliveryOrderCard extends StatelessWidget {
         badgeColor = Colors.orange;
         break;
       case "ongoing":
-        badgeColor = Colors.blue;
+        badgeColor = AppColors.primary;
         break;
       case "completed":
         badgeColor = Colors.green;

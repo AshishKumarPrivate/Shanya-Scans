@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/common/default_common_app_bar.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/base_widgets/common/default_common_app_bar.dart';
+import 'package:shanya_scans/ui_helper/app_text_styles.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 
 class MyAppointmentsScreen extends StatelessWidget {
@@ -27,9 +28,8 @@ class MyAppointmentsScreen extends StatelessWidget {
                     SizedBox(
                       width: ResponsiveHelper.containerWidth(context, 50),
                       height: ResponsiveHelper.containerWidth(context, 50),
-                      child: Image.asset(
+                      child: ImageLoaderUtil.assetImage(
                         "assets/images/img_error.jpg",
-                        fit: BoxFit.fill,
                       ),
                     ),
                     Text(

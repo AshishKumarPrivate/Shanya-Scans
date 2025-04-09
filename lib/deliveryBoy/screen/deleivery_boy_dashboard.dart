@@ -1,8 +1,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:healthians/deliveryBoy/controller/delivery_boy_auth_provider.dart';
-import 'package:healthians/deliveryBoy/screen/widget/DeliveryOrderList.dart';
+import 'package:shanya_scans/deliveryBoy/controller/delivery_boy_auth_provider.dart';
+import 'package:shanya_scans/deliveryBoy/screen/deliveryboy_home_toolbar_setion.dart';
+import 'package:shanya_scans/deliveryBoy/screen/widget/DeliveryOrderList.dart';
 import 'package:provider/provider.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../base_widgets/outlined_rounded_button.dart';
@@ -76,19 +77,9 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
     }
   }
 
-  // ✅ Handle Bottom Navigation Tap
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   // ✅ List of Screens for Bottom Navigation
   final List<Widget> _screens = [
     DeliveryBoyDashboardScreen(), // Dashboard
-    DeliveryBoyProfileScreen(), // Dashboard
-    // Text("Orders Page"), // Replace with Orders Screen
-    // Text("Profile Page"), // Replace with Profile Screen
   ];
 
   @override
@@ -105,23 +96,17 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
         backgroundColor: AppColors.deliveryPrimary, // Subtle background
         body: SafeArea(
           bottom: false,
-          child: _selectedIndex == 0
-              ? _buildDashboard() // Show Dashboard if selected
-              : Center(child: _screens[_selectedIndex]), // Other screens
+          child: Container(
+            child: Column(
+              children: [
+                DeliveryBoyHomeToolbarSection(),
+                    Expanded(child: _buildDashboard()) // Show Dashboard if selected
+
+              ],
+            ),
+          ), // Other screens
         ),
 
-        bottomNavigationBar: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          selectedItemColor: AppColors.deliveryPrimary,
-          unselectedItemColor: Colors.grey,
-          items: [
-            BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard), label: "Dashboard"),
-            BottomNavigationBarItem( icon: Icon(Icons.person), label: "Profile"),
-            // BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-          ],
-        ),
       ),
     );
   }
@@ -264,8 +249,6 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
     );
   }
 
-
-  /// **Custom Header with Order Summary Above Tabs**
   /// **Custom Header with Order Summary Above Tabs**
   Widget _buildOrderSummary(
       bool newOrderAssigned, DeliveryOrdersProvider provider) {
@@ -315,8 +298,7 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
                 ),
               ],
             ),
-            SizedBox(height: 10),
-
+            SizedBox(height: 5),
             // Shimmer Notification Effect
             Shimmer.fromColors(
               baseColor: Colors.white,
@@ -326,12 +308,14 @@ class _DeliveryBoyDashboardScreenState extends State<DeliveryBoyDashboardScreen>
                   Icon(Icons.delivery_dining,
                       color: Colors.greenAccent, size: 22),
                   SizedBox(width: 6),
-                  Text(
-                    "You have a new delivery order!",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                  Expanded(
+                    child: Text(
+                      "You have a new Home Collection!",
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ],
@@ -453,289 +437,289 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   }
 }
 
-class DeliveryBoyProfileScreen extends StatefulWidget {
-  @override
-  _DeliveryBoyProfileScreenState createState() =>
-      _DeliveryBoyProfileScreenState();
-}
-
-class _DeliveryBoyProfileScreenState extends State<DeliveryBoyProfileScreen> {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<DeliveryOrdersProvider>(context, listen: false)
-          .fetchDeliveryBoyProfileSummary();
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text("Profile"),
-      ),
-      body: Consumer<DeliveryOrdersProvider>(
-        builder: (context, userProvider, child) {
-          if (userProvider.isLoading) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (userProvider.deliveryBoyProfileSummaryModel == null) {
-            return Center(child: Text("No data available"));
-          }
-
-          var profile = userProvider.deliveryBoyProfileSummaryModel!.data;
-          return SingleChildScrollView(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // User Info Card
-                Container(
-                  width: double.infinity,
-                  child: Card(
-                    color: Colors.white,
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            profile?.name ?? "N/A",
-                            style: TextStyle(
-                                fontSize: 22, fontWeight: FontWeight.bold),
-                          ),
-                          SizedBox(height: 8),
-                          Text(
-                            "Email: ${profile?.email ?? "N/A"}",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20,),
-                Align(
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    width:
-                    ResponsiveHelper.containerWidth(context, 30),
-                    height:
-                    ResponsiveHelper.containerWidth(context, 8),
-                    child: OutlinedRoundedButton(
-                      text: 'Logout',
-                      borderWidth: 0.2,
-                      icon: Icon(
-                        Icons.logout,
-                        color: Colors.red,
-                      ),
-                      color: Colors.red,
-                      borderColor: Colors.red,
-                      borderRadius: 10.0,
-                      onPressed: () {
-                        showLogoutBottomSheet(context);
-                        print('Button clicked!');
-                      },
-                      textStyle: TextStyle(fontSize: 18),
-                      // icon: Icon(Icons.touch_app, color: Colors.white),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                // Order List
-                // Text(
-                //   "Order History",
-                //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                // ),
-                // SizedBox(height: 8),
-                Visibility(
-                  visible: false,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    reverse: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    itemCount: profile?.orderDetails?.length ?? 0,
-                    itemBuilder: (context, index) {
-                      var order = profile!.orderDetails![index];
-                      return Card(
-                        margin: EdgeInsets.symmetric(vertical: 8),
-                        elevation: 3,
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Order: ${order.orderName}",
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(height: 4),
-                              Text("Patient: ${order.patientName}"),
-                              Text("Age: ${order.patientAge}"),
-                              Text("Order Type: ${order.orderType}"),
-                              Text("Price: ₹${order.orderPrice}"),
-                              Text("Booking Status: ${order.bookingStatus}",
-                                  style: TextStyle(
-                                      color: order.bookingStatus == "completed"
-                                          ? Colors.green
-                                          : Colors.red)),
-                              Text("Report Status: ${order.reportStatus}"),
-                              Text("Order Date: ${order.orderDateTime}"),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  void showLogoutBottomSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      backgroundColor: Colors.white,
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              /// **Red Warning Icon**
-              Container(
-                width: 100,
-                height: 5,
-                color: Colors.grey[400],
-              ),
-
-              Container(
-                width: double.infinity,
-                // color: Colors.grey,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 10),
-                      const Icon(
-                        Icons.error_outline,
-                        color: Colors.red,
-                        size: 50,
-                      ),
-                      const SizedBox(height: 10),
-
-                      /// **Sign Out Text**
-                      Text(
-                        "Sign out from Account",
-                        style: AppTextStyles.bodyText1(context,
-                            overrideStyle: new TextStyle(
-                              color: Colors.red,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                            )),
-                      ),
-                      const SizedBox(height: 8),
-
-                      /// **Confirmation Message**
-                      Text(
-                        "Are you sure you would like to signout of your Account",
-                        textAlign: TextAlign.start,
-                        style: AppTextStyles.bodyText1(context,
-                            overrideStyle: new TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            )),
-                      ),
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-              ),
-
-              /// **Cancel & Logout Buttons**
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  /// **Cancel Button**
-                  ElevatedButton(
-                    onPressed: () => Navigator.pop(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.lightBrown_color,
-                      // Light background
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
-                    ),
-                    child: Text(
-                      "Cancel",
-                      style: AppTextStyles.heading1(context,
-                          overrideStyle: new TextStyle(
-                            color: Colors.red,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          )),
-                    ),
-                  ),
-
-                  /// **Logout Button**
-                  ElevatedButton(
-                    onPressed: () async {
-                      Provider.of<DeliveryBoyAuthApiProvider>(context, listen: false)
-                          .logoutUser(context);
-                      // **Storage se logout & async process complete hone ka wait karein**
-                      // await StorageHelper().logout();
-                      // // **Bottom Sheet Close karein**
-                      // Navigator.pop(context);
-                      // // **Navigate to LoginScreen & Remove All Screens**
-                      // Navigator.of(context).pushReplacement(
-                      //   MaterialPageRoute(builder: (context) => LoginScreen()),
-                      // );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange, // Orange button
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding:
-                      const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
-                    ),
-                    child: Text(
-                      "Logout",
-                      style: AppTextStyles.heading1(context,
-                          overrideStyle: new TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                          )),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 10),
-            ],
-          ),
-        );
-      },
-    );
-  }
-}
+// class DeliveryBoyProfileScreen extends StatefulWidget {
+//   @override
+//   _DeliveryBoyProfileScreenState createState() =>
+//       _DeliveryBoyProfileScreenState();
+// }
+//
+// class _DeliveryBoyProfileScreenState extends State<DeliveryBoyProfileScreen> {
+//   @override
+//   void initState() {
+//     super.initState();
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       Provider.of<DeliveryOrdersProvider>(context, listen: false)
+//           .fetchDeliveryBoyProfileSummary();
+//     });
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       appBar: AppBar(
+//         title: Text("Profile"),
+//       ),
+//       body: Consumer<DeliveryOrdersProvider>(
+//         builder: (context, userProvider, child) {
+//           if (userProvider.isLoading) {
+//             return Center(child: CircularProgressIndicator());
+//           }
+//           if (userProvider.deliveryBoyProfileSummaryModel == null) {
+//             return Center(child: Text("No data available"));
+//           }
+//
+//           var profile = userProvider.deliveryBoyProfileSummaryModel!.data;
+//           return SingleChildScrollView(
+//             padding: EdgeInsets.all(16),
+//             child: Column(
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 // User Info Card
+//                 Container(
+//                   width: double.infinity,
+//                   child: Card(
+//                     color: Colors.white,
+//                     elevation: 3,
+//                     shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(10)),
+//                     child: Padding(
+//                       padding: EdgeInsets.all(16),
+//                       child: Column(
+//                         crossAxisAlignment: CrossAxisAlignment.start,
+//                         children: [
+//                           Text(
+//                             profile?.name ?? "N/A",
+//                             style: TextStyle(
+//                                 fontSize: 22, fontWeight: FontWeight.bold),
+//                           ),
+//                           SizedBox(height: 8),
+//                           Text(
+//                             "Email: ${profile?.email ?? "N/A"}",
+//                             style: TextStyle(fontSize: 16),
+//                           ),
+//                         ],
+//                       ),
+//                     ),
+//                   ),
+//                 ),
+//                 SizedBox(height: 20,),
+//                 Align(
+//                   alignment: Alignment.center,
+//                   child: SizedBox(
+//                     width:
+//                     ResponsiveHelper.containerWidth(context, 30),
+//                     height:
+//                     ResponsiveHelper.containerWidth(context, 8),
+//                     child: OutlinedRoundedButton(
+//                       text: 'Logout',
+//                       borderWidth: 0.2,
+//                       icon: Icon(
+//                         Icons.logout,
+//                         color: Colors.red,
+//                       ),
+//                       color: Colors.red,
+//                       borderColor: Colors.red,
+//                       borderRadius: 10.0,
+//                       onPressed: () {
+//                         showLogoutBottomSheet(context);
+//                         print('Button clicked!');
+//                       },
+//                       textStyle: TextStyle(fontSize: 18),
+//                       // icon: Icon(Icons.touch_app, color: Colors.white),
+//                     ),
+//                   ),
+//                 ),
+//                 SizedBox(height: 16),
+//                 // Order List
+//                 // Text(
+//                 //   "Order History",
+//                 //   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+//                 // ),
+//                 // SizedBox(height: 8),
+//                 Visibility(
+//                   visible: false,
+//                   child: ListView.builder(
+//                     shrinkWrap: true,
+//                     reverse: true,
+//                     physics: NeverScrollableScrollPhysics(),
+//                     itemCount: profile?.orderDetails?.length ?? 0,
+//                     itemBuilder: (context, index) {
+//                       var order = profile!.orderDetails![index];
+//                       return Card(
+//                         margin: EdgeInsets.symmetric(vertical: 8),
+//                         elevation: 3,
+//                         shape: RoundedRectangleBorder(
+//                             borderRadius: BorderRadius.circular(10)),
+//                         child: Padding(
+//                           padding: EdgeInsets.all(16),
+//                           child: Column(
+//                             crossAxisAlignment: CrossAxisAlignment.start,
+//                             children: [
+//                               Text(
+//                                 "Order: ${order.orderName}",
+//                                 style: TextStyle(
+//                                     fontSize: 18, fontWeight: FontWeight.bold),
+//                               ),
+//                               SizedBox(height: 4),
+//                               Text("Patient: ${order.patientName}"),
+//                               Text("Age: ${order.patientAge}"),
+//                               Text("Order Type: ${order.orderType}"),
+//                               Text("Price: ₹${order.orderPrice}"),
+//                               Text("Booking Status: ${order.bookingStatus}",
+//                                   style: TextStyle(
+//                                       color: order.bookingStatus == "completed"
+//                                           ? Colors.green
+//                                           : Colors.red)),
+//                               Text("Report Status: ${order.reportStatus}"),
+//                               Text("Order Date: ${order.orderDateTime}"),
+//                             ],
+//                           ),
+//                         ),
+//                       );
+//                     },
+//                   ),
+//                 ),
+//               ],
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+//
+//   void showLogoutBottomSheet(BuildContext context) {
+//     showModalBottomSheet(
+//       context: context,
+//       shape: const RoundedRectangleBorder(
+//         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+//       ),
+//       backgroundColor: Colors.white,
+//       builder: (context) {
+//         return Padding(
+//           padding: const EdgeInsets.all(16.0),
+//           child: Column(
+//             mainAxisSize: MainAxisSize.min,
+//             children: [
+//               /// **Red Warning Icon**
+//               Container(
+//                 width: 100,
+//                 height: 5,
+//                 color: Colors.grey[400],
+//               ),
+//
+//               Container(
+//                 width: double.infinity,
+//                 // color: Colors.grey,
+//                 child: Padding(
+//                   padding: const EdgeInsets.only(left: 20.0),
+//                   child: Column(
+//                     mainAxisAlignment: MainAxisAlignment.start,
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       const SizedBox(height: 10),
+//                       const Icon(
+//                         Icons.error_outline,
+//                         color: Colors.red,
+//                         size: 50,
+//                       ),
+//                       const SizedBox(height: 10),
+//
+//                       /// **Sign Out Text**
+//                       Text(
+//                         "Sign out from Account",
+//                         style: AppTextStyles.bodyText1(context,
+//                             overrideStyle: new TextStyle(
+//                               color: Colors.red,
+//                               fontWeight: FontWeight.bold,
+//                               fontSize: 18,
+//                             )),
+//                       ),
+//                       const SizedBox(height: 8),
+//
+//                       /// **Confirmation Message**
+//                       Text(
+//                         "Are you sure you would like to signout of your Account",
+//                         textAlign: TextAlign.start,
+//                         style: AppTextStyles.bodyText1(context,
+//                             overrideStyle: new TextStyle(
+//                               fontWeight: FontWeight.bold,
+//                               fontSize: 14,
+//                             )),
+//                       ),
+//                       const SizedBox(height: 20),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//
+//               /// **Cancel & Logout Buttons**
+//               Row(
+//                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+//                 children: [
+//                   /// **Cancel Button**
+//                   ElevatedButton(
+//                     onPressed: () => Navigator.pop(context),
+//                     style: ElevatedButton.styleFrom(
+//                       backgroundColor: AppColors.lightBrown_color,
+//                       // Light background
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(10),
+//                       ),
+//                       padding:
+//                       const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+//                     ),
+//                     child: Text(
+//                       "Cancel",
+//                       style: AppTextStyles.heading1(context,
+//                           overrideStyle: new TextStyle(
+//                             color: Colors.red,
+//                             fontWeight: FontWeight.bold,
+//                             fontSize: 16,
+//                           )),
+//                     ),
+//                   ),
+//
+//                   /// **Logout Button**
+//                   ElevatedButton(
+//                     onPressed: () async {
+//                       Provider.of<DeliveryBoyAuthApiProvider>(context, listen: false)
+//                           .logoutUser(context);
+//                       // **Storage se logout & async process complete hone ka wait karein**
+//                       // await StorageHelper().logout();
+//                       // // **Bottom Sheet Close karein**
+//                       // Navigator.pop(context);
+//                       // // **Navigate to LoginScreen & Remove All Screens**
+//                       // Navigator.of(context).pushReplacement(
+//                       //   MaterialPageRoute(builder: (context) => LoginScreen()),
+//                       // );
+//                     },
+//                     style: ElevatedButton.styleFrom(
+//                       backgroundColor: Colors.orange, // Orange button
+//                       shape: RoundedRectangleBorder(
+//                         borderRadius: BorderRadius.circular(10),
+//                       ),
+//                       padding:
+//                       const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+//                     ),
+//                     child: Text(
+//                       "Logout",
+//                       style: AppTextStyles.heading1(context,
+//                           overrideStyle: new TextStyle(
+//                             color: Colors.white,
+//                             fontWeight: FontWeight.bold,
+//                             fontSize: 16,
+//                           )),
+//                     ),
+//                   ),
+//                 ],
+//               ),
+//
+//               const SizedBox(height: 10),
+//             ],
+//           ),
+//         );
+//       },
+//     );
+//   }
+// }

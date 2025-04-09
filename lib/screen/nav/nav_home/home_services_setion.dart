@@ -1,12 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 import '../../../ui_helper/responsive_helper.dart';
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
 import '../../../base_widgets/common/home_service_shimmer.dart';
-import 'package:healthians/screen/service/controller/service_scans_provider.dart';
-import 'package:healthians/screen/service/service_detail_list.dart';
+import 'package:shanya_scans/screen/service/controller/service_scans_provider.dart';
+import 'package:shanya_scans/screen/service/service_detail_list.dart';
 
 class HomeServicesSection extends StatefulWidget {
   final String? sectionHeading;
@@ -124,19 +125,7 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
                                 ),
                               ),
                             )
-                          // : services.isEmpty // ✅ Handle empty list separately
-                          //     ? Center(
-                          //         child: SizedBox(
-                          //           width: ResponsiveHelper.containerWidth(
-                          //               context, 50),
-                          //           height: ResponsiveHelper.containerWidth(
-                          //               context, 50),
-                          //           child: Image.asset(
-                          //             "assets/images/img_error.jpg",
-                          //             fit: BoxFit.cover,
-                          //           ),
-                          //         ),
-                          //       )
+
                           : GridView.builder(
                               scrollDirection: Axis.horizontal,
                               gridDelegate:
@@ -243,29 +232,27 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
                                           child: Padding(
                                             padding: const EdgeInsets.all(3),
                                             child: ClipOval(
-                                              child: CachedNetworkImage(
-                                                imageUrl: item
-                                                    .iconPhoto!.secureUrl
-                                                    .toString(),
-                                                fit: BoxFit.cover,
-                                                placeholder: (context, url) =>
-                                                    Center(
-                                                  child: Image.asset(
-                                                      "assets/images/img_placeholder.jpeg"), // Placeholder while loading
-                                                ),
-                                                errorWidget:
-                                                    (context, url, error) =>
-                                                        const Icon(
-                                                  Icons.error,
-                                                  color: Colors
-                                                      .red, // Show error icon if image fails
-                                                ),
-                                                fadeInDuration: const Duration(
-                                                    milliseconds: 500),
-                                                // Smooth fade-in effect
-                                                fadeOutDuration: const Duration(
-                                                    milliseconds: 300),
-                                              ),
+                                              child:ImageLoaderUtil.cacheNetworkImage(item .iconPhoto!.secureUrl.toString())
+
+
+                                              // CachedNetworkImage(
+                                              //   imageUrl: item
+                                              //       .iconPhoto!.secureUrl
+                                              //       .toString(),
+                                              //   fit: BoxFit.cover,
+                                              //   placeholder: (context, url) =>
+                                              //       Center(
+                                              //     child: Image.asset(
+                                              //         "assets/images/img_placeholder.jpeg"), // Placeholder while loading
+                                              //   ),
+                                              //   errorWidget: (context, url, error) => const Icon(
+                                              //     Icons.error,
+                                              //     color: Colors .red, // Show error icon if image fails
+                                              //   ),
+                                              //   fadeInDuration: const Duration(  milliseconds: 500),
+                                              //   // Smooth fade-in effect
+                                              //   fadeOutDuration: const Duration( milliseconds: 300),
+                                              // ),
                                             ),
                                           ),
                                         ),

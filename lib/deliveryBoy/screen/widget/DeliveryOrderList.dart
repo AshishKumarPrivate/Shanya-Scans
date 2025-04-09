@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/loading_indicator.dart';
-import 'package:healthians/deliveryBoy/model/DeliveryOrderLIstModel.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
+import 'package:shanya_scans/base_widgets/loading_indicator.dart';
+import 'package:shanya_scans/deliveryBoy/model/DeliveryOrderLIstModel.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
@@ -23,6 +23,7 @@ class _DeliveryOrderListState extends State<DeliveryOrderList> {
   DateTime? _selectedDate;
   late DeliveryOrdersProvider orderProvider;
   bool _showDateSelector = false; // Toggle for showing the date selector
+  bool isLocalLoading = true;
 
   /// 🔹 Selects the date and filters the list **locally** without API calls
   void _onDateSelected(DateTime selectedDate) {
@@ -47,15 +48,34 @@ class _DeliveryOrderListState extends State<DeliveryOrderList> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _fetchInitialOrders();
+    });
+  }
+
+  Future<void> _fetchInitialOrders() async {
+    setState(() {
+      isLocalLoading = true;
+    });
+    await Provider.of<DeliveryOrdersProvider>(context, listen: false)
+        .fetchDeliveryBoyOrderList(widget.status);
+    setState(() {
+      isLocalLoading = false;
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     orderProvider = Provider.of<DeliveryOrdersProvider>(context);
 
-    if (orderProvider.isLoading) {
-      return loadingIndicator(color: AppColors.deliveryPrimary);
-    }
+    // if (orderProvider.isLoading) {
+    //   return loadingIndicator(color: AppColors.deliveryPrimary);
+    // }
 
-    List<OrderDetails> filteredOrders =
-        _filterOrdersByDate(orderProvider.orderList);
+    List<OrderDetails> filteredOrders = _filterOrdersByDate(orderProvider.orderList);
 
     return Column(
       children: [
@@ -63,29 +83,37 @@ class _DeliveryOrderListState extends State<DeliveryOrderList> {
         if (_showDateSelector) _buildDateSelector(),
         // 🔹 Show only when toggled
         Expanded(
-          child: filteredOrders.isEmpty
-              ? _buildNoOrdersWidget()
-              : RefreshIndicator(
-                  onRefresh: () async {
-                    await orderProvider
-                        .fetchDeliveryBoyOrderList(widget.status);
-                  },
-                  child: ListView.builder(
-                    padding: const EdgeInsets.symmetric( horizontal: 0, vertical: 0),
-                    itemCount: filteredOrders.length,
-                    itemBuilder: (context, index) {
-                      return Padding(
-                        padding: EdgeInsets.only(
-                          left: 15,
-                          right: 15,
-                          top: index == 0 ? 12 : 5,
-                          bottom: index == filteredOrders.length - 1 ? 15 : 5,
+          child: isLocalLoading
+              ? loadingIndicator(color: AppColors.deliveryPrimary)
+              : orderProvider.isLoading
+                  ? loadingIndicator(color: AppColors.deliveryPrimary)
+                  : filteredOrders.isEmpty
+                      ? _buildNoOrdersWidget()
+                      : RefreshIndicator(
+                          onRefresh: () async {
+                            await orderProvider
+                                .fetchDeliveryBoyOrderList(widget.status);
+                          },
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 0, vertical: 0),
+                            itemCount: filteredOrders.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: EdgeInsets.only(
+                                  left: 15,
+                                  right: 15,
+                                  top: index == 0 ? 12 : 5,
+                                  bottom: index == filteredOrders.length - 1
+                                      ? 15
+                                      : 5,
+                                ),
+                                child: DeliveryOrderCard(
+                                    order: filteredOrders[index]),
+                              );
+                            },
+                          ),
                         ),
-                        child: DeliveryOrderCard(order: filteredOrders[index]),
-                      );
-                    },
-                  ),
-                ),
         ),
       ],
     );
@@ -102,8 +130,9 @@ class _DeliveryOrderListState extends State<DeliveryOrderList> {
             "Filter orders by date",
             style: AppTextStyles.bodyText1(
               context,
-              overrideStyle:
-                  TextStyle(fontSize: ResponsiveHelper.fontSize(context, 12),color: Colors.black),
+              overrideStyle: TextStyle(
+                  fontSize: ResponsiveHelper.fontSize(context, 12),
+                  color: Colors.black),
             ),
           ),
           OutlinedButton.icon(
@@ -117,8 +146,9 @@ class _DeliveryOrderListState extends State<DeliveryOrderList> {
               _showDateSelector ? "Filter" : "Filter",
               style: AppTextStyles.bodyText1(
                 context,
-                overrideStyle:
-                TextStyle(fontSize: ResponsiveHelper.fontSize(context, 12),color: Colors.black),
+                overrideStyle: TextStyle(
+                    fontSize: ResponsiveHelper.fontSize(context, 12),
+                    color: Colors.black),
               ),
             ),
             style: OutlinedButton.styleFrom(
@@ -155,14 +185,19 @@ class _DeliveryOrderListState extends State<DeliveryOrderList> {
         dayProps: EasyDayProps(
           todayStyle: DayStyle(
             decoration: BoxDecoration(
-              border: Border.all(color: AppColors.primary,width: 1),
+              border: Border.all(color: AppColors.primary, width: 1),
               // color: Colors.blueAccent,
               shape: BoxShape.rectangle,
               borderRadius: BorderRadius.circular(10),
             ),
-            dayStrStyle: TextStyle(color: AppColors.primary, ),
-            dayNumStyle: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
-            monthStrStyle: TextStyle(color: AppColors.primary,),
+            dayStrStyle: TextStyle(
+              color: AppColors.primary,
+            ),
+            dayNumStyle: TextStyle(
+                color: AppColors.primary, fontWeight: FontWeight.bold),
+            monthStrStyle: TextStyle(
+              color: AppColors.primary,
+            ),
           ),
           activeDayStyle: DayStyle(
             decoration: BoxDecoration(

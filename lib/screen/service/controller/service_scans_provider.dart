@@ -2,12 +2,12 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:healthians/network_manager/repository.dart';
-import 'package:healthians/screen/service/model/HomeServiceDetailModel.dart'
+import 'package:shanya_scans/network_manager/repository.dart';
+import 'package:shanya_scans/screen/service/model/HomeServiceDetailModel.dart'
     as HomeDetailModel;
-import 'package:healthians/screen/service/model/HomeServiceListModel.dart'
+import 'package:shanya_scans/screen/service/model/HomeServiceListModel.dart'
     as HomeListModel;
-import 'package:healthians/screen/service/model/ServiceDetailRateListModel.dart'
+import 'package:shanya_scans/screen/service/model/ServiceDetailRateListModel.dart'
     as RateModel;
 
 class ServiceApiProvider with ChangeNotifier {

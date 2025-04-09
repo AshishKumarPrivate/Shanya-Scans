@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/packages/model/PackageListByTabIdModel.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
-import 'package:healthians/base_widgets/solid_rounded_button.dart';
+import 'package:shanya_scans/screen/packages/model/PackageListByTabIdModel.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/base_widgets/solid_rounded_button.dart';
 
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';

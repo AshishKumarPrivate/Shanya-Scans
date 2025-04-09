@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:healthians/base_widgets/loading_indicator.dart';
-import 'package:healthians/deliveryBoy/controller/DeliveryOrdersProvider.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
+import 'package:shanya_scans/base_widgets/loading_indicator.dart';
+import 'package:shanya_scans/deliveryBoy/controller/DeliveryOrdersProvider.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
 import 'package:provider/provider.dart';
+import '../../base_widgets/common/default_common_app_bar.dart';
 import '../../base_widgets/outlined_rounded_button.dart';
 import '../../ui_helper/app_text_styles.dart';
 import '../../ui_helper/responsive_helper.dart';
@@ -63,16 +64,9 @@ class _DeliveryBoyOrderDetailScreenState
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        iconTheme: IconThemeData(
-          color: Colors.white, // Change this to your desired color
-        ),
-        title: Text(
-          "Order Details",
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: AppColors.deliveryPrimary,
-      ),
+      appBar: DefaultCommonAppBar(activityName: "Order Details",backgroundColor: AppColors.deliveryPrimary,),
+
+
       body: provider.isLoading
           ? Center(child: loadingIndicator(color: AppColors.deliveryPrimary))
           : provider.errorMessage.isNotEmpty

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
 import '../../screen/cart/cart_list_screen.dart';
 import '../../screen/cart/controller/cart_list_api_provider.dart';
@@ -39,10 +39,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       )
           : null,
       actions: [
-        const Icon(Icons.share, size: 22.0, color: Colors.white),
-        const SizedBox(width: 15.0),
-        const Icon(Icons.notifications_outlined, size: 22.0, color: Colors.white),
-        const SizedBox(width: 15.0),
+        // const Icon(Icons.share, size: 22.0, color: Colors.white),
+        // const SizedBox(width: 15.0),
+        // const Icon(Icons.notifications_outlined, size: 22.0, color: Colors.white),
+        // const SizedBox(width: 15.0),
         if (!isCartScreen)
           Consumer<CartProvider>(
             builder: (context, cartProvider, child) {

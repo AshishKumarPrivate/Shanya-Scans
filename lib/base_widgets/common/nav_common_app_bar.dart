@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
 import '../../screen/cart/cart_list_screen.dart';
 import '../../screen/cart/controller/cart_list_api_provider.dart';
@@ -78,7 +78,7 @@ class _NavCommonAppBarState extends State<NavCommonAppBar> {
                               overrideStyle: TextStyle(
                                   color: Colors.white,
                                   fontSize:
-                                  ResponsiveHelper.fontSize(context, 14))),
+                                      ResponsiveHelper.fontSize(context, 14))),
                           overflow: TextOverflow.ellipsis, // Prevent overflow
                         ),
                       ),
@@ -87,20 +87,22 @@ class _NavCommonAppBarState extends State<NavCommonAppBar> {
                 ),
                 Row(
                   children: [
-                    Icon(
-                      Icons.share,
-                      size: 22.0,
-                      color: Colors.white,
-                    ),
-                    SizedBox(width: 15.0),
-                    Icon(
-                      Icons.notification_important_outlined,
-                      size: 22.0,
-                      color: Colors.white,
-                    ),
+                    // Icon(
+                    //   Icons.share,
+                    //   size: 22.0,
+                    //   color: Colors.white,
+                    // ),
+                    // SizedBox(width: 15.0),
+                    // Icon(
+                    //   Icons.notification_important_outlined,
+                    //   size: 22.0,
+                    //   color: Colors.white,
+                    // ),
+
                     SizedBox(width: widget.isCartScreen ? 0.0 : 15.0),
                     Visibility(
-                      visible: !widget.isCartScreen, // Hide if isCartScreen is true
+                      visible: !widget.isCartScreen,
+                      // Hide if isCartScreen is true
                       child: InkWell(
                         onTap: () {
                           Navigator.push(
@@ -124,7 +126,8 @@ class _NavCommonAppBarState extends State<NavCommonAppBar> {
                                         context, 22), // Slightly larger icon
                                   ),
                                 ),
-                                if (cartProvider.cartItems.isNotEmpty) // Show badge if cart has items
+                                if (cartProvider.cartItems
+                                    .isNotEmpty) // Show badge if cart has items
                                   Positioned(
                                     right: -3, // 🛠 Adjusted position
                                     top: -10, // 🛠 Lifted up slightly
@@ -140,7 +143,8 @@ class _NavCommonAppBarState extends State<NavCommonAppBar> {
                                       ),
                                       child: Center(
                                         child: Text(
-                                          cartProvider.cartItems.length.toString(),
+                                          cartProvider.cartItems.length
+                                              .toString(),
                                           style: TextStyle(
                                             color: Colors.white,
                                             fontSize: 12,
@@ -156,56 +160,53 @@ class _NavCommonAppBarState extends State<NavCommonAppBar> {
                         ),
                       ),
                     ),
+                    SizedBox(width: 5.0),
                   ],
                 ),
               ],
             ),
             ResponsiveHelper.sizeBoxHeightSpace(context, 1),
-           widget.searchBarVisible ? Padding(
-             padding: EdgeInsets.symmetric(horizontal: 5),
-             child: InkWell(
-               onTap: () {},
-               child: Container(
-                 height: ResponsiveHelper.containerWidth(context, 10), // ✅ Reduced height
-                 padding: EdgeInsets.only(right: 5),
-                 decoration: BoxDecoration(
-                   color: Colors.white,
-                   borderRadius: BorderRadius.circular(8),
-                   border: Border.all(width: 0.4, color: AppColors.txtLightGreyColor),
-                 ),
-                 child: Row(
-                   crossAxisAlignment: CrossAxisAlignment.center,
-                   children: [
-                     Padding(
-                       padding: const EdgeInsets.only(top: 10.0,left: 8,right: 8,bottom: 5),
-                       child: Icon(Icons.search_sharp, color: Colors.grey,),
-                     ),
-                     Expanded(
-                       child: TextField(
-                         onTap: _unfocusKeyboard, // ✅ Tap anywhere to close keyboard,
-                         textAlignVertical: TextAlignVertical.top,
-                         controller: searchController,
-                         onChanged: widget.onSearchChanged, // ✅ Call the function
-                         // onChanged: (query) {
-                         //   Provider.of<HealthPacakgeListApiProvider>(context, listen: false)
-                         //       .filterPackages(query);
-                         // },
-                         decoration: InputDecoration(
-                           // prefixIcon: Icon(Icons.search_sharp, color: Colors.grey,),
-                           hintText: "Enter your test here",
-                           hintStyle: TextStyle(color: Colors.black54),
-                           border: InputBorder.none,
-                           // contentPadding: EdgeInsets.symmetric(vertical: 8), // ✅ Adjusted padding for smaller height
-                         ),
-                         style: TextStyle(color: Colors.black),
-                         cursorColor: AppColors.primary,
-                       ),
-                     ),
-                   ],
-                 ),
-               ),
-             ),
-           ) : SizedBox.shrink(),
+            widget.searchBarVisible
+                ? Padding(
+              padding: EdgeInsets.only(left: 5, right: 5,top: 5,bottom: 0),
+              child: Container(
+                height: ResponsiveHelper.containerHeight(context, 4.5),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(width: 0.4, color: AppColors.txtLightGreyColor),
+                ),
+                child: Center(
+                  child: TextField(
+                    controller: searchController,
+                    onTap: _unfocusKeyboard,
+                    onChanged: widget.onSearchChanged,
+                    textAlignVertical: TextAlignVertical.center,
+                    style: AppTextStyles.bodyText1(
+                      context,
+                      overrideStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: ResponsiveHelper.fontSize(context, 14),
+                      ),
+                    ),
+                    cursorColor: AppColors.primary,
+                    decoration: InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      isDense: true,
+                      prefixIcon: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                        child: Icon(Icons.search_sharp, color: Colors.grey,size: 24,),
+                      ),
+                      hintText: "Enter your test here",
+                      hintStyle: TextStyle(color: Colors.black54),
+                      border: InputBorder.none,
+                    ),
+                  ),
+                ),
+              ),
+            )
+
+          : SizedBox.shrink(),
           ],
         ),
       ),

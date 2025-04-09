@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:healthians/base_widgets/common/custom_app_bar.dart';
-import 'package:healthians/screen/cart/controller/cart_list_api_provider.dart';
+import 'package:shanya_scans/base_widgets/common/custom_app_bar.dart';
+import 'package:shanya_scans/screen/cart/controller/cart_list_api_provider.dart';
 import 'package:html/parser.dart'; // Import required package
 import 'package:provider/provider.dart';
 
@@ -79,7 +79,7 @@ class _CartListScreenState extends State<CartListScreen> {
                   // ✅ Calculate dynamic cart total
                   double cartTotal = cartProvider.cartItems.fold(
                       0, (sum, item) => sum + (item.price * item.quantity));
-                  double discount = 399.00;
+                  double discount = 0.00;
                   double orderTotal = cartTotal - discount;
 
                   return Stack(
@@ -116,12 +116,8 @@ class _CartListScreenState extends State<CartListScreen> {
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(10),
                                         child: Container(
-                                          width:
-                                              ResponsiveHelper.containerWidth(
-                                                  context, 20),
-                                          height:
-                                              ResponsiveHelper.containerWidth(
-                                                  context, 20),
+                                          width: ResponsiveHelper.containerWidth( context, 20),
+                                          height:ResponsiveHelper.containerWidth(context, 20),
                                           child: Image.network(
                                               cartItem.imageUrl,
                                               fit: BoxFit.cover),
@@ -342,10 +338,12 @@ class _CartListScreenState extends State<CartListScreen> {
                                           value: '₹$cartTotal'),
                                       SummaryRow(
                                           label: 'Coupon Discount',
-                                          value: '-₹$discount'),
-                                      SummaryRow(
-                                          label: 'Sample Collection Charges',
-                                          value: '₹250.00 Free'),
+                                          value: '₹$discount'),
+                                      // SummaryRow(
+                                      //     label: 'Sample Collection Charges',
+                                      //     value: '₹250.00 Free'),
+                                      //
+                                      //
                                       Divider(),
                                       SummaryRow(
                                           label: 'Amount Payable',
@@ -400,24 +398,57 @@ class _CartListScreenState extends State<CartListScreen> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
-                                      '₹$orderTotal',
-                                      style: AppTextStyles.heading2(
-                                        context,
-                                        overrideStyle: TextStyle(
-                                            color: Colors.black,
-                                            fontSize: ResponsiveHelper.fontSize(
-                                                context, 16)),
+                                    RichText(
+                                      text: TextSpan(
+                                        children: [
+                                          TextSpan(
+                                            text: "\u20B9", // Rupee Symbol with space
+                                            style: AppTextStyles.heading1(
+                                              context,
+                                              overrideStyle: TextStyle(
+                                                fontSize: ResponsiveHelper.fontSize(context, 16),
+                                              ),
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: "$orderTotal", // Price Amount
+                                            style: AppTextStyles.heading1(
+                                              context,
+                                              overrideStyle: TextStyle(
+                                                fontSize: ResponsiveHelper.fontSize(context, 16),
+                                              ),
+                                            ),
+                                          ),
+                                          TextSpan(
+                                            text: " /-", // Smaller "/-" Sign
+                                            style: AppTextStyles.heading1(
+                                              context,
+                                              overrideStyle: TextStyle(
+                                                fontSize: ResponsiveHelper.fontSize(context, 12), // Smaller font size
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
+
+
+
+
+
+
+
+
+
                                     Text(
-                                      '₹$orderTotal',
+                                      'Total Amount',
+                                      // '₹$orderTotal',
                                       style: AppTextStyles.bodyText1(context,
                                           overrideStyle: TextStyle(
                                               color: Colors.black,
                                               fontSize:
                                                   ResponsiveHelper.fontSize(
-                                                      context, 12))),
+                                                      context, 10))),
                                     ),
                                   ],
                                 ),

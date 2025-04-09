@@ -1,9 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/nav/nav_home/slider/controller/home_banner_api_provider.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/screen/nav/nav_home/slider/controller/home_banner_api_provider.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../../bottom_navigation_screen.dart';
@@ -106,27 +107,28 @@ class _HomeSlider2SectionState extends State<HomeSlider2Section> {
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
-                        child:CachedNetworkImage(
-                          imageUrl: item.photo!.secureUrl.toString(),
-                          fit: BoxFit.fill,
-                          placeholder: (context, url) =>
-                              Center(
-                                child: Image.asset(
-                                    "assets/images/img_placeholder.jpeg"), // Placeholder while loading
-                              ),
-                          errorWidget:
-                              (context, url, error) =>
-                          const Icon(
-                            Icons.error,
-                            color: Colors
-                                .red, // Show error icon if image fails
-                          ),
-                          fadeInDuration: const Duration(
-                              milliseconds: 500),
-                          // Smooth fade-in effect
-                          fadeOutDuration: const Duration(
-                              milliseconds: 300),
-                        ),
+                        child: ImageLoaderUtil.cacheNetworkImage(item.photo!.secureUrl.toString())
+                        // CachedNetworkImage(
+                        //   imageUrl: item.photo!.secureUrl.toString(),
+                        //   fit: BoxFit.fill,
+                        //   placeholder: (context, url) =>
+                        //       Center(
+                        //         child: Image.asset(
+                        //             "assets/images/img_placeholder.jpeg"), // Placeholder while loading
+                        //       ),
+                        //   errorWidget:
+                        //       (context, url, error) =>
+                        //   const Icon(
+                        //     Icons.error,
+                        //     color: Colors
+                        //         .red, // Show error icon if image fails
+                        //   ),
+                        //   fadeInDuration: const Duration(
+                        //       milliseconds: 500),
+                        //   // Smooth fade-in effect
+                        //   fadeOutDuration: const Duration(
+                        //       milliseconds: 300),
+                        // ),
 
 
 

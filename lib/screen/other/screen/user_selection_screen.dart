@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/base_widgets/outlined_rounded_button.dart';
-import 'package:healthians/deliveryBoy/screen/delivery_boy_login_screen.dart';
-import 'package:healthians/screen/auth/login_screen.dart';
-import 'package:healthians/ui_helper/app_colors.dart';
-import 'package:healthians/ui_helper/storage_helper.dart';
+import 'package:shanya_scans/base_widgets/outlined_rounded_button.dart';
+import 'package:shanya_scans/deliveryBoy/screen/delivery_boy_login_screen.dart';
+import 'package:shanya_scans/screen/auth/login_screen.dart';
+import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/storage_helper.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../../../base_widgets/solid_rounded_button.dart';
 
@@ -33,7 +34,7 @@ class UserSelectionScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Spacer(),
-              Image.asset(
+              ImageLoaderUtil.assetImage(
                 'assets/images/img_logo.png', // Replace with your actual logo asset
                 height: 80,
               ),

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
-import 'package:healthians/base_widgets/loading_indicator.dart';
-import 'package:healthians/screen/profile/controller/term_condition_provider.dart';
-import 'package:healthians/ui_helper/app_text_styles.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/base_widgets/loading_indicator.dart';
+import 'package:shanya_scans/screen/profile/controller/term_condition_provider.dart';
+import 'package:shanya_scans/ui_helper/app_text_styles.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../../../ui_helper/app_colors.dart';
 import '../../base_widgets/expandable_text_widget.dart';
@@ -79,8 +80,14 @@ class _WebViewScreenState extends State<WebViewScreen> {
           }
           if (provider.errorMessage.isNotEmpty) {
             return Center(
-                child: Text(provider.errorMessage,
-                    style: TextStyle(color: Colors.red)));
+              child: SizedBox(
+                width: ResponsiveHelper.containerWidth( context, 50),
+                height: ResponsiveHelper.containerWidth(context, 50),
+                child: ImageLoaderUtil.assetImage(
+                  "assets/images/img_error.jpg",
+                ),
+              ),
+            );
           }
 
           return SingleChildScrollView(

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:healthians/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
-import 'package:healthians/screen/order/model/OrderItem.dart';
-import 'package:healthians/ui_helper/responsive_helper.dart';
+import 'package:shanya_scans/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
+import 'package:shanya_scans/screen/order/model/OrderItem.dart';
+import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:provider/provider.dart';
+import 'package:shanya_scans/util/image_loader_util.dart';
 
 import '../../../base_widgets/card_body.dart';
 import '../../../base_widgets/product_card_bottom.dart';
@@ -29,37 +30,9 @@ class _HomeHealthPackageSectionState extends State<HomeHealthPackageSection> {
     super.initState();
     Future.microtask(() {
       Provider.of<HealthConcernApiProvider>(context, listen: false)
-          .getHealthConcernTagList(context);
-      // Provider.of<HealthPacakgeListApiProvider>(context, listen: false).getPackageListByTab(context, selectedTabIndex.toString());
+          .loadCachedHomeHealthConcern();
     });
   }
-
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   // Health concern tag list ki API call
-  //   Future.microtask(() {
-  //     Provider.of<HealthConcernApiProvider>(context, listen: false).getHealthConcernPackageTagList(context);
-  //   });
-  // }
-
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   if (_isFirstLoad) {
-  //     _isFirstLoad = false;
-  //     final provider =
-  //         Provider.of<HealthConcernApiProvider>(context, listen: false);
-  //     final tagList = provider.healthConcernPackageTagListModel?.data ?? [];
-  //
-  //     if (tagList.isNotEmpty) {
-  //       selectedTabIndex = 0;
-  //       selectedTabId = tagList[0].sId.toString();
-  //       Provider.of<HealthPacakgeListApiProvider>(context, listen: false)
-  //           .getPackageListByTab(context, selectedTabId!);
-  //     }
-  //   }
-  // }
 
   @override
   void didChangeDependencies() {
@@ -135,8 +108,13 @@ class _HomeHealthPackageSectionState extends State<HomeHealthPackageSection> {
             }
             if (provider.errorMessage.isNotEmpty) {
               return Center(
-                  child: Text(provider.errorMessage,
-                      style: TextStyle(color: Colors.red)));
+                child: SizedBox(
+                  width: ResponsiveHelper.containerWidth( context, 50),
+                  height: ResponsiveHelper.containerWidth(context, 50),
+                  child: ImageLoaderUtil.assetImage( "assets/images/img_error.jpg")
+
+                ),
+              );
             }
 
             final tagList =
