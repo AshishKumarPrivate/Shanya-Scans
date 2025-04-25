@@ -124,7 +124,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen>
                       const EdgeInsets.symmetric(horizontal: 30, vertical: 14),
                 ),
                 child: Text(
-                  "Continue Shopping",
+                  "Back to Home",
                   style: AppTextStyles.heading2(context,
                       overrideStyle:
                           new TextStyle(fontSize: 14, color: Colors.white)),

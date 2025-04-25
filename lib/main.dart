@@ -132,10 +132,8 @@ class MyApp extends StatelessWidget {
           initialEntries: [
             OverlayEntry(
               builder: (context) {
-                /// ✅ Har screen push hone par default white status bar
                 SystemChrome.setSystemUIOverlayStyle( SystemUiOverlayStyle(
                   statusBarColor: AppColors.primary,
-                  // statusBarColor: Colors.white,
                   statusBarIconBrightness: Brightness.light,
                 ));
 

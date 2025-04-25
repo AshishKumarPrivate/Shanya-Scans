@@ -4,20 +4,17 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
-
 import '../deliveryBoy/controller/DeliveryOrdersProvider.dart';
 import '../main.dart';
 
 class NotificationService {
   static final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
-  /// Initialize Firebase Messaging and handle notification permissions
   static Future<void> initialize(BuildContext context) async {
     await requestPermission(); // Request permission first
     await getFCMToken(); // Fetch FCM Token
     listenForTokenRefresh(); // Listen for token refresh
 
-    // 🔴 Enable iOS Foreground Notifications (🛑 iOS me zaroori hai)
     if (Platform.isIOS) {
       await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
         alert: true,
@@ -26,7 +23,6 @@ class NotificationService {
       );
     }
 
-    // 🔴 Listen for Foreground Notifications
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       print("📩 Foreground notification received: ${message.notification?.title}");
       _showNotificationDialog(context, message);

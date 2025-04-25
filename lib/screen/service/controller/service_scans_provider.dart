@@ -24,7 +24,7 @@ class ServiceApiProvider with ChangeNotifier {
   List<HomeListModel.Data> get scanList => _scanList;
 
   ServiceApiProvider() {
-    loadCachedPackages();
+    loadCachedScans();
   }
 
   // Getters for UI
@@ -41,10 +41,24 @@ class ServiceApiProvider with ChangeNotifier {
   RateModel.ServiceDetailRateListModel? get homeDerviceRateListModel =>
       _serviceRateListModel;
 
+  /// **Set Loading State for UI**
+  void _setLoadingState(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  /// **Set Error State for UI**
+  void _setErrorState(String message) {
+    _errorMessage = message;
+    _setLoadingState(false);
+    // notifyListeners(); // Ensure UI rebuilds
+  }
+
+
   /// &&&&&&&&&&&&&&&&&& strore the service list data in cache api call
 
   /// **Load Cached Data**
-  Future<void> loadCachedPackages() async {
+  Future<void> loadCachedScans() async {
     _setLoadingState(true);
     final prefs = await SharedPreferences.getInstance();
     final cachedData = prefs.getString('cached_health_scanList');
@@ -55,7 +69,7 @@ class ServiceApiProvider with ChangeNotifier {
         if(decodeData is List){
           print("✅ Cache Found: Loading cached scan list...");
           List<dynamic> rawList = json.decode(cachedData);
-          _scanList = decodeData.map((e) => HomeListModel.Data.fromJson(e)).toList();
+          _scanList = rawList.map((e) => HomeListModel.Data.fromJson(e)).toList();
           print("✅ Cache Loaded Successfully! ${_scanList.length} items.");
         }else{
           _scanList = []; // Ensure empty state doesn't break UI
@@ -75,7 +89,7 @@ class ServiceApiProvider with ChangeNotifier {
       print("⚠️ No Cached Data Found!");
     }
     notifyListeners();
-    fetchScansList();
+   await fetchScansList();
   }
 
   /// **Fetch Home Service List API**
@@ -89,16 +103,20 @@ class ServiceApiProvider with ChangeNotifier {
       var response = await _repository.getHomeServiceModelResponse();
       if (response.success == true && response.data != null) {
         print("✅ API Response Received");
-        _scanList = List<HomeListModel.Data>.from(response.data!); // ✅ Fixed Type Issue
+        final newList = List<HomeListModel.Data>.from(response.data!); // ✅ Fixed Type Issue
         // ✅ Compare with cached data
-        if (cachedData == json.encode(_scanList)) {
-          print("🔄 No Changes in API Data. Cache is Up-to-date!");
+        // Check if cache needs to be updated
+        final newJson = json.encode(newList.map((e) => e.toJson()).toList());
+        final oldJson = prefs.getString('cached_health_scanList');
+
+        if (oldJson != newJson) {
+          print("📦 API data changed, updating cache...");
+          await prefs.setString('cached_health_scanList', newJson);
         } else {
-          print("📁 API Data Changed! Updating Cache...");
-          await prefs.setString(
-              'cached_health_scanList', json.encode(_scanList));
-          print("✅ Cache Updated Successfully!");
+          print("✅ API data is same as cache. No update needed.");
         }
+
+        _scanList = newList;
       } else {
         _setErrorState(response.message ?? "Failed to fetch service list");
       }
@@ -107,10 +125,7 @@ class ServiceApiProvider with ChangeNotifier {
     }
 
     notifyListeners();
-    // ✅ Print Cached Data After Fetching
-    // final prefs = await SharedPreferences.getInstance();
-    // print(
-    //     "🔍 Cached Data After Fetch: ${prefs.getString('cached_health_scanList')}");
+    _setLoadingState(false);
   }
 
   Future<void> checkCachedData() async {
@@ -132,18 +147,6 @@ class ServiceApiProvider with ChangeNotifier {
 
   /// &&&&&&&&&&&&&&&&&& strore the service list data in cahse api call
 
-  /// **Set Loading State for UI**
-  void _setLoadingState(bool loading) {
-    _isLoading = loading;
-    notifyListeners();
-  }
-
-  /// **Set Error State for UI**
-  void _setErrorState(String message) {
-    _errorMessage = message;
-    _setLoadingState(false);
-    // notifyListeners(); // Ensure UI rebuilds
-  }
 
   /// **Fetch Home Service List API**
   Future<bool> getHomeServiceList(BuildContext context) async {
@@ -154,8 +157,7 @@ class ServiceApiProvider with ChangeNotifier {
     try {
       var response = await _repository.getHomeServiceModelResponse();
 
-      if (response.success == true &&
-          response.data != null) {
+      if (response.success == true && response.data != null) {
         print("✅ Home Service List Fetched Successfully");
 
         // Reorder the list before passing it to the GridView

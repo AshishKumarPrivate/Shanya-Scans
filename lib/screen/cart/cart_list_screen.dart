@@ -13,6 +13,7 @@ import '../../ui_helper/responsive_helper.dart';
 import '../checkout/CheckoutScreen.dart';
 import '../checkout/controller/checkout_api_provider.dart';
 import '../order/model/OrderItem.dart';
+import '../splash/controller/network_provider_controller.dart';
 
 class CartListScreen extends StatefulWidget {
   @override
@@ -20,6 +21,9 @@ class CartListScreen extends StatefulWidget {
 }
 
 class _CartListScreenState extends State<CartListScreen> {
+
+  bool _isInternetAvailable = true;
+
   @override
   void initState() {
     super.initState();
@@ -30,6 +34,8 @@ class _CartListScreenState extends State<CartListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _isInternetAvailable = Provider.of<NetworkProvider>(context).isConnected;
+
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: PreferredSize(
@@ -40,7 +46,8 @@ class _CartListScreenState extends State<CartListScreen> {
           backgroundColor: AppColors.primary,
         ),
       ),
-      body: Container(
+      body: _isInternetAvailable
+          ?  Container(
         color: Colors.white,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -533,6 +540,30 @@ class _CartListScreenState extends State<CartListScreen> {
               ),
             ),
           ],
+        ),
+      )
+          : Center(
+        child: Container(
+          width: double.infinity,
+          color: Colors.white,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.wifi_off, size: 80, color: Colors.grey),
+              SizedBox(height: 20),
+              Text("No internet connection",
+                  style: TextStyle(fontSize: 18)),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  Provider.of<NetworkProvider>(context,
+                      listen: false)
+                      .checkConnection(context, showSnackBar: true);
+                },
+                child: Text("Retry"),
+              ),
+            ],
+          ),
         ),
       ),
     );

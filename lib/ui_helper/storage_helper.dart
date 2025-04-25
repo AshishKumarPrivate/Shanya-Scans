@@ -66,6 +66,22 @@ class StorageHelper {
     await prefs.remove("role");
   }
 
+  void setPaymentKey(String key) {
+    sp.setString('payment_key', key);
+  }
+
+  String getPaymentKey() {
+    return sp.getString('payment_key') ?? "";
+  }
+
+  Future<void> setOrderTotalToPrefs(double orderTotal) async {
+    await sp.setDouble('order_total', orderTotal);
+  }
+  Future<double> getOrderTotalFromPrefs() async {
+    return sp.getDouble('order_total') ?? 0.0;
+  }
+
+
 
   void setUserAccessToken(String token) {
     sp.setString('user_access_token', token);

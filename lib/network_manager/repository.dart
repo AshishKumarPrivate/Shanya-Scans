@@ -34,7 +34,7 @@ import 'dio_helper.dart';
 class Repository {
   static final DioHelper _dioHelper = DioHelper();
 
-  // static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms";
+  // static const String baseUrl = "https://5h8cr5kr-5000.inc1.devtunnels.ms/";
    static const String baseUrl = "https://db.shanyascans.com";
 
 
@@ -473,10 +473,34 @@ class Repository {
     // return LogInModel.fromJson(response);
   }
 
+  /// RAZER PAYMENT
+  Future<Map<String, dynamic>> getRazorPaymentKey() async {
+    try {
+      Map<String, dynamic> response = await _dioHelper.get(
+        url: '$baseUrl/api/v1/payment/key',
+      );
+
+      return {
+        "success": response["success"] ?? false,
+        "message": response["message"] ?? "Something went wrong",
+        "key": response["key"],
+      };
+    } on DioException catch (e) {
+      return {
+        "success": false,
+        "message": e.response?.data["message"] ?? "Something went wrong",
+      };
+    } catch (e) {
+      return {
+        "success": false,
+        "message": "Unexpected error occurred",
+      };
+    }
+  }
 
 
 
- // ✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨  Shanya Scans Delivery Boy API   ✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨
+  // ✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨  Shanya Scans Delivery Boy API   ✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨
 
   // user login
   Future<DeliveryLoginModelResponse> deliveryBoyLogin(Map<String, dynamic> requestBody) async {

@@ -262,7 +262,6 @@ class OrderApiProvider with ChangeNotifier {
 
 
   // &&&&&&&&&&& order history &&&&&&&&&&&&&&&&&
-  /// **Fetch Home Service List API**
   Future<bool> getOrderHistory(BuildContext context) async {
     _setLoadingState(true);
     _errorMessage = "";

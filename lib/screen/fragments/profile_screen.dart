@@ -18,16 +18,24 @@ import 'package:provider/provider.dart';
 import '../../base_widgets/outlined_rounded_button.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../util/share_app_utils.dart';
+import '../splash/controller/network_provider_controller.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
   // const ProfileScreen({super.key});
+
+  bool _isInternetAvailable = true;
 
   @override
   Widget build(BuildContext context) {
     final userName = StorageHelper().getUserName();
     final userEmail = StorageHelper().getEmail();
-
     print("userId => ${StorageHelper().getUserId()}");
+    _isInternetAvailable = Provider.of<NetworkProvider>(context).isConnected;
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
@@ -38,7 +46,8 @@ class ProfileScreen extends StatelessWidget {
       child: Scaffold(
         backgroundColor: AppColors.primary,
         body: SafeArea(
-          child: Container(
+          child: _isInternetAvailable
+              ? Container(
             height: MediaQuery.of(context).size.height, // Fill full height
             width: double.infinity,
             color: Colors.white,
@@ -73,7 +82,7 @@ class ProfileScreen extends StatelessWidget {
                                       color: Colors.white, // Fill color of the circle
                                       shape: BoxShape.circle,
                                     ),
-                                    child: SvgPicture.asset(                                      
+                                    child: SvgPicture.asset(
                                       "assets/svg/profile_icon.svg",
                                       colorFilter: ColorFilter.mode(AppColors.txtGreyColor, BlendMode.srcIn),
                                     ),
@@ -353,6 +362,30 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
             ),
+          )
+              : Center(
+            child: Container(
+              color: Colors.white,
+              width: double.infinity,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.wifi_off, size: 80, color: Colors.grey),
+                  SizedBox(height: 20),
+                  Text("No internet connection",
+                      style: TextStyle(fontSize: 18)),
+                  SizedBox(height: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Provider.of<NetworkProvider>(context,
+                          listen: false)
+                          .checkConnection(context, showSnackBar: true);
+                    },
+                    child: Text("Retry"),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       ),
@@ -382,6 +415,11 @@ class CustomClipPath extends CustomClipper<Path> {
 }
 
 void showLogoutBottomSheet(BuildContext context) {
+
+  bool _isInternetAvailable = true;
+
+  _isInternetAvailable = Provider.of<NetworkProvider>(context).isConnected;
+
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
@@ -389,7 +427,8 @@ void showLogoutBottomSheet(BuildContext context) {
     ),
     backgroundColor: Colors.white,
     builder: (context) {
-      return Padding(
+      return  _isInternetAvailable
+          ? Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -510,6 +549,28 @@ void showLogoutBottomSheet(BuildContext context) {
 
             const SizedBox(height: 10),
           ],
+        ),
+      )
+          : Center(
+        child: Container(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.wifi_off, size: 80, color: Colors.grey),
+              SizedBox(height: 20),
+              Text("No internet connection",
+                  style: TextStyle(fontSize: 18)),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  Provider.of<NetworkProvider>(context,
+                      listen: false)
+                      .checkConnection(context, showSnackBar: true);
+                },
+                child: Text("Retry"),
+              ),
+            ],
+          ),
         ),
       );
     },

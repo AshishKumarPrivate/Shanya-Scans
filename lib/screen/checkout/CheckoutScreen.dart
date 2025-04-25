@@ -6,6 +6,7 @@ import 'package:shanya_scans/screen/checkout/checkout_text_fields.dart';
 import 'package:shanya_scans/screen/order/model/OrderItem.dart';
 import 'package:shanya_scans/screen/other/screen/search_screen.dart';
 import 'package:shanya_scans/ui_helper/app_colors.dart';
+import 'package:shanya_scans/ui_helper/snack_bar.dart';
 import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import 'package:provider/provider.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -110,31 +111,38 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     print("Payment Successful: ${response.paymentId}");
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Payment Successful: ${response.paymentId}")));
+    showCustomSnackbarHelper.showSnackbar(
+      context: context,
+      backgroundColor:Colors.green,
+      message: "Payment Done Successfully!",
+      duration: Duration(seconds: 2),
+    );
 
-    // Call the API after successful payment
-    // Provider.of<OrderApiProvider>(context, listen: false).createOrder(
-    //   context,
-    //   widget.name,
-    //   selectedDateString.toString(),
-    //   selectedTimeString.toString(),
-    //   widget.categoryName,
-    //   widget.price,
-    //   StorageHelper().getEmail(),
-    //   fullNameController.text.toString(),
-    //   ageController.text.toString(),
-    //   phoneController.text.toString(),
-    //   "",
-    //   selectedGender.toString(),
-    //   cityAddressController.text.toString(),
-    // );
+    Provider.of<CheckoutProvider>(context, listen: false)
+        .createOrder(
+      context,
+      selectedDateString.toString(),
+      selectedTimeString.toString(),
+      StorageHelper().getEmail(),
+      fullNameController.text.toString(),
+      ageController.text.toString(),
+      phoneController.text.toString(),
+      altPhoneController.text.toString(),
+      selectedGender.toString(),
+      cityAddressController.text.toString(),
+      selectedPlace.toString(),
+      selectedAddressType.toString(),
+    );
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
     print("Payment Failed: ${response.message}");
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Payment Failed: ${response.message}")));
+    showCustomSnackbarHelper.showSnackbar(
+      context: context,
+      backgroundColor: Colors.red,
+      message: "Payment Failed",
+      duration: Duration(seconds: 2),
+    );
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -143,16 +151,22 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         content: Text("External Wallet Selected: ${response.walletName}")));
   }
 
-  void openRazorpayPayment() {
+  void openRazorpayPayment() async{
+
+    final paymentProvider = Provider.of<CheckoutProvider>(context, listen: false);
+    await paymentProvider.totalAmount;
+    paymentProvider.setLoadingState(true);
+    print("Total amount=> ${paymentProvider.totalAmount}");
     var options = {
-      "key": "YOUR_RAZORPAY_KEY",
+      "key": "${StorageHelper().getPaymentKey()}",
       // Replace with your Razorpay key
-      "amount": 1 * 100,
+      // "amount": 1 * 100,
       // Convert price to paise
-      // "amount": double.parse(widget.rateListData.testPrice.toString()) * 100, // Convert price to paise
+      "amount": (paymentProvider.totalAmount) * 100, // Convert price to paise
       "currency": "INR",
-      "name": "Your App Name",
-      "description": "Test Payment",
+      "name": "Shanya Scans",
+      "description": "Book Your Home Collection",
+      "image": "https://res.cloudinary.com/duaqq7maw/image/upload/v1745390957/shanya_gwjo0s.jpg",
       "prefill": {
         "email": StorageHelper().getEmail(),
         "contact": phoneController.text.toString()
@@ -162,7 +176,9 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     try {
       _razorpay.open(options);
+      paymentProvider.setLoadingState(false);
     } catch (e) {
+      paymentProvider.setLoadingState(false);
       print("Error opening Razorpay: $e");
     }
   }
@@ -465,24 +481,44 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         setState(() {
                           _currentStep += 1;
                         });
-                      } else {
-                        print("Finish button clicked");
-                        Provider.of<CheckoutProvider>(context, listen: false)
-                            .createOrder(
-                          context,
-                          selectedDateString.toString(),
-                          selectedTimeString.toString(),
-                          StorageHelper().getEmail(),
-                          fullNameController.text.toString(),
-                          ageController.text.toString(),
-                          phoneController.text.toString(),
-                          altPhoneController.text.toString(),
-                          selectedGender.toString(),
-                          cityAddressController.text.toString(),
-                          selectedPlace.toString(),
-                          selectedAddressType.toString(),
-                        );
                       }
+                      else {
+                        print("Finish button clicked");
+                        final paymentProvider = Provider.of<CheckoutProvider>(context, listen: false);
+                        await paymentProvider.fetchRazorpayKey();
+
+                        if (paymentProvider.razorpayKey != null) {
+                          // Proceed with Razorpay payment
+                          openRazorpayPayment();
+                          print("Razorpay Key: ${paymentProvider.razorpayKey}");
+                        } else {
+                          // Show error
+                          print("Error: ${paymentProvider.errorMessage.toString()}");
+                        }
+
+
+
+
+
+                        // Provider.of<CheckoutProvider>(context, listen: false)
+                        //     .createOrder(
+                        //   context,
+                        //   selectedDateString.toString(),
+                        //   selectedTimeString.toString(),
+                        //   StorageHelper().getEmail(),
+                        //   fullNameController.text.toString(),
+                        //   ageController.text.toString(),
+                        //   phoneController.text.toString(),
+                        //   altPhoneController.text.toString(),
+                        //   selectedGender.toString(),
+                        //   cityAddressController.text.toString(),
+                        //   selectedPlace.toString(),
+                        //   selectedAddressType.toString(),
+                        // );
+                      }
+
+
+
                     },
                     textStyle: const TextStyle(
                       color: Colors.white,
@@ -910,6 +946,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 .fold(0, (sum, item) => sum + ((item.price) * item.quantity));
             double discount = 0.00;
             double orderTotal = cartTotal - discount;
+            StorageHelper().setOrderTotalToPrefs(orderTotal);
 
             return Stack(
               children: [

@@ -1,0 +1,2 @@
+D:/ASHISH/New folder/CodeCrafter/Shanya-Scans/android/app/.cxx/Debug/3354234r/x86_64/CMakeFiles/edit_cache.dir
+D:/ASHISH/New folder/CodeCrafter/Shanya-Scans/android/app/.cxx/Debug/3354234r/x86_64/CMakeFiles/rebuild_cache.dir

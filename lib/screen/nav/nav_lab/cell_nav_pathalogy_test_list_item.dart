@@ -9,6 +9,7 @@ import 'package:shanya_scans/util/StringUtils.dart';
 
 import '../../../ui_helper/app_colors.dart';
 import '../../../ui_helper/app_text_styles.dart';
+import '../../splash/controller/network_provider_controller.dart';
 
 class CellNavLabListItem extends StatefulWidget {
 
@@ -21,13 +22,36 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
   final double circleRadius = 60.0;
   final ScrollController _scrollController = ScrollController();
 
+  bool _isInternetAvailable = true;
+
+  Future<void> _initializeNetworkAndLoadData() async {
+    final networkProvider =
+    Provider.of<NetworkProvider>(context, listen: false);
+    networkProvider.initializeConnectivityListener(context);
+    await networkProvider.checkConnection(context, showSnackBar: false);
+    final isConnected = networkProvider.isConnected;
+    if (isConnected) {
+      _loadCachedData();
+    }
+    setState(() {
+      _isInternetAvailable = isConnected;
+    });
+  }
+
+  void _loadCachedData() {
+    Provider.of<PathalogyTestApiProvider>(context, listen: false)
+        .loadCachedNavPathalogyTests(context);
+  }
+
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
-      // Clear old data and fetch new service details
       Provider.of<PathalogyTestApiProvider>(context, listen: false)
           .loadCachedNavPathalogyTests(context);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _initializeNetworkAndLoadData();
+      });
     });
     // Scroll listener for pagination
     _scrollController.addListener(() {
@@ -117,7 +141,8 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
     print("BuildRateList ");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
-      child: RefreshIndicator(
+      child:  _isInternetAvailable
+          ? RefreshIndicator(
         onRefresh: _refreshData,
         child: ListView.builder(
           controller: _scrollController, // Attach scroll controller
@@ -217,7 +242,30 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
             );
           },
         ),
+      )
+          : Center(
+        child: Container(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.wifi_off, size: 80, color: Colors.grey),
+              SizedBox(height: 20),
+              Text("No internet connection",
+                  style: TextStyle(fontSize: 18)),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  Provider.of<NetworkProvider>(context,
+                      listen: false)
+                      .checkConnection(context, showSnackBar: true);
+                },
+                child: Text("Retry"),
+              ),
+            ],
+          ),
+        ),
       ),
+
     );
   }
 }

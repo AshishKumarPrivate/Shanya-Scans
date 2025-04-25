@@ -36,7 +36,7 @@ class NetworkProvider with ChangeNotifier {
 
 
   // Method to manually check the network status
-  Future<void> checkConnection(BuildContext context) async {
+  Future<void> checkConnection(BuildContext context, {bool showSnackBar = false}) async {
     bool isNotConnected = true;
 
     try {
@@ -50,7 +50,11 @@ class NetworkProvider with ChangeNotifier {
 
     _isConnected = !isNotConnected;
     notifyListeners();
-    _showNetworkStatusSnackBar(context, isNotConnected);
+    // Only show snackbar if explicitly requested
+    if (showSnackBar) {
+      _showNetworkStatusSnackBar(context, isNotConnected);
+    }
+    // _showNetworkStatusSnackBar(context, isNotConnected);
   }
 
   // Method to listen for connectivity changes and show the snackbar

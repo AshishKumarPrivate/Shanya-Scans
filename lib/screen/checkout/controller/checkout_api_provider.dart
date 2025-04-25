@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shanya_scans/screen/order/model/OrderItem.dart';
 import 'package:shanya_scans/ui_helper/snack_bar.dart';
+import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import 'package:shanya_scans/util/StringUtils.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,17 +19,25 @@ class CheckoutProvider with ChangeNotifier {
 
   bool _isLoading = false;
   String _errorMessage = "";
+  String? _razorpayKey;
 
   CreateOrder2ModelResponse? _createOrderModelResponse;
+
   // CreateOrderModelResponse? _createOrderModelResponse;
 
   CreateOrder2ModelResponse? get createOrderModelResponse =>
       _createOrderModelResponse;
+
   // CreateOrderModelResponse? get createOrderModelResponse => _createOrderModelResponse;
   List<OrderItem> get checkoutItems => _checkoutItems;
+
   bool get isCheckoutEmpty => _checkoutItems.isEmpty;
+
   bool get isLoading => _isLoading;
+
   String get errorMessage => _errorMessage;
+
+  String? get razorpayKey => _razorpayKey;
 
   void reset() {
     _isLoading = false;
@@ -39,14 +48,14 @@ class CheckoutProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void _setLoadingState(bool loading) {
+  void setLoadingState(bool loading) {
     _isLoading = loading;
     notifyListeners();
   }
 
   void _setErrorState(String message) {
     _errorMessage = message;
-    _setLoadingState(false);
+    setLoadingState(false);
     notifyListeners();
   }
 
@@ -126,7 +135,8 @@ class CheckoutProvider with ChangeNotifier {
 
     if (cartData != null) {
       final List<dynamic> decodedData = jsonDecode(cartData);
-      _checkoutItems = decodedData.map((item) => OrderItem.fromJson(item)).toList();
+      _checkoutItems =
+          decodedData.map((item) => OrderItem.fromJson(item)).toList();
       notifyListeners();
     }
   }
@@ -223,10 +233,8 @@ class CheckoutProvider with ChangeNotifier {
       String gender,
       String cityState,
       String selectedPlace,
-      String addressType
-
-      ) async {
-    _setLoadingState(true);
+      String addressType) async {
+    setLoadingState(true);
     _errorMessage = "";
     _createOrderModelResponse = null;
 
@@ -311,7 +319,7 @@ class CheckoutProvider with ChangeNotifier {
       if (response.success == true && response.data != null) {
         print("✅ Order created successfully!");
         _createOrderModelResponse = response;
-        _setLoadingState(false);
+        setLoadingState(false);
 
         Navigator.pushReplacement(
           context,
@@ -333,7 +341,7 @@ class CheckoutProvider with ChangeNotifier {
       );
     }
 
-    _setLoadingState(false);
+    setLoadingState(false);
     return false;
   }
 
@@ -353,5 +361,24 @@ class CheckoutProvider with ChangeNotifier {
   double get totalAmount {
     return _checkoutItems.fold(
         0.0, (sum, item) => sum + ((item.price) * item.quantity));
+  }
+
+  //// Payment call
+  Future<String?> fetchRazorpayKey() async {
+    setLoadingState(true);
+    // notifyListeners();
+    final response = await _repository.getRazorPaymentKey();
+
+    if (response["success"] == true) {
+      _razorpayKey = response["key"];
+      if (razorpayKey != null) {
+        StorageHelper().setPaymentKey(razorpayKey.toString());
+        return _razorpayKey;
+      } else {
+        _razorpayKey = null;
+      }
+      setLoadingState(false);
+      notifyListeners();
+    }
   }
 }

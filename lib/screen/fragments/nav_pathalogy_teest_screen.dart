@@ -5,6 +5,7 @@ import 'package:shanya_scans/ui_helper/app_colors.dart';
 import 'package:provider/provider.dart';
 
 import '../nav/nav_lab/controller/pathalogy_test_provider.dart';
+import '../splash/controller/network_provider_controller.dart';
 
 class PathalogyNavSection extends StatefulWidget {
   PathalogyNavSection({super.key});
@@ -16,6 +17,7 @@ class PathalogyNavSection extends StatefulWidget {
 class _PathalogyNavSectionState extends State<PathalogyNavSection> {
 
 
+  bool _isInternetAvailable = true;
   @override
   void dispose() {
     super.dispose();
@@ -23,6 +25,8 @@ class _PathalogyNavSectionState extends State<PathalogyNavSection> {
 
   @override
   Widget build(BuildContext context) {
+
+    _isInternetAvailable = Provider.of<NetworkProvider>(context).isConnected;
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
@@ -44,10 +48,33 @@ class _PathalogyNavSectionState extends State<PathalogyNavSection> {
                 // backgroundColor: AppColors.primary,
               ),
               Expanded(
-                child: Padding(
+                child: _isInternetAvailable
+                    ? Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: 10.0, vertical: 0.0),
                   child: CellNavLabListItem( ),
+                )
+                    : Center(
+                  child: Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.wifi_off, size: 80, color: Colors.grey),
+                        SizedBox(height: 20),
+                        Text("No internet connection",
+                            style: TextStyle(fontSize: 18)),
+                        SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            Provider.of<NetworkProvider>(context,
+                                listen: false)
+                                .checkConnection(context, showSnackBar: true);
+                          },
+                          child: Text("Retry"),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],

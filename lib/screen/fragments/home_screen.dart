@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:shanya_scans/screen/nav/nav_home/home_ending_setion.dart';
 import 'package:shanya_scans/screen/nav/nav_home/home_first_service_setion.dart';
@@ -34,20 +33,21 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _isInternetAvailable = true;
 
   void _loadCachedData() {
-    Provider.of<ServiceApiProvider>(context, listen: false).loadCachedPackages();
-    Provider.of<HomeBannerApiProvider>(context, listen: false).loadCachedBanners();
-    Provider.of<HealthConcernApiProvider>(context, listen: false).loadCachedHomeHealthConcern();
-    Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false).loadCachedFrequentlyHomeLabTest();
+    Provider.of<ServiceApiProvider>(context, listen: false)
+        .loadCachedScans();
+    Provider.of<HomeBannerApiProvider>(context, listen: false)
+        .loadCachedBanners();
+    Provider.of<HealthConcernApiProvider>(context, listen: false)
+        .loadCachedHomeHealthConcern();
+    Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false)
+        .loadCachedFrequentlyHomeLabTest();
   }
 
-
   Future<void> _initializeNetworkAndLoadData() async {
-    final networkProvider = Provider.of<NetworkProvider>(context, listen: false);
-    // Initialize connectivity listener
+    final networkProvider =
+        Provider.of<NetworkProvider>(context, listen: false);
     networkProvider.initializeConnectivityListener(context);
-    // Await the async connection check
-    await networkProvider.checkConnection(context);
-    // Now check the updated connection state
+    await networkProvider.checkConnection(context, showSnackBar: false);
     final isConnected = networkProvider.isConnected;
     if (isConnected) {
       _loadCachedData();
@@ -65,32 +65,24 @@ class _HomeScreenState extends State<HomeScreen> {
       _initializeNetworkAndLoadData();
     });
 
-
-    // Provider.of<ServiceApiProvider>(context, listen: false).loadCachedPackages();
-    // Provider.of<HomeBannerApiProvider>(context, listen: false)
-    //     .loadCachedBanners();
-    // Provider.of<HealthConcernApiProvider>(context, listen: false)
-    //     .getHealthConcernTagList(context);
-    // Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false)
-    //     .loadCachedFrequentlyHomeLabTest();
-    // Provider.of<HealthConcernApiProvider>(context, listen: false)
-    //     .getHealthConcernTagList(context);
   }
 
   Future<void> _refreshData() async {
-    final isConnected = Provider.of<NetworkProvider>(context, listen: false).isConnected;
+    final isConnected =
+        Provider.of<NetworkProvider>(context, listen: false).isConnected;
     if (!isConnected) return;
 
-    await Provider.of<HomeBannerApiProvider>(context, listen: false) .getHomeBanner1List();
-    await Provider.of<ServiceApiProvider>(context, listen: false).fetchScansList();
-    await Provider.of<HealthConcernApiProvider>(context, listen: false).loadCachedHomeHealthConcern(forceRefresh: true);
-    await Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false).loadCachedFrequentlyHomeLabTest(forceRefresh: true);
-
+    await Provider.of<HomeBannerApiProvider>(context, listen: false)
+        .getHomeBanner1List();
+    await Provider.of<ServiceApiProvider>(context, listen: false)
+        .fetchScansList();
+    await Provider.of<HealthConcernApiProvider>(context, listen: false)
+        .loadCachedHomeHealthConcern(forceRefresh: true);
+    await Provider.of<FrequentlyPathalogyTagApiProvider>(context, listen: false)
+        .loadCachedFrequentlyHomeLabTest(forceRefresh: true);
 
     print("refresh data is loaded");
-
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -100,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: AppColors.primary,
       body: SafeArea(
         child: Container(
-          // color: Colors.pink,
+          color: Colors.white,
           // padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 10.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,47 +100,57 @@ class _HomeScreenState extends State<HomeScreen> {
               HomeToolbarSection(),
               // Banner Section
               Expanded(
-                child:_isInternetAvailable
+                child: _isInternetAvailable
                     ? RefreshIndicator(
-                  onRefresh: _refreshData,
-                  child: SingleChildScrollView(
-                    physics: AlwaysScrollableScrollPhysics(),
-                    child: Container(
-                      color: Colors.white,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          HomeFirstServiceSection(onTabChange: widget.onTabChange),
-                          HomeSlider1Section(),
-                          HomeContactSection(),
-                          HomeServicesSection( sectionHeading: "Our Best Radiology Service",),
-                          HomeSlider2Section(),
-                          HealthConcernSetion(),
-                          HomeLabTestSection(sectionHeading: "Frequently Lab Test",),
-                          HomeHealthPackageSection(),
-                          HomeEndingSection()
-                        ],
+                        onRefresh: _refreshData,
+                        child: SingleChildScrollView(
+                          physics: AlwaysScrollableScrollPhysics(),
+                          child: Container(
+                            color: Colors.white,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                HomeFirstServiceSection(
+                                    onTabChange: widget.onTabChange),
+                                HomeSlider1Section(),
+                                HomeContactSection(),
+                                HomeServicesSection(
+                                  sectionHeading: "Our Best Radiology Service",
+                                ),
+                                HomeSlider2Section(),
+                                HealthConcernSetion(),
+                                HomeLabTestSection(
+                                  sectionHeading: "Frequently Lab Test",
+                                ),
+                                HomeHealthPackageSection(),
+                                HomeEndingSection()
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    : Center(
+                        child: Container(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.wifi_off, size: 80, color: Colors.grey),
+                              SizedBox(height: 20),
+                              Text("No internet connection",
+                                  style: TextStyle(fontSize: 18)),
+                              SizedBox(height: 10),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Provider.of<NetworkProvider>(context,
+                                          listen: false)
+                                      .checkConnection(context, showSnackBar: true);
+                                },
+                                child: Text("Retry"),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ) :  Center(
-              child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.wifi_off, size: 80, color: Colors.grey),
-                  SizedBox(height: 20),
-                  Text("No internet connection", style: TextStyle(fontSize: 18)),
-                  SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      Provider.of<NetworkProvider>(context, listen: false).checkConnection(context);
-                    },
-                    child: Text("Retry"),
-                  ),
-                ],
-              ),
-        ),
-
               ),
             ],
           ),

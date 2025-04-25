@@ -51,8 +51,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
               ),
             );
           } else {
-            final orderHistoryList =
-                orderProvider.myOrderHistoryListModel?.data;
+            final orderHistoryList =orderProvider.myOrderHistoryListModel?.data;
             if (orderHistoryList == null || orderHistoryList.isEmpty) {
               return Center(
                 child: Text(

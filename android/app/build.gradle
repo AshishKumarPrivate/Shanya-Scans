@@ -52,7 +52,7 @@ android {
             minifyEnabled false  // Disable code shrinking
             shrinkResources false  // Disable resource shrinking
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig = signingConfigs.release
+            signingConfig = signingConfigs.debug
         }
     }
 }

@@ -22,30 +22,29 @@ class HomeServicesSection extends StatefulWidget {
 }
 
 class _HomeServicesSectionState extends State<HomeServicesSection> {
-  // @override
-  // void initState() {
-  //   super.initState();
-  //
-  //   // Ensure API call is triggered only once when the screen is first opened
-  //   Future.microtask(() {
-  //     final provider = Provider.of<ServiceApiProvider>(context, listen: false);
-  //     provider.loadCachedPackages();
-  //   });
-  // }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final provider = Provider.of<ServiceApiProvider>(context, listen: false);
-    if (provider.scanList.isEmpty) {
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        provider.loadCachedPackages(); // Ensure data is loaded
-      });
-
-      // provider.loadCachedPackages(); // Ensure data is loaded
-    }
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      Provider.of<ServiceApiProvider>(context, listen: false)
+          .loadCachedScans();
+    });
   }
+
+  // @override
+  // void didChangeDependencies() {
+  //   super.didChangeDependencies();
+  //   final provider = Provider.of<ServiceApiProvider>(context, listen: false);
+  //   if (provider.scanList.isEmpty) {
+  //
+  //     WidgetsBinding.instance.addPostFrameCallback((_) {
+  //       provider.loadCachedPackages(); // Ensure data is loaded
+  //     });
+  //
+  //     // provider.loadCachedPackages(); // Ensure data is loaded
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

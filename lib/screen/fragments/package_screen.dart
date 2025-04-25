@@ -9,6 +9,7 @@ import '../../base_widgets/common/rate_list_service_shimmer.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../ui_helper/responsive_helper.dart';
 import '../packages/controller/health_package_list_api_provider.dart';
+import '../splash/controller/network_provider_controller.dart';
 
 class HealthPackageScreen extends StatefulWidget {
   HealthPackageScreen({super.key});
@@ -19,6 +20,7 @@ class HealthPackageScreen extends StatefulWidget {
 
 class _HealthPackageScreenState extends State<HealthPackageScreen> {
 
+  bool _isInternetAvailable = true;
   @override
   void initState() {
     super.initState();
@@ -37,6 +39,7 @@ class _HealthPackageScreenState extends State<HealthPackageScreen> {
 
   @override
   Widget build(BuildContext context) {
+    _isInternetAvailable = Provider.of<NetworkProvider>(context).isConnected;
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: SafeArea(
@@ -64,7 +67,8 @@ class _HealthPackageScreenState extends State<HealthPackageScreen> {
               // SizedBox(height: 15),
               // ListView takes the full screen height
               Expanded(
-                child: Padding(
+                child: _isInternetAvailable
+                    ? Padding(
                   padding:
                       EdgeInsets.symmetric(horizontal: 15.0, vertical: 0.0),
                   child: Consumer<HealthPacakgeListApiProvider>(
@@ -125,6 +129,28 @@ class _HealthPackageScreenState extends State<HealthPackageScreen> {
                         ),
                       );
                     },
+                  ),
+                )
+                    : Center(
+                  child: Container(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.wifi_off, size: 80, color: Colors.grey),
+                        SizedBox(height: 20),
+                        Text("No internet connection",
+                            style: TextStyle(fontSize: 18)),
+                        SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: () {
+                            Provider.of<NetworkProvider>(context,
+                                listen: false)
+                                .checkConnection(context, showSnackBar: true);
+                          },
+                          child: Text("Retry"),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),

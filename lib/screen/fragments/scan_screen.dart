@@ -21,13 +21,15 @@ class ScanScreen extends StatefulWidget {
 }
 
 class _ScanScreenState extends State<ScanScreen> {
+
+  bool _isInternetAvailable = true;
+
   @override
   void initState() {
     super.initState();
-
     Future.microtask(() =>
         Provider.of<ServiceApiProvider>(context, listen: false)
-            .loadCachedPackages());
+            .loadCachedScans());
   }
 
   @override
@@ -37,265 +39,294 @@ class _ScanScreenState extends State<ScanScreen> {
     final provider = Provider.of<ServiceApiProvider>(context);
     // final services = provider.homeServiceListModel?.data ?? []; // API response
     final services = provider.scanList;
-    bool isConnected = Provider.of<NetworkProvider>(context, listen: false).isConnected;
 
-  return isConnected ? Scaffold(
-      backgroundColor: AppColors.primary,
-      body: SafeArea(
-        child: Container(
-          color: Colors.white,
-          padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
-          child: Column(
-            children: [
-              // Header Row
-              // CommonAppBar(
-              //   aciviyName: "X-Rays & Scans",
-              //   isNavigation: true,
-              // ),
-              NavCommonAppBar(
-                aciviyName: "X-Rays & Scans",
-                isNavigation: true,
-                backgroundColor: AppColors.primary, // ✅ Change Background Color
-                searchBarVisible: false,
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 0.0),
+    _isInternetAvailable = Provider.of<NetworkProvider>(context).isConnected;
+
+    return Scaffold(
+            backgroundColor: AppColors.primary,
+            body: SafeArea(
+              child: Container(
+                color: Colors.white,
+                padding: EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                child: Column(
+                  children: [
+                    // Header Row
+                    // CommonAppBar(
+                    //   aciviyName: "X-Rays & Scans",
+                    //   isNavigation: true,
+                    // ),
+                    NavCommonAppBar(
+                      aciviyName: "X-Rays & Scans",
+                      isNavigation: true,
+                      backgroundColor:
+                          AppColors.primary, // ✅ Change Background Color
+                      searchBarVisible: false,
+                    ),
+                    Expanded(
+                      child: _isInternetAvailable
+                          ? SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 0.0),
+                              child: Container(
+                                width: double.infinity,
+                                height: 200,
+                                // height: ResponsiveHelper.containerHeight(context, 21),
+                                // decoration: BoxDecoration(
+                                //   gradient: LinearGradient(
+                                //     colors: [
+                                //       // Color(0xFFe3f2fd), // Light Color
+                                //       // Color(0xFFe3f2fd), // Soft Blue Shade
+                                //       // Color(0xFFe0f7fa), // Light Cyan Blue
+                                //       // Color(0xFFb2ebf2), // Sky Blue
+                                //
+                                //       //// is somthing best
+                                //       Color(0xFFe0f2f1), // Light Teal
+                                //       Color(0xFFb2dfdb), // Mint Green-Teal
+                                //       // its something best
+                                //
+                                //       // its so looking good
+                                //       // Color(0xFFede7f6), // Light Purple
+                                //       // Color(0xFFb3e5fc), // Soft Blue
+                                //       /// looking good
+                                //     ],
+                                //     begin: Alignment.topLeft,
+                                //     end: Alignment.bottomRight,
+                                //   ),
+                                // ),
+                                child: HomeSlider1Section(
+                                  bannerImageHeight: 160,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 10.0, vertical: 10.0),
+                              child: provider.isLoading && services.isEmpty
+                                  ? ScansServiceShimmer(
+                                      itemCount:
+                                          10) // ✅ Show shimmer only when no cache
+                                  : provider.errorMessage.isNotEmpty
+                                      ? Center(
+                                          child: SizedBox(
+                                              width: ResponsiveHelper
+                                                  .containerWidth(context, 50),
+                                              height: ResponsiveHelper
+                                                  .containerWidth(context, 50),
+                                              child: ImageLoaderUtil.assetImage(
+                                                  "assets/images/img_error.jpg")),
+                                        )
+                                      : GridView.builder(
+                                          shrinkWrap: true,
+                                          physics:
+                                              NeverScrollableScrollPhysics(),
+                                          scrollDirection: Axis.vertical,
+                                          gridDelegate:
+                                              SliverGridDelegateWithFixedCrossAxisCount(
+                                            crossAxisCount: 3, // 3 columns
+                                            crossAxisSpacing:
+                                                8.0, // Space between columns
+                                            mainAxisSpacing:
+                                                0.0, // Removed spacing between rows
+                                          ),
+                                          // itemCount: provider.scanList.length,
+                                          itemCount: services.length,
+                                          itemBuilder: (context, index) {
+                                            final item = services[index];
+                                            return InkWell(
+                                              onTap: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        AllServicesDetailListScreen(
+                                                      serviceSlug:
+                                                          item.slug ?? "",
+                                                      serviceName:
+                                                          item.serviceDetailName ??
+                                                              "",
+                                                      serviceDescription:
+                                                          item.serviceDetail ??
+                                                              "",
+                                                      servicePhoto: item
+                                                          .servicePhoto!
+                                                          .secureUrl
+                                                          .toString(),
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              splashColor: AppColors.whiteColor,
+                                              highlightColor:
+                                                  AppColors.whiteColor,
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    bottom: 8.0),
+                                                child: Container(
+                                                  width: double.infinity,
+                                                  decoration: BoxDecoration(
+                                                    color: AppColors.whiteColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                    border: Border.all(
+                                                      color: Colors.white,
+                                                      width: 0,
+                                                    ),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: Colors.black
+                                                            .withOpacity(0.1),
+                                                        blurRadius: 10,
+                                                        offset: Offset(0, 2),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      ResponsiveHelper
+                                                          .sizeBoxHeightSpace(
+                                                              context, 0.5),
+                                                      // Circular image
+                                                      Material(
+                                                        elevation: 2,
+                                                        // Add elevation for shadow effect
+                                                        shape: CircleBorder(),
+                                                        child: Container(
+                                                          width: circleRadius,
+                                                          height: circleRadius,
+                                                          decoration:
+                                                              const ShapeDecoration(
+                                                            shape:
+                                                                CircleBorder(),
+                                                            color: Colors.white,
+                                                          ),
+                                                          child: Padding(
+                                                              padding:
+                                                                  const EdgeInsets
+                                                                      .all(5),
+                                                              child: ImageLoaderUtil
+                                                                  .cacheNetworkImage(item
+                                                                      .iconPhoto!
+                                                                      .secureUrl
+                                                                      .toString())
+
+                                                              // CachedNetworkImage(
+                                                              //   imageUrl: item
+                                                              //       .iconPhoto!
+                                                              //       .secureUrl
+                                                              //       .toString(),
+                                                              //   fit: BoxFit.fill,
+                                                              //   placeholder:
+                                                              //       (context, url) =>
+                                                              //           Center(
+                                                              //     child: Image.asset(
+                                                              //         "assets/images/img_placeholder.jpeg"), // Placeholder while loading
+                                                              //   ),
+                                                              //   errorWidget: (context,
+                                                              //           url, error) =>
+                                                              //       Center(
+                                                              //     child: Image.asset(
+                                                              //         "assets/images/img_placeholder.jpeg"), // Placeholder while loading
+                                                              //   ),
+                                                              //   fadeInDuration:
+                                                              //       const Duration(
+                                                              //           milliseconds:
+                                                              //               500),
+                                                              //   // Smooth fade-in effect
+                                                              //   fadeOutDuration:
+                                                              //       const Duration(
+                                                              //           milliseconds:
+                                                              //               300),
+                                                              // ),
+
+                                                              // DecoratedBox(
+                                                              //   decoration: ShapeDecoration(
+                                                              //     shape:
+                                                              //         const CircleBorder(),
+                                                              //     image: DecorationImage(
+                                                              //       fit: BoxFit.fill,
+                                                              //       image: NetworkImage(item
+                                                              //           .iconPhoto!
+                                                              //           .secureUrl
+                                                              //           .toString()),
+                                                              //     ),
+                                                              //   ),
+                                                              // ),
+                                                              ),
+                                                        ),
+                                                      ),
+                                                      const SizedBox(
+                                                          height: 8.0),
+                                                      // Space between image and text
+                                                      // Title text
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                                horizontal:
+                                                                    5.0),
+                                                        child: Text(
+                                                          "${item.serviceDetailName.toString()}",
+                                                          style: AppTextStyles.heading1(
+                                                              context,
+                                                              overrideStyle: TextStyle(
+                                                                  fontSize: ResponsiveHelper
+                                                                      .fontSize(
+                                                                          context,
+                                                                          11))),
+                                                          maxLines: 2,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        ),
+                            ),
+                          ],
+                        ),
+                      )
+                          : Center(
                         child: Container(
-                          width: double.infinity,
-                          height: 200,
-                          // height: ResponsiveHelper.containerHeight(context, 21),
-                          // decoration: BoxDecoration(
-                          //   gradient: LinearGradient(
-                          //     colors: [
-                          //       // Color(0xFFe3f2fd), // Light Color
-                          //       // Color(0xFFe3f2fd), // Soft Blue Shade
-                          //       // Color(0xFFe0f7fa), // Light Cyan Blue
-                          //       // Color(0xFFb2ebf2), // Sky Blue
-                          //
-                          //       //// is somthing best
-                          //       Color(0xFFe0f2f1), // Light Teal
-                          //       Color(0xFFb2dfdb), // Mint Green-Teal
-                          //       // its something best
-                          //
-                          //       // its so looking good
-                          //       // Color(0xFFede7f6), // Light Purple
-                          //       // Color(0xFFb3e5fc), // Soft Blue
-                          //       /// looking good
-                          //     ],
-                          //     begin: Alignment.topLeft,
-                          //     end: Alignment.bottomRight,
-                          //   ),
-                          // ),
-                          child: HomeSlider1Section(
-                            bannerImageHeight: 160,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.wifi_off, size: 80, color: Colors.grey),
+                              SizedBox(height: 20),
+                              Text("No internet connection",
+                                  style: TextStyle(fontSize: 18)),
+                              SizedBox(height: 10),
+                              ElevatedButton(
+                                onPressed: () {
+                                  Provider.of<NetworkProvider>(context,
+                                      listen: false)
+                                      .checkConnection(context, showSnackBar: true);
+                                },
+                                child: Text("Retry"),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: 10.0, vertical: 10.0),
-                        child: provider.isLoading && services.isEmpty
-                            ? ScansServiceShimmer(
-                                itemCount:
-                                    10) // ✅ Show shimmer only when no cache
-                            : provider.errorMessage.isNotEmpty
-                                ? Center(
-                                    child: SizedBox(
-                                      width: ResponsiveHelper.containerWidth(
-                                          context, 50),
-                                      height: ResponsiveHelper.containerWidth(
-                                          context, 50),
-                                      child:ImageLoaderUtil.assetImage( "assets/images/img_error.jpg")
-
-
-                                    ),
-                                  )
-                                : GridView.builder(
-                                    shrinkWrap: true,
-                                    physics: NeverScrollableScrollPhysics(),
-                                    scrollDirection: Axis.vertical,
-                                    gridDelegate:
-                                        SliverGridDelegateWithFixedCrossAxisCount(
-                                      crossAxisCount: 3, // 3 columns
-                                      crossAxisSpacing:
-                                          8.0, // Space between columns
-                                      mainAxisSpacing:
-                                          0.0, // Removed spacing between rows
-                                    ),
-                                    // itemCount: provider.scanList.length,
-                                    itemCount: services.length,
-                                    itemBuilder: (context, index) {
-                                      final item = services[index];
-                                      return InkWell(
-                                        onTap: () {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  AllServicesDetailListScreen(
-                                                serviceSlug: item.slug ?? "",
-                                                serviceName:
-                                                    item.serviceDetailName ??
-                                                        "",
-                                                serviceDescription:
-                                                    item.serviceDetail ?? "",
-                                                servicePhoto: item
-                                                    .servicePhoto!.secureUrl
-                                                    .toString(),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                        splashColor: AppColors.whiteColor,
-                                        highlightColor: AppColors.whiteColor,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 8.0),
-                                          child: Container(
-                                            width: double.infinity,
-                                            decoration: BoxDecoration(
-                                              color: AppColors.whiteColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              border: Border.all(
-                                                color: Colors.white,
-                                                width: 0,
-                                              ),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withOpacity(0.1),
-                                                  blurRadius: 10,
-                                                  offset: Offset(0, 2),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.start,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                ResponsiveHelper
-                                                    .sizeBoxHeightSpace(
-                                                        context, 0.5),
-                                                // Circular image
-                                                Material(
-                                                  elevation: 2,
-                                                  // Add elevation for shadow effect
-                                                  shape: CircleBorder(),
-                                                  child: Container(
-                                                    width: circleRadius,
-                                                    height: circleRadius,
-                                                    decoration:
-                                                        const ShapeDecoration(
-                                                      shape: CircleBorder(),
-                                                      color: Colors.white,
-                                                    ),
-                                                    child: Padding(
-                                                      padding: const EdgeInsets.all( 5),
-                                                      child:ImageLoaderUtil.cacheNetworkImage(item.iconPhoto!.secureUrl.toString())
-
-                                                      // CachedNetworkImage(
-                                                      //   imageUrl: item
-                                                      //       .iconPhoto!
-                                                      //       .secureUrl
-                                                      //       .toString(),
-                                                      //   fit: BoxFit.fill,
-                                                      //   placeholder:
-                                                      //       (context, url) =>
-                                                      //           Center(
-                                                      //     child: Image.asset(
-                                                      //         "assets/images/img_placeholder.jpeg"), // Placeholder while loading
-                                                      //   ),
-                                                      //   errorWidget: (context,
-                                                      //           url, error) =>
-                                                      //       Center(
-                                                      //     child: Image.asset(
-                                                      //         "assets/images/img_placeholder.jpeg"), // Placeholder while loading
-                                                      //   ),
-                                                      //   fadeInDuration:
-                                                      //       const Duration(
-                                                      //           milliseconds:
-                                                      //               500),
-                                                      //   // Smooth fade-in effect
-                                                      //   fadeOutDuration:
-                                                      //       const Duration(
-                                                      //           milliseconds:
-                                                      //               300),
-                                                      // ),
-
-                                                      // DecoratedBox(
-                                                      //   decoration: ShapeDecoration(
-                                                      //     shape:
-                                                      //         const CircleBorder(),
-                                                      //     image: DecorationImage(
-                                                      //       fit: BoxFit.fill,
-                                                      //       image: NetworkImage(item
-                                                      //           .iconPhoto!
-                                                      //           .secureUrl
-                                                      //           .toString()),
-                                                      //     ),
-                                                      //   ),
-                                                      // ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                const SizedBox(height: 8.0),
-                                                // Space between image and text
-                                                // Title text
-                                                Padding(
-                                                  padding: const EdgeInsets
-                                                      .symmetric(
-                                                      horizontal: 5.0),
-                                                  child: Text(
-                                                    "${item.serviceDetailName.toString()}",
-                                                    style: AppTextStyles.heading1(
-                                                        context,
-                                                        overrideStyle: TextStyle(
-                                                            fontSize:
-                                                                ResponsiveHelper
-                                                                    .fontSize(
-                                                                        context,
-                                                                        11))),
-                                                    maxLines: 2,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    textAlign: TextAlign.center,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
-    ) : Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        ImageLoaderUtil.assetImage("assets/images/img_error.jpg", width: 150, height: 150),
-        SizedBox(height: 20),
-        Text(
-          "No Internet Connection",
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
-      ],
-    ),
-  ) ;
+            ),
+          );
   }
 }
