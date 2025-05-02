@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:shanya_scans/screen/checkout/model/store_checkout_form_data_model.dart';
 import 'package:shanya_scans/screen/order/model/OrderItem.dart';
 import 'package:shanya_scans/ui_helper/snack_bar.dart';
 import 'package:shanya_scans/ui_helper/storage_helper.dart';
@@ -12,32 +14,36 @@ import '../../../network_manager/api_error_handler.dart';
 import '../../../network_manager/repository.dart';
 import '../../order/model/CreateOrder2ModelResponse.dart';
 import '../../order/screen/OrderSuccessScreen.dart';
+import '../../order/screen/order_failed_screen.dart';
+import '../model/payment_checkout_model.dart';
 
 class CheckoutProvider with ChangeNotifier {
   final Repository _repository = Repository();
   List<OrderItem> _checkoutItems = [];
+  StoreCheckoutFormDataModel? _formData;
+
+  StoreCheckoutFormDataModel? get formData => _formData;
 
   bool _isLoading = false;
   String _errorMessage = "";
   String? _razorpayKey;
 
+  late Razorpay _razorpay;
+
+  PaymentCheckoutModel? _checkoutModel;
+  PaymentCheckoutModel? get checkoutModel => _checkoutModel;
   CreateOrder2ModelResponse? _createOrderModelResponse;
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  // CreateOrderModelResponse? _createOrderModelResponse;
+  String paymentStatus = '';
 
-  CreateOrder2ModelResponse? get createOrderModelResponse =>
-      _createOrderModelResponse;
-
-  // CreateOrderModelResponse? get createOrderModelResponse => _createOrderModelResponse;
+  CreateOrder2ModelResponse? get createOrderModelResponse =>  _createOrderModelResponse;
   List<OrderItem> get checkoutItems => _checkoutItems;
-
   bool get isCheckoutEmpty => _checkoutItems.isEmpty;
-
   bool get isLoading => _isLoading;
-
   String get errorMessage => _errorMessage;
-
   String? get razorpayKey => _razorpayKey;
+
 
   void reset() {
     _isLoading = false;
@@ -124,7 +130,7 @@ class CheckoutProvider with ChangeNotifier {
   Future<void> saveCheckoutItems() async {
     final prefs = await SharedPreferences.getInstance();
     final String encodedData =
-        jsonEncode(_checkoutItems.map((item) => item.toJson()).toList());
+    jsonEncode(_checkoutItems.map((item) => item.toJson()).toList());
     await prefs.setString('checkout_items', encodedData);
   }
 
@@ -221,6 +227,35 @@ class CheckoutProvider with ChangeNotifier {
     }
   }
 
+  void saveFormData({
+    required String selectedDate,
+    required String selectedTime,
+    required String email,
+    required String fullName,
+    required String age,
+    required String phone,
+    required String altPhone,
+    required String gender,
+    required String cityAddress,
+    required String place,
+    required String addressType,
+  }) {
+    _formData = StoreCheckoutFormDataModel(
+      selectedDate: selectedDate,
+      selectedTime: selectedTime,
+      email: email,
+      fullName: fullName,
+      age: age,
+      phone: phone,
+      altPhone: altPhone,
+      gender: gender,
+      cityAddress: cityAddress,
+      place: place,
+      addressType: addressType,
+    );
+    notifyListeners();
+  }
+
   Future<bool> createOrder(
       BuildContext context,
       String bookingDate,
@@ -269,29 +304,29 @@ class CheckoutProvider with ChangeNotifier {
           "category": test.category,
           "orderType": test.orderType,
           "orderPrice": test.price,
-          "bookingDate": bookingDate,
-          "bookingTime": bookingTime,
+          "bookingDate": _formData!.selectedDate.toString(),
+          "bookingTime":  _formData!.selectedTime.toString(),
         };
       }).toList();
 
       // Construct order details with patient info only once
       List<Map<String, dynamic>> orderDetailsJson = [
         {
-          "patientName": name,
-          "patientAge": age,
-          "patientGender": StringUtils.toLowerCase(gender),
+          "patientName":  _formData!.fullName.toString(),
+          "patientAge":  _formData!.age.toString(),
+          "patientGender": StringUtils.toLowerCase( _formData!.gender.toString()),
           "tests": tests, // All tests for the patient
         }
       ];
 
       // Construct request body
       Map<String, dynamic> requestBody = {
-        "email": email,
-        "address": cityState,
-        "selectedPlace": selectedPlace,
-        "addressType": addressType,
-        "phoneNumber": phone,
-        "altPhoneNumber": altPhone,
+        "email":  _formData!.email.toString(),
+        "address":  _formData!.cityAddress.toString(),
+        "selectedPlace":  _formData!.place.toString(),
+        "addressType":  _formData!.addressType.toString(),
+        "phoneNumber":  _formData!.phone.toString(),
+        "altPhoneNumber":  _formData!.altPhone.toString(),
         "orderDetails": orderDetailsJson,
       };
 
@@ -357,6 +392,8 @@ class CheckoutProvider with ChangeNotifier {
     );
   }
 
+  //  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Paymebt api ****************************************
+
   // 🟢 Get Total Amount
   double get totalAmount {
     return _checkoutItems.fold(
@@ -381,4 +418,125 @@ class CheckoutProvider with ChangeNotifier {
       notifyListeners();
     }
   }
+
+  initRazorpay(BuildContext context) async {
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, (response) => _handlePaymentSuccess(response, context));
+
+    // _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+    createAndStartPayment(1,"Book Test");
+  }
+
+  Future<void> createAndStartPayment( int total,  String forName) async {
+
+    setLoadingState(true);
+
+    final requestBody = {
+      "total": 1,
+      "forName": "Book Test",
+    };
+
+    final result = await _repository.createRazerPayOrder(requestBody);
+    _checkoutModel = result;
+
+
+    setLoadingState(true);
+
+    if (_checkoutModel?.order?.id != null) {
+      var apiKey = await fetchRazorpayKey();
+      _startRazorpayPayment(apiKey.toString(), _checkoutModel!);
+    }
+  }
+
+  void _startRazorpayPayment(String? apiKey, PaymentCheckoutModel model) {
+    final order = model.order!;
+    var options = {
+      'key': apiKey,
+      'amount': order.amount, // in paise
+      'currency': 'INR',
+      'name': 'Shanya App',
+      'description': 'Payment for order',
+      'order_id': order.id,
+      'prefill': {
+        'contact': _formData?.phone ?? '',
+        'email': _formData?.email ?? '',
+      }
+    };
+
+    _razorpay.open(options);
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response, BuildContext context) async {
+    final requestBody = {
+      "razorpay_payment_id": response.paymentId!,
+      "razorpay_order_id": response.orderId!,
+      "razorpay_signature": response.signature!,
+    };
+
+    setLoadingState(true);
+    final verified = await _repository.verifyPayment(requestBody);
+    if (verified) {
+      bool orderCreated = await createOrder(
+        context,
+        _formData!.selectedDate,
+        _formData!.selectedTime,
+        _formData!.email,
+        _formData!.fullName,
+        _formData!.age,
+        _formData!.phone,
+        _formData!.altPhone,
+        _formData!.gender,
+        _formData!.cityAddress,
+        _formData!.place,
+        _formData!.addressType,
+      );
+      if (orderCreated) {
+        paymentStatus = 'Payment and order successful';
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => OrderSuccessScreen()),
+        );
+      } else {
+        paymentStatus = 'Payment successful, but order failed';
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => OrderFailedScreen(reason: "Order creation failed"),
+          ),
+        );
+      }
+    } else {
+      paymentStatus = 'Payment verification failed';
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => OrderFailedScreen(reason: "Payment verification failed"),
+        ),
+      );
+    }
+
+    paymentStatus = verified ? 'Payment successful' : 'Payment verification failed';
+    print("payment status => ${paymentStatus}");
+
+    setLoadingState(false);
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    paymentStatus = 'Payment failed: ${response.message}';
+    print("payment status => ${paymentStatus}");
+    setLoadingState(false);
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    paymentStatus = 'External wallet selected: ${response.walletName}';
+    print("payment status => ${paymentStatus}");
+    setLoadingState(false);
+  }
+
+  void clearRazorpay() {
+    _razorpay.clear();
+  }
+
 }

@@ -40,27 +40,24 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
 
   void _loadCachedData() {
     Provider.of<PathalogyTestApiProvider>(context, listen: false)
-        .loadCachedNavPathalogyTests(context);
+        .loadCachedNavPathalogyTests(context, forceReload: false);
   }
 
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
-      Provider.of<PathalogyTestApiProvider>(context, listen: false)
-          .loadCachedNavPathalogyTests(context);
+      // Provider.of<PathalogyTestApiProvider>(context, listen: false)
+      //     .loadCachedNavPathalogyTests(context, forceReload: true);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _initializeNetworkAndLoadData();
       });
     });
     // Scroll listener for pagination
     _scrollController.addListener(() {
-      final provider =
-      Provider.of<PathalogyTestApiProvider>(context, listen: false);
+      final provider = Provider.of<PathalogyTestApiProvider>(context, listen: false);
       if (_scrollController.position.pixels >=
-          _scrollController.position.maxScrollExtent - 100 &&
-          !provider.isFetchingMore &&
-          !provider.isLastPage) {
+          _scrollController.position.maxScrollExtent - 200 ) {
         provider.getPathalogyTestList(context, loadMore: true);
       }
     });
@@ -87,7 +84,7 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
       child: Consumer<PathalogyTestApiProvider>(
           builder: (context, provider, child) {
         // Check if the loading state is true
-        if (provider.isLoading && provider.filteredPathalogyTest.isEmpty) {
+        if (provider.isLoading && provider.filteredPathalogyTests.isEmpty) {
           return loadingIndicator(); // Show shimmer effect while loading
         }
 
@@ -97,13 +94,12 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
         }
 
         // Check if the data is null or empty
-        if (provider.pathalogyTestListModel?.data == null ||
-            provider.pathalogyTestListModel!.data!.isEmpty) {
+        if (provider.filteredPathalogyTests.isEmpty) {
           return _buildEmptyListWidget(); // Show empty list widget if data is null or empty
         }
 
         // If data is loaded, display the rate list
-        return _buildPathalogyList(provider.filteredPathalogyTest, provider);
+        return _buildPathalogyList(provider.filteredPathalogyTests, provider);
       }),
     );
   }
@@ -129,7 +125,7 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
         width: ResponsiveHelper.containerWidth(context, 50),
         height: ResponsiveHelper.containerWidth(context, 50),
         child: Image.asset(
-          "assets/images/img_error.png",
+          "assets/images/img_error.jpg",
           fit: BoxFit.cover,
         ),
       ),
@@ -137,7 +133,7 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
   }
 
   Widget _buildPathalogyList(
-      List<Data> pathalogyTestList, PathalogyTestApiProvider provider) {
+      List<Allpathology> pathalogyTestList, PathalogyTestApiProvider provider) {
     print("BuildRateList ");
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 5.0),
@@ -147,14 +143,14 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
         child: ListView.builder(
           controller: _scrollController, // Attach scroll controller
           scrollDirection: Axis.vertical,
-          itemCount: provider.filteredPathalogyTest.length +
+          itemCount: provider.filteredPathalogyTests.length +
               (provider.isFetchingMore ? 1 : 0),
           // itemCount: pathalogyTestList.length,
           itemBuilder: (context, index) {
-            if (index == provider.filteredPathalogyTest.length) {
-              return Center(child: CircularProgressIndicator()); // Show loader
+            if (index == provider.filteredPathalogyTests.length) {
+              return  loadingIndicator(); // Show loader
             }
-            final item = provider.filteredPathalogyTest[index];
+            final item = provider.filteredPathalogyTests[index];
             EdgeInsets itemPadding = EdgeInsets.only(
               top: index == 0 ? 8.0 : 0.0,
               // Extra padding for first item
@@ -202,14 +198,6 @@ class _CellNavLabListItemState extends State<CellNavLabListItem> {
                           gradient: LinearGradient(
                             // color: AppColors.pinkColor,
                             colors: [Color(0xFFF9F7F4), Color(0xFFF1FBFC)],
-
-
-                            // [Colors.blue.shade50, Colors.blue.shade100],
-                            // [Colors.teal.shade50, Colors.teal.shade100],
-                            // [Colors.green.shade50, Colors.green.shade100],
-                            // [Colors.amber.shade50, Colors.amber.shade100],
-                            // [Colors.purple.shade50, Colors.purple.shade100],
-
                             // Lighter shades
                             begin: Alignment.bottomLeft,
                             end: Alignment.topRight,

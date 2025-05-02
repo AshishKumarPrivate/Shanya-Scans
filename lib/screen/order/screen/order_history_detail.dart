@@ -244,7 +244,7 @@ class _UserOrderHistoryDetailScreenState
                           'Order Date,Time,  ${DateUtil.formatISODate(
                               orderDetail.data!.bookingDate
                                   .toString())}, ${DateUtil.formatISOTime(
-                              orderDetail.data!.bookingDate.toString())}'),
+                              orderDetail.data!.orderDateTime.toString())}'),
                     ],
                   ),
                   const SizedBox(height: 16),

@@ -69,7 +69,7 @@ class UserSelectionScreen extends StatelessWidget {
                 onPressed: () {
                   _saveRoleAndNavigate(context, "user");
                 },
-                text: 'User Login',
+                text: 'Patient Login',
                 color: AppColors.primary,
                 borderRadius: 10.0,
                 textStyle: const TextStyle(
@@ -81,7 +81,7 @@ class UserSelectionScreen extends StatelessWidget {
                 borderRadius: 10,
                 borderWidth: 1,
                 borderColor: AppColors.deliveryPrimary,
-                text: 'Sales Login',
+                text: 'Sales Person Login',
                 onPressed: () {
                   _saveRoleAndNavigate(context, "delivery_boy");
                 },

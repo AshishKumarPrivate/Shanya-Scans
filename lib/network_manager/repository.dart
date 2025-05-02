@@ -26,6 +26,7 @@ import '../screen/auth/model/ListModel.dart';
 import '../screen/auth/model/ObjectModel.dart';
 import '../screen/auth/model/OtpVerifyModel.dart';
 import '../screen/auth/model/SignUpModel.dart';
+import '../screen/checkout/model/payment_checkout_model.dart';
 import '../screen/nav/nav_home/health_concern/model/HealthConcernDetailModel.dart';
 import '../screen/nav/nav_lab/model/PathalogyTestListDetailModel.dart';
 import '../screen/nav/nav_lab/model/PathalogyTestListModel.dart';
@@ -378,11 +379,11 @@ class Repository {
 // &&&&&&&&&&& bottom nav Scans List  &&&&&&&&&
 // Bottom nav Scans list
 
-  Future<PathalogyTestListModel> getNavLabScanResponse() async {
+  Future<PathalogyTestListModel> getNavLabScanResponse({int page = 1, int limit = 10}) async {
     // var response =
     //     await _dioHelper.get(url: 'https://reqres.in/api/users?page=2');
     Map<String, dynamic> response =
-        await _dioHelper.get(url: '$baseUrl/api/v1/pathology');
+        await _dioHelper.get(url: '$baseUrl/api/v1/pathology/pagination?page=$page&limit=$limit');
     return PathalogyTestListModel.fromJson(response);
   }
 
@@ -445,17 +446,6 @@ class Repository {
   }
 
 
-
-
-  // &&&&&&&&&&&&&&&& ORDER API &&&&&&&&&&&&&&&&&&&&&&&&&&
-  Future<CreateOrder2ModelResponse> createOrderResponse(
-      Object requestBody) async {
-    Map<String, dynamic> response = await _dioHelper.post(
-        url: '$baseUrl/api/v1/order', requestBody: requestBody);
-
-    return CreateOrder2ModelResponse.fromJson(response);
-    // return LogInModel.fromJson(response);
-  }
   // order history
   Future<MyOrderHistoryListModel> getOrderHistoryResponse(String userId) async {
     // var response =
@@ -472,7 +462,7 @@ class Repository {
     return EnquiryNeedHelpModel.fromJson(response);
     // return LogInModel.fromJson(response);
   }
-
+/////////&&&&&&&&&&&7 PAYMENT &&&&&&&&&&&&&&&&&&&&&
   /// RAZER PAYMENT
   Future<Map<String, dynamic>> getRazorPaymentKey() async {
     try {
@@ -498,7 +488,48 @@ class Repository {
     }
   }
 
+  Future<PaymentCheckoutModel?> createRazerPayOrder(Object requestBody) async {
+    try {
+      Map<String, dynamic> response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/payment/checkout',
+        requestBody: requestBody,
+      );
 
+      if (response['success']) {
+        return PaymentCheckoutModel.fromJson(response);
+      }
+    } catch (e) {
+      print('Error creating order: $e');
+    }
+    return null;
+  }
+
+  Future<bool> verifyPayment( Object requestBody ) async {
+    try {
+      // final response = await _dio.post(ApiConstants.verifyPayment, data: {
+      //   "razorpay_payment_id": paymentId,
+      //   "razorpay_order_id": orderId,
+      //   "razorpay_signature": signature,
+      // });
+      Map<String, dynamic> response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/payment/status',
+        requestBody: requestBody,
+      );
+      return response['success'];
+    } catch (e) {
+      print('Error verifying payment: $e');
+    }
+    return false;
+  }
+  // &&&&&&&&&&&&&&&& ORDER API &&&&&&&&&&&&&&&&&&&&&&&&&&
+  Future<CreateOrder2ModelResponse> createOrderResponse(
+      Object requestBody) async {
+    Map<String, dynamic> response = await _dioHelper.post(
+        url: '$baseUrl/api/v1/order', requestBody: requestBody);
+
+    return CreateOrder2ModelResponse.fromJson(response);
+    // return LogInModel.fromJson(response);
+  }
 
   // ✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨  Shanya Scans Delivery Boy API   ✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨✨
 

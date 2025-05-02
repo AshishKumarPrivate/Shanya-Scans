@@ -34,7 +34,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized(); // ✅ Ensure Flutter binding is initialized
   await Firebase.initializeApp();
 
-  StorageHelper().init(); // ✅ Initialize SharedPreferences
+  await StorageHelper().init(); // ✅ Initialize SharedPreferences
   await PackageInfo.fromPlatform(); // Ensures package is loaded
 
   runApp(
@@ -119,7 +119,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
-          foregroundColor: Colors.black,
+          foregroundColor: Colors.white,
         ),
         fontFamily: "Poppins"
       ),

@@ -78,18 +78,18 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.14.3
-  flutter_native_splash: ^2.4.4
+#  flutter_native_splash: ^2.4.4
   change_app_package_name: ^1.5.0
 #  flutter_local_notifications: ^18.0.1
 
-flutter_native_splash:
-  color: "#ffffff" # Background color of splash (white or your app bg)
-  image: assets/images/logo.png # Path to your splash image
-  branding: null
-  android: true
-  ios: true
-  fullscreen: true
-  android_gravity: center # Image center aligned
+#flutter_native_splash:
+#  color: "#ffffff" # Background color of splash (white or your app bg)
+#  image: assets/images/logo.png # Path to your splash image
+#  branding: null
+#  android: true
+#  ios: true
+#  fullscreen: true
+#  android_gravity: center # Image center aligned
 #  web : true
 
 flutter_launcher_icons:

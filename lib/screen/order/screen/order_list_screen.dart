@@ -224,7 +224,7 @@ class OrderCard extends StatelessWidget {
                       SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          "${DateUtil.formatISOTime(order.bookingDate.toString())}",
+                          "${DateUtil.formatISOTime(order.bookingTime.toString())}",
                           style:
                               TextStyle(fontSize: 13, color: Colors.grey[700]),
                           maxLines: 2,

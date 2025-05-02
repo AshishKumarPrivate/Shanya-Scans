@@ -28,25 +28,16 @@ class BookATestNowScreen extends StatefulWidget {
 class _BookATestNowScreenState extends State<BookATestNowScreen> {
   bool isFormVisible = false;
 
+  final ScrollController _scrollController = ScrollController();
   // Boolean to show the test list container
   bool _isTestListVisible = true;
+  // List of tests after filtering
+  List<Map<String, String>> _filteredTests = [];
+  // Selected tests
+  List<Allpathology> _selectedTests = [];
 
-  final List<Map<String, String>> _tests = [
-    {"test": "2 D ECHO", "price": "1800"},
-    {"test": "TMT TEST", "price": "2000"},
-    {"test": "ECG", "price": "300"},
-    {"test": "ECHO (below 6 yrs)", "price": "2500"},
-    {"test": "NCV ALL FOUR LIMBS", "price": "5500"},
-    {"test": "EEG", "price": "2100"},
-    {"test": "TIFFA (TWINS)", "price": "4500"},
-    {"test": "Karyotype+Qfpcr", "price": "14000"},
-    {"test": "FETAL ECHO TWINS", "price": "6000"},
-    {"test": "Single reduction", "price": "14000"},
-    {"test": "Microarray 750k", "price": "23000"},
-    {"test": "REDUCTION", "price": "20000"},
-    {"test": "TWINS REDUCATION", "price": "16000"},
-    {"test": "dIAGNOSTIC TAPPING", "price": "3000"},
-  ];
+  // Controller for the search text field
+  final TextEditingController _searchController = TextEditingController();
 
   List<Map<String, dynamic>> getTotalTests() {
     List<Map<String, dynamic>> selectedTestsList = [];
@@ -56,7 +47,7 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
       return selectedTestsList;
     }
 
-    for (Data test in _selectedTests) {
+    for (Allpathology test in _selectedTests) {
       selectedTestsList.add({
         "name": test.testDetailName ?? "Unknown Test",
         "price": test.testPrice ?? 0,
@@ -67,14 +58,12 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
     return selectedTestsList;
   }
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
-  // List of tests after filtering
-  List<Map<String, String>> _filteredTests = [];
-  // Selected tests
-  List<Data> _selectedTests = [];
-
-  // Controller for the search text field
-  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -82,30 +71,20 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
     Future.microtask(() {
       // Clear old data and fetch new service details
       Provider.of<PathalogyTestApiProvider>(context, listen: false)
-          .loadCachedNavPathalogyTests(context);
+          .loadCachedNavPathalogyTests(context, forceReload: true);
     });
 
-    // Listen to search input
-    _searchController.addListener(() {
-      Provider.of<PathalogyTestApiProvider>(context, listen: false)
-          .filterPathologyTestList(_searchController.text);
-    });
-  }
+    if (_scrollController.hasClients || !_scrollController.hasListeners) {
+      _scrollController.addListener(() {
+        final provider = Provider.of<PathalogyTestApiProvider>(context, listen: false);
+        if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200 ) {
+          provider.getPathalogyTestList(context, loadMore: true);
+        }
+      });
+    }
 
-  void _filterTests() {
-    setState(() {
-      if (_searchController.text.isEmpty) {
-        _filteredTests = List.from(_tests);
-      } else {
-        _filteredTests = _tests
-            .where((test) =>
-                test["test"]!
-                    .toLowerCase()
-                    .contains(_searchController.text.toLowerCase()) ||
-                test["price"]!.contains(_searchController.text))
-            .toList();
-      }
-    });
+
   }
 
   // Toggle the visibility of the test list
@@ -126,7 +105,7 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
   //   });
   // }
   // Toggle selection function
-  void _toggleSelection(Data test) {
+  void _toggleSelection(Allpathology test) {
     setState(() {
       if (_selectedTests.contains(test)) {
         _selectedTests.remove(test);
@@ -138,7 +117,7 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
 
   double getTotalPrice() {
     double total = 0.0;
-    for (Data test in _selectedTests) {
+    for (Allpathology test in _selectedTests) {
       total += (test.testPrice ?? 0).toDouble(); // Directly access price
     }
 
@@ -147,7 +126,7 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
 
 
   // Remove the selected test
-  void _removeSelectedTest(Data test) {
+  void _removeSelectedTest(Allpathology test) {
     setState(() {
       _selectedTests.remove(test);
     });
@@ -156,7 +135,7 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = Provider.of<PathalogyTestApiProvider>(context);
-    final tests = provider.filteredPathalogyTest;
+    final tests = provider.filteredPathalogyTests;
 
 
     return Scaffold(
@@ -279,6 +258,11 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
                                           hintText:
                                               "Enter tests eg CBC, Fever profile etc",
                                           keyboardType: TextInputType.name,
+                                          onChanged: (query) {
+                                            Provider.of<PathalogyTestApiProvider>(context, listen: false)
+                                                .filterPathologyTestList(query);
+                                          },
+
                                           // controller: mobileController,
                                         ),
                                       ),
@@ -297,7 +281,7 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
                                         builder: (context, provider, child) {
                                       // Check if the loading state is true
                                       if (provider.isLoading &&
-                                          provider.filteredPathalogyTest
+                                          provider.filteredPathalogyTests
                                               .isEmpty) {
                                         return loadingIndicator(); // Show shimmer effect while loading
                                       }
@@ -306,16 +290,16 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
                                         return _buildErrorWidget(); // Show error widget if there's an error
                                       }
                                       // Check if the data is null or empty
-                                      if (provider.pathalogyTestListModel
-                                                  ?.data ==
-                                              null ||
-                                          provider.pathalogyTestListModel!
-                                              .data!.isEmpty) {
-                                        return _buildEmptyListWidget(); // Show empty list widget if data is null or empty
-                                      }
+                                      // if (provider.pathalogyTestListModel
+                                      //             ?.Allpathology ==
+                                      //         null ||
+                                      //     provider.pathalogyTestListModel!
+                                      //         .Allpathology!.isEmpty) {
+                                      //   return _buildEmptyListWidget(); // Show empty list widget if data is null or empty
+                                      // }
                                       // If data is loaded, display the rate list
                                       return _buildPathalogyList(
-                                          provider.filteredPathalogyTest,
+                                          provider.filteredPathalogyTests,
                                           provider);
                                     }),
                                   ),
@@ -430,7 +414,7 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
   }
 
   Widget _buildPathalogyList(
-      List<Data> pathalogyTestList, PathalogyTestApiProvider provider) {
+      List<Allpathology> pathalogyTestList, PathalogyTestApiProvider provider) {
     return Container(
       padding: EdgeInsets.all(8),
       decoration: BoxDecoration(
@@ -449,8 +433,12 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
         child: Scrollbar(
           thumbVisibility: true, // Ensures the scrollbar is always visible when scrolling
           child: ListView.builder(
-            itemCount:provider.filteredPathalogyTest.length + (provider.isFetchingMore ? 1 : 0),
+            controller: _scrollController, // Attach scroll controller
+            itemCount:provider.filteredPathalogyTests.length + (provider.isFetchingMore ? 1 : 0),
             itemBuilder: (context, index) {
+              if (index == provider.filteredPathalogyTests.length) {
+                return loadingIndicator(); // Show loader
+              }
               final test = pathalogyTestList[index];
           
               return ListTile(
@@ -481,7 +469,7 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
 
 
   Widget _buildSelectedTestsList() {
-    List<Data> selectedTests = _selectedTests; // Use your actual selected tests list
+    List<Allpathology> selectedTests = _selectedTests; // Use your actual selected tests list
 
     return Padding(
       padding: const EdgeInsets.all(8.0),

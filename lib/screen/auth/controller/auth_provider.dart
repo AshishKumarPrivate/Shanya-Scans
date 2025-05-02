@@ -48,7 +48,7 @@ class AuthApiProvider with ChangeNotifier {
       } else {
         print("❌ Unexpected response format: $response");
         _handleSignupErrors(context, response.message);
-        throw Exception("Invalid API response format");
+        throw Exception(response.message.toString());
       }
     } on DioException catch (e) {
       print("❌ DioException occurred: $e");
@@ -71,10 +71,27 @@ class AuthApiProvider with ChangeNotifier {
       );
     } catch (e) {
       print("❌ Unexpected error occurred: $e");
-      _handleUnexpectedErrors(
-        context,
-        e,
-        "User Already Exist! ",
+
+      String errorMessage = "Something went wrong";
+      if (e is DioException) {
+        int? statusCode = e.response?.statusCode;
+        if (statusCode == 400) {
+          errorMessage = "User already exists";
+        }
+        if (statusCode == 500) {
+          errorMessage = "Server error occurred. Please try again later."; // Again custom for 500
+        } else {
+          errorMessage = ApiErrorHandler.handleError(e);
+        }
+      } else if (e is Exception) {
+        errorMessage = e.toString();
+      }
+
+      showCustomSnackbarHelper.showSnackbar(
+        context: context,
+        message: errorMessage,
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 3),
       );
     } finally {
       _setLoading(false);

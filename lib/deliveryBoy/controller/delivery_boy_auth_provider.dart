@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shanya_scans/deliveryBoy/screen/deleivery_boy_dashboard.dart';
 import 'package:shanya_scans/network_manager/repository.dart';
+import 'package:shanya_scans/screen/auth/login_screen.dart';
 import 'package:shanya_scans/ui_helper/app_colors.dart';
 import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import '../../../network_manager/api_error_handler.dart';
@@ -81,7 +82,7 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier {
       StorageHelper().logout();
       _setLoading(false);
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => UserSelectionScreen()),
+        MaterialPageRoute(builder: (context) => LoginScreen()),
         (route) => false,
       );
     });

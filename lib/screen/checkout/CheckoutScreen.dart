@@ -61,7 +61,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       date: DateTime.now().toString(),
       currentFormat: "yyyy-MM-dd HH:mm:ss.SSS",
       desiredFormat: "yyyy-MM-dd"); // ✅ Store default date
-  String? selectedTimeString;
+  // String? selectedTimeString;
+  String? selectedTimeString = DateUtil.formatDate(
+      date: DateTime.now().toString(),
+      currentFormat: "yyyy-MM-dd HH:mm:ss.SSS",
+      desiredFormat: "HH:mm" // or any format you need like "hh:mm a"
+  );
 
   bool showBookingFor = false;
   bool showGender = false;
@@ -78,7 +83,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   // intialize Razer payment
 
-  late Razorpay _razorpay;
+  // late Razorpay _razorpay;
 
   @override
   void initState() {
@@ -88,102 +93,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       statusBarIconBrightness: Brightness.light,
     ));
 
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   Provider.of<CartProvider>(context, listen: false).loadCartItems();
-    // });
-
-    // WidgetsBinding.instance.addPostFrameCallback((_) {
-    //   Provider.of<OrderApiProvider>(context, listen: false)
-    //       .loadSingleTestScanItem();
-    // });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CheckoutProvider>(context, listen: false).loadCheckoutItems();
     });
 
-    _razorpay = Razorpay();
-    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
-
-  // &&&&&&&&&&&&&&&&&&&& Razer Payment &&&&&&&&&&&&&&&&&&
-
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    print("Payment Successful: ${response.paymentId}");
-    showCustomSnackbarHelper.showSnackbar(
-      context: context,
-      backgroundColor:Colors.green,
-      message: "Payment Done Successfully!",
-      duration: Duration(seconds: 2),
-    );
-
-    Provider.of<CheckoutProvider>(context, listen: false)
-        .createOrder(
-      context,
-      selectedDateString.toString(),
-      selectedTimeString.toString(),
-      StorageHelper().getEmail(),
-      fullNameController.text.toString(),
-      ageController.text.toString(),
-      phoneController.text.toString(),
-      altPhoneController.text.toString(),
-      selectedGender.toString(),
-      cityAddressController.text.toString(),
-      selectedPlace.toString(),
-      selectedAddressType.toString(),
-    );
-  }
-
-  void _handlePaymentError(PaymentFailureResponse response) {
-    print("Payment Failed: ${response.message}");
-    showCustomSnackbarHelper.showSnackbar(
-      context: context,
-      backgroundColor: Colors.red,
-      message: "Payment Failed",
-      duration: Duration(seconds: 2),
-    );
-  }
-
-  void _handleExternalWallet(ExternalWalletResponse response) {
-    print("External Wallet: ${response.walletName}");
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("External Wallet Selected: ${response.walletName}")));
-  }
-
-  void openRazorpayPayment() async{
-
-    final paymentProvider = Provider.of<CheckoutProvider>(context, listen: false);
-    await paymentProvider.totalAmount;
-    paymentProvider.setLoadingState(true);
-    print("Total amount=> ${paymentProvider.totalAmount}");
-    var options = {
-      "key": "${StorageHelper().getPaymentKey()}",
-      // Replace with your Razorpay key
-      // "amount": 1 * 100,
-      // Convert price to paise
-      "amount": (paymentProvider.totalAmount) * 100, // Convert price to paise
-      "currency": "INR",
-      "name": "Shanya Scans",
-      "description": "Book Your Home Collection",
-      "image": "https://res.cloudinary.com/duaqq7maw/image/upload/v1745390957/shanya_gwjo0s.jpg",
-      "prefill": {
-        "email": StorageHelper().getEmail(),
-        "contact": phoneController.text.toString()
-      },
-      "theme": {"color": "#000000"},
-    };
-
-    try {
-      _razorpay.open(options);
-      paymentProvider.setLoadingState(false);
-    } catch (e) {
-      paymentProvider.setLoadingState(false);
-      print("Error opening Razorpay: $e");
-    }
-  }
-
-  // &&&&&&&&&&&&&&&&&&&& Razer Payment &&&&&&&&&&&&&&&&&&
 
   void defaultStatusBarColor() {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -271,7 +186,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   @override
   void dispose() {
     defaultStatusBarColor();
-    _razorpay.clear(); // Cleanup Razorpay instance
+    // _razorpay.clear(); // Cleanup Razorpay instance
     super.dispose();
   }
 
@@ -459,72 +374,74 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 ),
                 child: SizedBox(
                   width: ResponsiveHelper.containerWidth(context, 30),
-                  child: SolidRoundedButton(
-                    text: _currentStep == 3 ? "Finish" : "Next",
-                    color: AppColors.primary,
-                    borderRadius: 10.0,
-                    onPressed: () async {
-                      if (_currentStep < 3) {
-                        print("Next  button clicked");
-                        if (_currentStep == 0) {
-                          if (!validateBookingForm(context)) {
-                            print("Validation failed at step 0.");
-                            return;
+                    child: SolidRoundedButton(
+                      text: _currentStep == 3 ? "Finish" : "Next",
+                      color: AppColors.primary,
+                      borderRadius: 10.0,
+                      onPressed: () async {
+
+                        if (_currentStep < 3) {
+                          print("Next  button clicked");
+                          if (_currentStep == 0) {
+                            if (!validateBookingForm(context)) {
+                              print("Validation failed at step 0.");
+                              return;
+                            }
                           }
-                        }
-                        if (_currentStep == 1) {
-                          if (!validateShippingForm(context)) {
-                            print("Validation failed at step 1.");
-                            return;
+                          if (_currentStep == 1) {
+                            if (!validateShippingForm(context)) {
+                              print("Validation failed at step 1.");
+                              return;
+                            }
                           }
+                          setState(() {
+                            _currentStep += 1;
+                          });
                         }
-                        setState(() {
-                          _currentStep += 1;
-                        });
-                      }
-                      else {
-                        print("Finish button clicked");
-                        final paymentProvider = Provider.of<CheckoutProvider>(context, listen: false);
-                        await paymentProvider.fetchRazorpayKey();
+                        else {
+                          print("Finish button clicked");
+                          final checkoutProvider = Provider.of<CheckoutProvider>(context, listen: false);
 
-                        if (paymentProvider.razorpayKey != null) {
-                          // Proceed with Razorpay payment
-                          openRazorpayPayment();
-                          print("Razorpay Key: ${paymentProvider.razorpayKey}");
-                        } else {
-                          // Show error
-                          print("Error: ${paymentProvider.errorMessage.toString()}");
+                          checkoutProvider.saveFormData(
+                            selectedDate: selectedDateString.toString(),
+                            selectedTime: selectedTimeString.toString(),
+                            email: StorageHelper().getEmail(),
+                            fullName: fullNameController.text.toString(),
+                            age: ageController.text.toString(),
+                            phone: phoneController.text.toString(),
+                            altPhone: altPhoneController.text.toString(),
+                            gender: selectedGender.toString(),
+                            cityAddress: cityAddressController.text.toString(),
+                            place: selectedPlace.toString(),
+                            addressType: selectedAddressType.toString(),
+                          );
+                          await checkoutProvider.initRazorpay(context);
+
+                          // Provider.of<CheckoutProvider>(context, listen: false)
+                          //     .createOrder(
+                          //   context,
+                          //   selectedDateString.toString(),
+                          //   selectedTimeString.toString(),
+                          //   StorageHelper().getEmail(),
+                          //   fullNameController.text.toString(),
+                          //   ageController.text.toString(),
+                          //   phoneController.text.toString(),
+                          //   altPhoneController.text.toString(),
+                          //   selectedGender.toString(),
+                          //   cityAddressController.text.toString(),
+                          //   selectedPlace.toString(),
+                          //   selectedAddressType.toString(),
+                          // );
                         }
 
 
 
-
-
-                        // Provider.of<CheckoutProvider>(context, listen: false)
-                        //     .createOrder(
-                        //   context,
-                        //   selectedDateString.toString(),
-                        //   selectedTimeString.toString(),
-                        //   StorageHelper().getEmail(),
-                        //   fullNameController.text.toString(),
-                        //   ageController.text.toString(),
-                        //   phoneController.text.toString(),
-                        //   altPhoneController.text.toString(),
-                        //   selectedGender.toString(),
-                        //   cityAddressController.text.toString(),
-                        //   selectedPlace.toString(),
-                        //   selectedAddressType.toString(),
-                        // );
-                      }
-
-
-
-                    },
-                    textStyle: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
+                      },
+                      textStyle: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                      ),
                     ),
-                  ),
                 ),
               ),
             );
@@ -828,8 +745,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       setState(() {
         selectedTime = pickedTime;
         print("selected booking time=>${selectedTime}");
-        selectedTimeString =
-            "${selectedTime!.hourOfPeriod}:${selectedTime!.minute.toString().padLeft(2, '0')} ${selectedTime!.period == DayPeriod.am ? "AM" : "PM"}";
+        selectedTimeString = "${selectedTime!.hourOfPeriod}:${selectedTime!.minute.toString().padLeft(2, '0')} ${selectedTime!.period == DayPeriod.am ? "AM" : "PM"}";
+        print("selected booking time=>${selectedTime}");
       });
     }
   }

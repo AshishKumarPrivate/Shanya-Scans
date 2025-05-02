@@ -329,8 +329,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Align(
                             alignment: Alignment.center,
                             child: SizedBox(
-                              width:
-                                  ResponsiveHelper.containerWidth(context, 30),
+                              width: ResponsiveHelper.containerWidth(context, 30),
                               height:
                                   ResponsiveHelper.containerWidth(context, 8),
                               child: OutlinedRoundedButton(
@@ -416,10 +415,6 @@ class CustomClipPath extends CustomClipper<Path> {
 
 void showLogoutBottomSheet(BuildContext context) {
 
-  bool _isInternetAvailable = true;
-
-  _isInternetAvailable = Provider.of<NetworkProvider>(context).isConnected;
-
   showModalBottomSheet(
     context: context,
     shape: const RoundedRectangleBorder(
@@ -427,8 +422,7 @@ void showLogoutBottomSheet(BuildContext context) {
     ),
     backgroundColor: Colors.white,
     builder: (context) {
-      return  _isInternetAvailable
-          ? Padding(
+      return Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -549,28 +543,6 @@ void showLogoutBottomSheet(BuildContext context) {
 
             const SizedBox(height: 10),
           ],
-        ),
-      )
-          : Center(
-        child: Container(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.wifi_off, size: 80, color: Colors.grey),
-              SizedBox(height: 20),
-              Text("No internet connection",
-                  style: TextStyle(fontSize: 18)),
-              SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () {
-                  Provider.of<NetworkProvider>(context,
-                      listen: false)
-                      .checkConnection(context, showSnackBar: true);
-                },
-                child: Text("Retry"),
-              ),
-            ],
-          ),
         ),
       );
     },

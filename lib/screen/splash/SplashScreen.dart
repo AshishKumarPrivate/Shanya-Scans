@@ -26,7 +26,7 @@ class _SplashScreenState extends State<SplashScreen> {
     _checkConnectivity();
   }
   void _checkConnectivity() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
 
     bool isConnected = Provider.of<NetworkProvider>(context, listen: false).isConnected;
 
