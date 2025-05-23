@@ -18,6 +18,8 @@ class CustomTextField extends StatelessWidget {
   final Color? borderColor;
   final Color? shadowColor;
   final bool enableShadow; // New optional parameter
+  final bool isPassword;
+  final FormFieldValidator<String>? validator;
 
   const CustomTextField({
     Key? key,
@@ -35,6 +37,8 @@ class CustomTextField extends StatelessWidget {
     this.borderColor,
     this.shadowColor,
     this.enableShadow = true, // Default value set to true
+    this.isPassword = false,
+    this.validator,
   }) : super(key: key);
 
   @override
@@ -44,6 +48,9 @@ class CustomTextField extends StatelessWidget {
       children: [
         FormField<String>(
           validator: (value) {
+            if (validator != null) {
+              return validator!(controller.text);
+            }
             if (controller.text.isEmpty) {
               return errorMessage;
             }
@@ -110,6 +117,7 @@ class CustomTextField extends StatelessWidget {
                             focusNode: focusNode,
                             keyboardType: keyboardType,
                             maxLength: maxLength,
+                            obscureText: isPassword,
                             decoration: InputDecoration(
                               counterText: "", // Hides the counter text
                               hintText: hintText,
@@ -123,6 +131,18 @@ class CustomTextField extends StatelessWidget {
                             onChanged: (value) {
                               fieldState.didChange(value); // Trigger validation
                             },
+                            // validator: (value) {
+                            //   // If a custom validator is passed, use it and skip default errorMessage check
+                            //   if (validator != null) {
+                            //     return validator!(controller.text);
+                            //   }
+                            //
+                            //   // Else use the default error message
+                            //   if (controller.text.isEmpty) {
+                            //     return errorMessage;
+                            //   }
+                            //   return null;
+                            // },
                           ),
                         ),
                       ],

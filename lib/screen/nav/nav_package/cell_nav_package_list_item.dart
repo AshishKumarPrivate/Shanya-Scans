@@ -212,38 +212,61 @@ class CellNavPackageListItem extends StatelessWidget {
                   color: AppColors.lightBlueColor,
                     borderRadius: BorderRadius.only(bottomLeft: Radius.circular(10),bottomRight: Radius.circular(10)),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                child:   Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Row(
-                      children: [
-                        Icon(Icons.watch_later_outlined, size: 18, color: Colors.black),
-                        SizedBox(width: 5),
-                        Text(
-                          "Fasting Required",
-                          style: AppTextStyles.heading2(
-                            context,
-                            overrideStyle: TextStyle(
-                              fontSize: ResponsiveHelper.fontSize(context, 10),
+                    Flexible(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Icon(Icons.timer, size: 18, color: Colors.grey),
+                          SizedBox(width: 2),
+                          Flexible(
+                            child: Text(
+                              item.fasting ?? "N/A",
+                              style: AppTextStyles.heading2(
+                                context,
+                                overrideStyle: TextStyle(
+                                  fontSize: ResponsiveHelper.fontSize(context, 10),
+                                ),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              softWrap: true,
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    Row(
-                      children: [
-                        Icon(Icons.access_time, size: 18, color: Colors.black),
-                        SizedBox(width: 5),
-                        Text(
-                          "Report within 24 hours",
-                          style: AppTextStyles.heading2(
-                            context,
-                            overrideStyle: TextStyle(
-                              fontSize: ResponsiveHelper.fontSize(context, 10),
+                    Flexible(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        // Align to the end
+                        children: [
+                          Icon(Icons.access_time,
+                              size: 18, color: Colors.grey),
+                          SizedBox(width: 2),
+                          Flexible(
+                            child: Text(
+                              "Reports within ${item.report} hours",
+                              // "${rateListItem.reportTime}",
+                              style: AppTextStyles.heading2(
+                                context,
+                                overrideStyle: TextStyle(
+                                  fontSize:
+                                  ResponsiveHelper.fontSize(context, 10),
+                                ),
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 2,
+                              softWrap: true,
+                              textAlign:
+                              TextAlign.start, // Align text to the right
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

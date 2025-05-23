@@ -30,6 +30,7 @@ import '../screen/checkout/model/payment_checkout_model.dart';
 import '../screen/nav/nav_home/health_concern/model/HealthConcernDetailModel.dart';
 import '../screen/nav/nav_lab/model/PathalogyTestListDetailModel.dart';
 import '../screen/nav/nav_lab/model/PathalogyTestListModel.dart';
+import 'dio_error_handler.dart';
 import 'dio_helper.dart';
 
 class Repository {
@@ -76,34 +77,73 @@ class Repository {
       );
 
       if (response == null) {
-        print("❌ API returned null response!");
-        return SignUpModel(success: false, message: "No response from server");
+        return SignUpModel(
+          success: false,
+          message: "No response from server",
+        );
       }
-      print("✅ Signup API Response: $response");
-
-      // ✅ Handle API returning `success: false`
-      // if (response["success"] == false) {
-      //   return SignUpModel(success: false, message: response["message"] ?? "Signup failed");
-      // }
 
       if (response is Map<String, dynamic>) {
-        // 🟢 Response is in expected format
         return SignUpModel.fromJson(response);
-      } else if (response is String) {
-        // 🔴 String error (like "Bad Request")
-        return SignUpModel(success: false, message: "response");
-      } else {
-        // 🔴 Unexpected format
-        return SignUpModel(success: false, message: "Unexpected error occurred.");
       }
-      // ✅ Convert API response into Model
-      return SignUpModel.fromJson(response);
-    } catch (e) {
 
-      print("❌ Error parsing signup response: $e");
-      return SignUpModel(success: false, message: "Parsing failed: ${e.toString()}");
+      // Handle plain String response like "Bad Request"
+      if (response is String) {
+        final msg = response.containsValue("Bad Request")
+            ? "Account already exists. Try a different account."
+            : "Unexpected response: $response";
 
+        return SignUpModel(success: false, message: msg);
+      }
+
+      return SignUpModel(success: false, message: "Unexpected response format");
+    }on DioException catch (e) {
+      final statusCode = e.response?.statusCode;
+      final responseData = e.response?.data;
+
+      String message = "Something went wrong";
+
+      // Try to extract message from responseData if possible
+      if (responseData is Map<String, dynamic> && responseData['message'] != null) {
+        message = responseData['message'];
+      } else if (responseData is String) {
+        message = responseData;
+      }
+
+      switch (statusCode) {
+        case 400:
+        // Most likely user already exists or invalid input
+          if (message.contains("Bad Request") || message.toLowerCase().contains("already exists")) {
+            message = "Account already exists. Try a different account.";
+          } else if (message.isEmpty || message == "Bad Request") {
+            message = "Invalid input. Please check your details.";
+          }
+          break;
+        case 401:
+          message = "Unauthorized access. Please check your credentials.";
+          break;
+        case 403:
+          message = "Access denied.";
+          break;
+        case 404:
+          message = "API endpoint not found.";
+          break;
+        case 409:
+          message = "Conflict: Duplicate data.";
+          break;
+        case 500:
+          message = "Server error. Please try again later.";
+          break;
+        default:
+        // fallback message
+          if (message.isEmpty) {
+            message = "Unexpected error occurred. Please try again.";
+          }
+      }
+
+      return SignUpModel(success: false, message: message);
     }
+
     // }
     // on DioException catch (e) {
     //   final statusCode = e.response?.statusCode;

@@ -7,6 +7,8 @@ import 'package:shanya_scans/ui_helper/app_colors.dart';
 import 'package:shanya_scans/ui_helper/storage_helper.dart';
 import '../../../bottom_navigation_screen.dart';
 import '../../../network_manager/api_error_handler.dart';
+import '../../../network_manager/api_exception.dart';
+import '../../../network_manager/dio_error_handler.dart';
 import '../../../ui_helper/snack_bar.dart';
 
 class AuthApiProvider with ChangeNotifier {
@@ -27,11 +29,12 @@ class AuthApiProvider with ChangeNotifier {
     _setLoading(false);
   }
 
-  Future<void> signUpUser( BuildContext context, String name, String email, String password) async {
+  Future<void> signUpUser( BuildContext context, String name, String phoneNumber, String email, String password) async {
     _setLoading(true);
     try {
       Map<String, dynamic> requestBody = {
         "name": name,
+        "phoneNumber": phoneNumber,
         "email": email,
         "password": password
       };
@@ -41,26 +44,36 @@ class AuthApiProvider with ChangeNotifier {
         Navigator.push(context, MaterialPageRoute(builder: (context) => OTPScreen(email)));
         showCustomSnackbarHelper.showSnackbar(
           context: context,
-          message: "Sign-up successful! Please verify OTP.",
+          message: response.message  ?? "Sign-up successful! Please verify OTP.",
           backgroundColor: AppColors.primary,
           duration: Duration(seconds: 2),
         );
       } else {
         print("❌ Unexpected response format: $response");
-        _handleSignupErrors(context, response.message);
-        throw Exception(response.message.toString());
+        String displayMessage = response.message ?? "Sign-up failed. Please try again.";
+
+        // Check if message is generic "Bad Request" and replace with friendlier message
+        if (displayMessage.toLowerCase().contains("bad request")) {
+          displayMessage = "Account already exists. Try a different account.";
+        }
+
+        showCustomSnackbarHelper.showSnackbar(
+          context: context,
+          message: displayMessage,
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
+        );
       }
     } on DioException catch (e) {
-      print("❌ DioException occurred: $e");
-      int? statusCode = e.response?.statusCode;
+      final statusCode = e.response?.statusCode;
+      final responseData = e.response?.data;
 
-      String message = "Something went wrong";
+      String message = "";
+
       if (statusCode == 400) {
-        message = "User already exists";
+        message = "Account already exists. Try with different account.";
       } else if (statusCode == 500) {
         message = "Server error. Please try again later.";
-      } else {
-        message = ApiErrorHandler.handleError(e);
       }
 
       showCustomSnackbarHelper.showSnackbar(
@@ -69,36 +82,12 @@ class AuthApiProvider with ChangeNotifier {
         backgroundColor: Colors.red,
         duration: Duration(seconds: 3),
       );
-    } catch (e) {
-      print("❌ Unexpected error occurred: $e");
-
-      String errorMessage = "Something went wrong";
-      if (e is DioException) {
-        int? statusCode = e.response?.statusCode;
-        if (statusCode == 400) {
-          errorMessage = "User already exists";
-        }
-        if (statusCode == 500) {
-          errorMessage = "Server error occurred. Please try again later."; // Again custom for 500
-        } else {
-          errorMessage = ApiErrorHandler.handleError(e);
-        }
-      } else if (e is Exception) {
-        errorMessage = e.toString();
-      }
-
-      showCustomSnackbarHelper.showSnackbar(
-        context: context,
-        message: errorMessage,
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
-      );
-    } finally {
+    }  finally {
       _setLoading(false);
     }
   }
 
-  Future<bool> getOtp(BuildContext context, String email, String otp) async {
+  Future<bool> verifyOtp(BuildContext context, String email, String otp) async {
     _setLoading(true);
     try {
       Map<String, dynamic> requestBody = {"email": email, "otp": otp};
@@ -156,21 +145,24 @@ class AuthApiProvider with ChangeNotifier {
       var response = await _repository.userLogin(requestBody);
 
       if (response.success == true) {
-        bool isOtpVerified = await StorageHelper().getOtpVerified();
-        if (!isOtpVerified) {
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => OTPScreen(email)));
-        } else {
+        print("Success => ${response.success}");
+
+        await _storeUserData(response);
+      StorageHelper().setOtpVerified(true);
+        if (response.data!.isVerified==true) {
           Navigator.pushReplacement(
               context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
         }
-        // showCustomSnackbarHelper.showSnackbar(
-        //   context: context,
-        //   message: response.message ?? 'Login successful!',
-        //   backgroundColor: AppColors.primary,
-        //   duration: Duration(seconds: 2),
-        // );
+        // else {
+        //   Navigator.pushReplacement(
+        //       context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
+        // }
+
+        await _storeUserData(response);
+        // Navigator.pushReplacement(
+        //     context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
       } else {
+        print("Success => ${response.success}");
         showCustomSnackbarHelper.showSnackbar(
           context: context,
           message: "User not exist" ?? 'Login failed!',
@@ -180,9 +172,7 @@ class AuthApiProvider with ChangeNotifier {
       }
     } on DioException catch (e) {
       _handleDioErrors(context, e);
-    } catch (e) {
-      _handleUnexpectedErrors(context, e, "User not exist! Please SignUp");
-    } finally {
+    }  finally {
       _setLoading(false);
     }
   }
@@ -294,7 +284,7 @@ class AuthApiProvider with ChangeNotifier {
       StorageHelper().setPassword(response.data!.password.toString());
       StorageHelper().setPhoneNumber(response.data!.phoneNumber.toString());
       StorageHelper() .setWhatsappNumber(response.data!.whatsappNumber.toString());
-      await StorageHelper().saveOrderListFromApi(response);
+      // await StorageHelper().saveOrderListFromApi(response);
     } else {
       await StorageHelper().clearOrderList();
     }

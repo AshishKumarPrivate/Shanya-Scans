@@ -91,7 +91,7 @@ class _OTPScreenState extends State<OTPScreen> {
                                             );
                                             return;
                                           }
-                                          otpProvider.getOtp(context, widget.email, otpCode);
+                                          otpProvider.verifyOtp(context, widget.email, otpCode);
                                         },
                                         textStyle: TextStyle(color: Colors.white, fontSize: 18),
                                       ),

@@ -13,17 +13,6 @@ import '../forget_password_screen.dart';
 class LoginFormWidget extends StatefulWidget {
   LoginFormWidget();
 
-  // final VoidCallback onSubmit;
-  // final TextEditingController emailController;
-  // final TextEditingController passwordController;
-  //
-  // const LoginFormWidget({
-  //   Key? key,
-  //   required this.onSubmit,
-  //   required this.emailController,
-  //   required this.passwordController,
-  // }) : super(key: key);
-
   @override
   _LoginFormWidgetState createState() => _LoginFormWidgetState();
 }
@@ -46,10 +35,10 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
   void handleSubmit() {
     final loginProvider = context.read<AuthApiProvider>();
     print("🟢 Login Button Clicked");
-    if (emailController.text.isEmpty || passwordController.text.isEmpty) {
-      print("🔴 Validation Failed: Fields are empty");
-      return;
-    }
+    // if (emailController.text.isEmpty || passwordController.text.isEmpty) {
+    //   print("🔴 Validation Failed: Fields are empty");
+    //   return;
+    // }
     loginProvider.loginUser(
         context, emailController.text, passwordController.text);
   }
@@ -82,10 +71,19 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   controller: emailController,
                   focusNode: _emailFocusNode,
                   icon: Icons.email_outlined,
-                  hintText: "Enter your email",
-                  title: "Email",
-                  errorMessage: "Invalid Email",
+                  hintText: "Enter your Email / Phone",
+                  title: "Email / Phone",
+                  errorMessage: "",
                   keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                  final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+                  final phoneRegex = RegExp(r"^\d{10}$");
+                  if (value == null || value.isEmpty) return "Invalid Email / Phone";
+                  if (!emailRegex.hasMatch(value) && !phoneRegex.hasMatch(value)) {
+                    return "Enter valid email or 10-digit phone number";
+                  }
+                  return null;
+                },
                 ),
                 const SizedBox(height: 10),
                 CustomTextField(

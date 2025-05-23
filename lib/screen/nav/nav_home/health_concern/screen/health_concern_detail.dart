@@ -5,6 +5,7 @@ import 'package:shanya_scans/base_widgets/common/health_concern_detail_page_shim
 import 'package:shanya_scans/base_widgets/common/why_choose_use_section.dart';
 import 'package:shanya_scans/base_widgets/custom_rounded_container.dart';
 import 'package:shanya_scans/screen/nav/nav_home/health_concern/controller/health_concern_provider.dart';
+import 'package:shanya_scans/screen/nav/nav_home/health_concern/model/HealthConcernDetailModel.dart';
 import 'package:shanya_scans/ui_helper/app_colors.dart';
 import 'package:shanya_scans/ui_helper/app_text_styles.dart';
 import 'package:shanya_scans/ui_helper/responsive_helper.dart';
@@ -562,6 +563,8 @@ class _ViewDetailHealthConcernScreenState
                                                       ),
                                                     ]),
                                                     Text(
+                                                      // healthConcernModel
+                                                      //     .toString(),
                                                       "Required",
                                                       style: AppTextStyles.heading1(
                                                           context,
@@ -753,8 +756,7 @@ class _ViewDetailHealthConcernScreenState
                                 child: _buildExpandableTestSections(
                                   sid: healthConcernModel.sId.toString(),
                                   serviceName: widget.packageName,
-                                  packageName:
-                                      healthConcernModel.packageName.toString(),
+                                  packageName:healthConcernModel.packageName.toString(),
                                   packageOverView: healthConcernModel
                                       .packageOverview
                                       .toString(),
@@ -764,6 +766,7 @@ class _ViewDetailHealthConcernScreenState
                                       .packageCategory
                                       .toString(),
                                   section2Key: section2Key,
+                                  healthConcernModel: healthConcernModel
 
                                 ),
                               ),
@@ -840,6 +843,7 @@ class _buildExpandableTestSections extends StatelessWidget {
       packageName,
       packageRate;
 
+  Data? healthConcernModel;
   GlobalKey? section2Key;
 
   // _buildExpandableTestSections({required this.serviceData});
@@ -852,6 +856,7 @@ class _buildExpandableTestSections extends StatelessWidget {
     required this.packageName,
     required this.packageRate,
     this.section2Key,
+    this.healthConcernModel,
   });
 
   @override
@@ -906,7 +911,8 @@ class _buildExpandableTestSections extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  "24-hr to 4 days",
+                                  "${healthConcernModel!.report.toString()} Hrs",
+                                  // "24-hr to 4 days",
                                   style: AppTextStyles.heading1(
                                     context,
                                     overrideStyle: TextStyle(
@@ -955,7 +961,8 @@ class _buildExpandableTestSections extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  "Consult your doctor",
+                                  healthConcernModel!.fasting.toString(),
+                                  // "Consult your doctor",
                                   style: AppTextStyles.heading1(
                                     context,
                                     overrideStyle: TextStyle(
@@ -1051,7 +1058,8 @@ class _buildExpandableTestSections extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  "All Ages",
+                                  healthConcernModel!.age.toString(),
+                                  // "All Ages",
                                   style: AppTextStyles.heading1(
                                     context,
                                     overrideStyle: TextStyle(

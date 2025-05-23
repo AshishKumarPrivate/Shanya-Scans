@@ -37,6 +37,43 @@ class DioHelper {
   //   );
   // }
 
+  /// Unified error handler with timeout handling
+  dynamic _handleError(DioException e) {
+    if (e.type == DioExceptionType.connectionTimeout ||
+        e.type == DioExceptionType.sendTimeout ||
+        e.type == DioExceptionType.receiveTimeout) {
+      print("⏰ Request Timeout Error: ${e.message}");
+      return {
+        "success": false,
+        "message": "Request timed out. Please try again.",
+      };
+    }
+
+    if (e.response != null) {
+      final responseData = e.response?.data;
+
+      print("❌ API Error Response: $responseData");
+
+      // If it's a plain string like "Bad Request", wrap it in a Map
+      if (responseData is String) {
+        return {
+          "success": false,
+          "message": responseData,
+        };
+      }
+
+      if (responseData is Map<String, dynamic>) {
+        return responseData;
+      }
+    }
+
+    print("❌ Network Error: ${e.message}");
+    return {
+      "success": false,
+      "message": "Network error occurred. Please check your connection.",
+    };
+  }
+
 
 
 
@@ -45,6 +82,18 @@ class DioHelper {
     try {
       Response response = await dio.get(url, options: options(isAuthRequired));
       return response.data;
+    }on DioException catch (e) {
+
+      return _handleError(e);
+      // ❌ If DioException, check if it contains a response
+      if (e.response != null) {
+        print("❌ API Error Response: ${e.response?.data}");
+
+        return e.response?.data; // ✅ Return error response from API
+      } else {
+        print("❌ Network Error: ${e.message}");
+        return null; // ✅ Return null for network errors
+      }
     }catch (error){
       return null;
     }
@@ -79,6 +128,7 @@ class DioHelper {
 
       return response.data;
     } on DioException catch (e) {
+      return _handleError(e);
       // ❌ If DioException, check if it contains a response
       if (e.response != null) {
         print("❌ API Error Response: ${e.response?.data}");

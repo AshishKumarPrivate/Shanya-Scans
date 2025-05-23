@@ -218,13 +218,13 @@ class StorageHelper {
   String getWhatsappNumber() {
     return sp.getString('whatsappNumber') ?? "";
   }
-  void setVerified(bool verify) async {
-    await sp.setBool('verify', verify); // Store the boolean value correctly
-  }
-
-  Future<bool> isUserVerified() async {
-    return sp.getBool('verify') ?? false; // Retrieve the boolean value
-  }
+  // void setVerified(bool verify) async {
+  //   await sp.setBool('verify', verify); // Store the boolean value correctly
+  // }
+  //
+  // Future<bool> isUserVerified() async {
+  //   return sp.getBool('verify') ?? false; // Retrieve the boolean value
+  // }
   void setProfileImage(String url) {
     sp.setString('user_profile_image', url);
   }

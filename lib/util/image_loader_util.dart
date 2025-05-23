@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 class ImageLoaderUtil {
   /// Loads a normal Network Image
   static Widget networkImage(String imageUrl,
-      {double? width, double? height, BoxFit fit = BoxFit.cover, Widget? errorWidget}) {
+      {double? width, double? height, BoxFit fit = BoxFit.contain, Widget? errorWidget}) {
     return Image.network(
       imageUrl,
       width: width,
@@ -21,7 +21,7 @@ class ImageLoaderUtil {
 
   /// Loads a Cached Network Image
   static Widget cacheNetworkImage(String imageUrl,
-      {double? width, double? height, BoxFit fit = BoxFit.cover, String? errorWidget}) {
+      {double? width, double? height, BoxFit fit = BoxFit.contain, String? errorWidget}) {
     return CachedNetworkImage(
       imageUrl: imageUrl,
       width: width,
@@ -36,7 +36,7 @@ class ImageLoaderUtil {
 
   /// Loads an Asset Image
   static Widget assetImage(String assetPath,
-      {double? width, double? height, BoxFit fit = BoxFit.cover}) {
+      {double? width, double? height, BoxFit fit = BoxFit.contain}) {
     return Image.asset(
       assetPath,
       width: width,

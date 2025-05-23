@@ -3,7 +3,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 // Function to open WhatsApp based on the platform
 Future<void> openWhatsApp(String message) async {
-  String contact = "+919161066154"; // The target phone number
+  String contact = "+919219816159"; // The target phone number
   // String message = 'Hello, this is a test message!'; // The message to send
   String androidUrl = "whatsapp://send?phone=$contact&text=hello!"; // Android URL scheme
   // String androidUrl = "whatsapp://send?phone=$contact&text=${Uri.encodeComponent(message)}"; // Android URL scheme

@@ -12,28 +12,17 @@ import '../../../ui_helper/responsive_helper.dart';
 class SignUpFormWidget extends StatefulWidget {
   const SignUpFormWidget({super.key});
 
-  // final VoidCallback onSubmit;
-  // final TextEditingController namelController;
-  // final TextEditingController emailController;
-  // final TextEditingController passwordController;
-  //
-  // const SignUpFormWidget({
-  //   Key? key,
-  //   required this.onSubmit,
-  //   required this.namelController,
-  //   required this.emailController,
-  //   required this.passwordController,
-  // }) : super(key: key);
-
   @override
   _SignUpFormWidgetState createState() => _SignUpFormWidgetState();
 }
 
 class _SignUpFormWidgetState extends State<SignUpFormWidget> {
   final TextEditingController nameController = TextEditingController();
+  final TextEditingController phoneNumberController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final FocusNode _nameFocusNode = FocusNode();
+  final FocusNode _phoneNumberFocusNode = FocusNode();
   final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
   final _formKey = GlobalKey<FormState>(); // 🔹 Add Form Key for validation
@@ -43,12 +32,13 @@ class _SignUpFormWidgetState extends State<SignUpFormWidget> {
     final signUpProvider = context.read<AuthApiProvider>();
     print("🟢 Login Button Clicked");
     if (nameController.text.isEmpty ||
+        phoneNumberController.text.isEmpty ||
         emailController.text.isEmpty ||
         passwordController.text.isEmpty) {
       print("🔴 Validation Failed: Fields are empty");
       return;
     }
-    signUpProvider.signUpUser(context, nameController.text,
+    signUpProvider.signUpUser(context, nameController.text, phoneNumberController.text,
         emailController.text, passwordController.text);
   }
 
@@ -56,6 +46,7 @@ class _SignUpFormWidgetState extends State<SignUpFormWidget> {
   void initState() {
     super.initState();
     _nameFocusNode.addListener(() => setState(() {}));
+    _phoneNumberFocusNode.addListener(() => setState(() {}));
     _emailFocusNode.addListener(() => setState(() {}));
     _passwordFocusNode.addListener(() => setState(() {}));
   }
@@ -63,6 +54,7 @@ class _SignUpFormWidgetState extends State<SignUpFormWidget> {
   @override
   void dispose() {
     nameController.dispose();
+    phoneNumberController.dispose();
     emailController.dispose();
     passwordController.dispose();
     super.dispose();
@@ -93,6 +85,18 @@ class _SignUpFormWidgetState extends State<SignUpFormWidget> {
                   title: "Full Name",
                   errorMessage: "Invalid Name",
                   keyboardType: TextInputType.name,
+                ),
+                const SizedBox(height: 10),
+                // _buildLabel(context, "Full Name"),
+                CustomTextField(
+                  controller: phoneNumberController,
+                  focusNode: _phoneNumberFocusNode,
+                  icon: Icons.phone_android,
+                  maxLength: 10,
+                  hintText: "Enter your phone number",
+                  title: "Phone Number",
+                  errorMessage: "Invalid number",
+                  keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(height: 10),
                 // _buildLabel(context, "Email"),

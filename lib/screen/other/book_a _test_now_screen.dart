@@ -140,16 +140,24 @@ class _BookATestNowScreenState extends State<BookATestNowScreen> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60), // Adjust height as needed
+        child:  CustomAppBar(
+          activityName: "Home Collections",
+          isCartScreen: true,
+          backgroundColor: AppColors.primary,
+        ),
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // AppBar
-            CustomAppBar(
-              activityName: "Home Collections",
-              isCartScreen: true,
-              backgroundColor: AppColors.primary,
-            ), // Main Content
+            // CustomAppBar(
+            //   activityName: "Home Collections",
+            //   isCartScreen: true,
+            //   backgroundColor: AppColors.primary,
+            // ), // Main Content
             Expanded(
               child: Container(
                 color: AppColors.whiteColor,
