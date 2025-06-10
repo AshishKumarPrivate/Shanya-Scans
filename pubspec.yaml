@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.1+5
+version: 1.0.1+6
 
 environment:
   sdk: ^3.6.0
@@ -78,27 +78,43 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_launcher_icons: ^0.14.3
-#  flutter_native_splash: ^2.4.4
+  flutter_native_splash: ^2.4.6
   change_app_package_name: ^1.5.0
 #  flutter_local_notifications: ^18.0.1
 
-#flutter_native_splash:
-#  color: "#ffffff" # Background color of splash (white or your app bg)
-#  image: assets/images/logo.png # Path to your splash image
-#  branding: null
-#  android: true
-#  ios: true
-#  fullscreen: true
-#  android_gravity: center # Image center aligned
-#  web : true
+flutter_native_splash:
+  color: "#ffffff" # White background
+  image: "assets/images/transition_splash_logo.png" # Your SHANYA logo
+
+  # New additions from your provided image:
+  background_image: "assets/images/transition_splash_logo.png" # You'll need to create this image
+#  branding: "assets/branding.png" # You'll need to create this image
+
+  # Dark mode specific assets (optional, uncomment if you plan to use dark mode)
+  # background_image_dark: "assets/background_dark.png"
+  # image_dark: "assets/logo_dark.png"
+  # branding_dark: "assets/branding_dark.png"
+
+  # Android 12 specific configuration
+  android_12:
+    color: "#ffffff" # The specific color from your image
+    image: "assets/images/transition_splash_logo.png" # You'll need to create this image for Android 12
+#    branding: "assets/images/simple_logo.png" # You'll need to create this image for Android 12
+
+  # Other existing settings from your previous configuration:
+  android: true
+  ios: true
+  web : true
+  fullscreen: true
+  android_gravity: center
 
 flutter_launcher_icons:
   android: true
   ios: true
-  web : true
+#  web : true
   remove_alpha_ios: true
-  image_path_android: "assets/images/img_logo.png"
-  image_path_ios: "assets/images/img_logo.png"
+  image_path_android: "assets/images/simple_logo.png"
+  image_path_ios: "assets/images/simple_logo.png"
 
 
   # The "flutter_lints" package below contains a set of recommended lints to

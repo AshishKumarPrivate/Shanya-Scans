@@ -149,16 +149,39 @@ class AuthApiProvider with ChangeNotifier {
 
         await _storeUserData(response);
       StorageHelper().setOtpVerified(true);
-        if (response.data!.isVerified==true) {
-          Navigator.pushReplacement(
-              context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
-        }
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
+        showCustomSnackbarHelper.showSnackbar(
+          context: context,
+          message: response.message ?? "SignUp successfully!",
+          backgroundColor: AppColors.primary,
+          duration: Duration(seconds: 2),
+        );
+
+        // if (response.data!.isVerified==true) {
+        //   Navigator.pushReplacement(
+        //       context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
+        //   showCustomSnackbarHelper.showSnackbar(
+        //     context: context,
+        //     message: response.message ?? "SignUp successfully!",
+        //     backgroundColor: AppColors.primary,
+        //     duration: Duration(seconds: 2),
+        //   );
+        // }else{
+        //   showCustomSnackbarHelper.showSnackbar(
+        //     context: context,
+        //     message: response.message ?? "SignUp Failed!",
+        //     backgroundColor: Colors.red,
+        //     duration: Duration(seconds: 2),
+        //   );
+        // }
+
         // else {
         //   Navigator.pushReplacement(
         //       context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
         // }
 
-        await _storeUserData(response);
+        // await _storeUserData(response);
         // Navigator.pushReplacement(
         //     context, MaterialPageRoute(builder: (context) => BottomNavigationScreen()));
       } else {

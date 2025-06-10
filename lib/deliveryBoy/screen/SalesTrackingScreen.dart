@@ -12,13 +12,13 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'dart:ui' as ui;
 import 'dart:math' as math;
 
+import '../../ui_helper/app_colors.dart';
+import '../../ui_helper/app_text_styles.dart';
+import '../../ui_helper/responsive_helper.dart';
 import '../controller/socket_provider.dart';
 
 class SalesLiveTrackingScreen extends StatefulWidget {
-
   String? patientname;
-
-
   SalesLiveTrackingScreen(this.patientname);
 
   @override
@@ -38,7 +38,7 @@ class _SalesLiveTrackingScreenState extends State<SalesLiveTrackingScreen> {
   late BitmapDescriptor _salesPersonIcon;
   late BitmapDescriptor _salesPersonArrivedIcon;
   String? salesPersonName ;
-  String salesPersonPhone = "+91 9876543210";
+  String salesPersonPhone = "Patient Name";
   late BitmapDescriptor customIcon;
 
   @override
@@ -70,8 +70,10 @@ class _SalesLiveTrackingScreenState extends State<SalesLiveTrackingScreen> {
 
   // ✅ Load custom marker function
   Future<void> _loadCustomMarker() async {
+
+    salesPersonName = await StorageHelper().getDeliveryBoyName();
     final Uint8List markerIcon =
-    await _getBytesFromAsset('assets/images/sales_marker.png', 200);
+    await _getBytesFromAsset('assets/images/shanya_marker.png', 100);
     setState(() {
       customIcon = BitmapDescriptor.fromBytes(markerIcon);
     });
@@ -276,7 +278,28 @@ class _SalesLiveTrackingScreenState extends State<SalesLiveTrackingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Live Tracking')),
+      appBar: AppBar(
+        backgroundColor: AppColors.deliveryPrimary,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          // onPressed: () =>
+          //     _showExitDialog(context), // Show exit confirmation dialog
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: const Text(
+          "Track Patient",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        // actions: [
+        //   IconButton(
+        //     icon:
+        //         const Icon(Icons.shopping_cart_outlined, color: Colors.white),
+        //     onPressed: () {},
+        //   ),
+        // ],
+      ),
       body: Stack(
         children: [
           GoogleMap(
@@ -325,8 +348,8 @@ class _SalesLiveTrackingScreenState extends State<SalesLiveTrackingScreen> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(widget.patientname.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                           Text(salesPersonPhone, style: TextStyle(fontSize: 14, color: Colors.grey[700])),
+                          Text(widget.patientname.toString(), style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
                         ],
                       ),
                     ],

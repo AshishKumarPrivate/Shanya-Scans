@@ -8,6 +8,9 @@ class StorageHelper {
   static final StorageHelper _singleton = StorageHelper._internal();
   static const String _orderDetailsKey = 'order_details';
 
+
+  static const String _locationDisclosureAcceptedKey = 'locationDisclosureAccepted';
+
   factory StorageHelper() {
     return _singleton;
   }
@@ -64,6 +67,22 @@ class StorageHelper {
   static Future<void> clearUserRole() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove("role");
+  }
+
+  Future<void> setUserLocationDisclosureAccepted(bool accepted) async {
+    await sp.setBool(_locationDisclosureAcceptedKey, accepted);
+  }
+
+  bool isUserLocationDisclosureAccepted() {
+    return sp.getBool(_locationDisclosureAcceptedKey) ?? false;
+  }
+
+  Future<void> setSalesLocationDisclosureAccepted(bool accepted) async {
+    await sp.setBool("Sales_disclosure", accepted);
+  }
+
+  bool isSalesLocationDisclosureAccepted() {
+    return sp.getBool("Sales_disclosure") ?? false;
   }
 
   void setPaymentKey(String key) {

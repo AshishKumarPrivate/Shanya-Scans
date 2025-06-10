@@ -415,7 +415,7 @@ class CheckoutProvider with ChangeNotifier {
         _razorpayKey = null;
       }
       setLoadingState(false);
-      notifyListeners();
+      // notifyListeners();
     }
   }
 
@@ -432,18 +432,13 @@ class CheckoutProvider with ChangeNotifier {
   Future<void> createAndStartPayment( int total,  String forName) async {
 
     setLoadingState(true);
-
     final requestBody = {
       "total": 1,
       "forName": "Book Test",
     };
-
     final result = await _repository.createRazerPayOrder(requestBody);
     _checkoutModel = result;
-
-
-    setLoadingState(true);
-
+    // setLoadingState(true);
     if (_checkoutModel?.order?.id != null) {
       var apiKey = await fetchRazorpayKey();
       _startRazorpayPayment(apiKey.toString(), _checkoutModel!);
@@ -475,7 +470,7 @@ class CheckoutProvider with ChangeNotifier {
       "razorpay_signature": response.signature!,
     };
 
-    setLoadingState(true);
+    // setLoadingState(true);
     final verified = await _repository.verifyPayment(requestBody);
     if (verified) {
       bool orderCreated = await createOrder(

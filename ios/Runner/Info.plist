@@ -3,9 +3,7 @@
 <plist version="1.0">
 	<dict>
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>We need your location to track the sales person.</string>
-		<key>NSLocationAlwaysUsageDescription</key>
-		<string>We need your location even in the background.</string>
+		<string>We use your location to improve your service experience.</string>
 		<key>FirebaseAppDelegateProxyEnabled</key>
 		<false/>
 		<key>NSAppTransportSecurity</key>
@@ -14,11 +12,18 @@
 			<true/>
 		</dict>
 		<key>NSPushNotificationUsageDescription</key>
-		<string>We would like to send you push notifications.</string>
-		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>We need your location to show places nearby</string>
+		<string>We would like to send you notifications related to your order and reports.</string>
 		<key>NSLocationAlwaysUsageDescription</key>
 		<string>We need your location for better experience</string>
+		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+        <string>Your location is required to provide relevant services in all app states.</string>
+        <key>UIBackgroundModes</key>
+        <array>
+            <string>location</string>
+        </array>
+
+
+
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>

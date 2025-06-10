@@ -1,15 +1,9 @@
-import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:shanya_scans/deliveryBoy/screen/deleivery_boy_dashboard.dart';
-import 'package:shanya_scans/screen/cart/cart_list_screen.dart';
 import 'package:shanya_scans/ui_helper/responsive_helper.dart';
 import 'package:shanya_scans/ui_helper/app_colors.dart';
 import 'package:shanya_scans/ui_helper/app_text_styles.dart';
-import 'package:provider/provider.dart';
-
-import '../../../bottom_navigation_screen.dart';
 import '../../../ui_helper/storage_helper.dart';
 import '../../../util/config.dart';
 import 'delivery_boy_profile_screen.dart';
@@ -25,28 +19,103 @@ class _DeliveryBoyHomeToolbarSectionState extends State<DeliveryBoyHomeToolbarSe
 
   String deliveryBoyName = StorageHelper().getDeliveryBoyName(); // Fetch stored email
   String deliveryBoyAddress = "Lucknow,Uttar Pradesh";
+  bool _hasLocationAttemptFailed = false;
+
+  bool _isRequestingPermission = false; // Add this flag
+  final ConfigUtils _configUtils = ConfigUtils();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      getUserAddress();
+      _attemptGetLocation();
     });
   }
 
-  void getUserAddress() async {
-    final ConfigUtils _configUtils = ConfigUtils();
-    _configUtils.startTracking();
+  // @override
+  // void dispose() {
+  //   // WidgetsBinding.instance.removeObserver(this);
+  //   _configUtils.dispose(); // Dispose ConfigUtils when the widget is disposed
+  //   super.dispose();
+  // }
 
-    Map<String, dynamic> locationData = await _configUtils.locationStream.first;
-    String latitude = locationData["latitude"].toString();
-    String longitude = locationData["longitude"].toString();
-    String address = locationData["address"];
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // When the app resumes (e.g., from background after opening settings),
+      // re-attempt to get location.
+      if (_hasLocationAttemptFailed || deliveryBoyAddress.contains("Tap to retry")) {
+        _attemptGetLocation();
+      }    }
+  }
 
-    StorageHelper().setDeliveryBoyLiveAddress(address);
+  void _attemptGetLocation() async {
+    // Check if the widget is still mounted before performing UI updates
+    if (!mounted) return;
+    if (_hasLocationAttemptFailed && !deliveryBoyAddress.contains("Tap to retry")) {
+      return;
+    }
+
+
     setState(() {
-      deliveryBoyAddress = address;
+      deliveryBoyAddress = "Fetching location..."; // 위치를 다시 가져오는 중임을 나타냄
+      _hasLocationAttemptFailed = false; // 새로운 시도이므로 실패 플래그 초기화
     });
+    // Start listening to the location stream immediately to update UI
+    _configUtils.locationStream.listen((locationData) {
+      if (mounted) {
+        setState(() {
+          deliveryBoyAddress = locationData["address"] ?? "Address Not Found";
+          _hasLocationAttemptFailed = false;
+        });
+        StorageHelper().setDeliveryBoyLiveAddress(deliveryBoyAddress);
+      }
+    });
+
+    // Start tracking in the background. `startTracking()` will handle permissions/service.
+    // No need to check `_isRequestingPermission` here, `ConfigUtils` handles its own dialog state.
+    bool success = await _configUtils.startTracking();
+
+    if (!success) {
+      // If startTracking was not successful (e.g., permission denied or service off),
+      // you might want to show a persistent message or a retry button.
+      if (mounted) {
+        setState(() {
+          // Keep a message that indicates location is not available
+          deliveryBoyAddress = "Location not available. Tap to retry.";
+          _hasLocationAttemptFailed = true;
+        });
+      }
+      // You could also add a listener to the location stream from ConfigUtils
+      // and update the address when a location becomes available later.
+    }
+  }
+
+
+
+  void getUserAddress() async {
+    if (_isRequestingPermission) return;  // Prevent multiple calls
+    _isRequestingPermission = true;
+
+    // final ConfigUtils _configUtils = ConfigUtils();
+    _configUtils.startTracking();
+    try {
+      Map<String, dynamic> locationData = await _configUtils.locationStream.first;
+      String latitude = locationData["latitude"].toString();
+      String longitude = locationData["longitude"].toString();
+      String address = locationData["address"];
+
+      StorageHelper().setDeliveryBoyLiveAddress(address);
+      if (mounted) {
+        setState(() {
+          deliveryBoyAddress = address;
+        });
+      }
+    } catch (e) {
+      // Handle errors if any, e.g. permission denied or timeout
+    } finally {
+      _isRequestingPermission = false;
+    }
   }
 
   @override
@@ -94,15 +163,22 @@ class _DeliveryBoyHomeToolbarSectionState extends State<DeliveryBoyHomeToolbarSe
                           width: 5,
                         ),
                         Expanded(
-                          child: Text(
-                            deliveryBoyAddress,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: AppTextStyles.heading1(context,
-                                overrideStyle: TextStyle(
-                                    color: Colors.white,
-                                    fontSize:
-                                        ResponsiveHelper.fontSize(context, 10))),
+                          child:InkWell( // Make the address tap-able to retry
+                            onTap: () {
+                              if (deliveryBoyAddress == "Location not available. Tap to retry.") {
+                                _attemptGetLocation(); // Retry if location is off
+                              }
+                            },
+                            child: Text(
+                              deliveryBoyAddress,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppTextStyles.heading1(context,
+                                  overrideStyle: TextStyle(
+                                      color: Colors.white,
+                                      fontSize:
+                                          ResponsiveHelper.fontSize(context, 10))),
+                            ),
                           ),
                         ),
                       ],

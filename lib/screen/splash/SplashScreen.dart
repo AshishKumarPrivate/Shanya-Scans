@@ -9,6 +9,7 @@ import '../../bottom_navigation_screen.dart';
 import '../../ui_helper/app_colors.dart';
 import '../../ui_helper/responsive_helper.dart';
 import '../../ui_helper/storage_helper.dart';
+import '../../util/config.dart';
 import '../cart/controller/cart_list_api_provider.dart';
 import 'controller/network_provider_controller.dart';
 
@@ -20,6 +21,10 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+
+
+  late final ConfigUtils _configUtils;
+
   @override
   void initState() {
     super.initState();
@@ -44,9 +49,29 @@ class _SplashScreenState extends State<SplashScreen> {
         _navigateTo( UserSelectionScreen());
       }
     } else if (userRole == "delivery_boy") {
-      _navigateTo( DeliveryBoyDashboardScreen());
+      _configUtils = ConfigUtils();
+      final isAcceptedDisclosure = await StorageHelper().isSalesLocationDisclosureAccepted();
+
+      if (isAcceptedDisclosure) {
+        print("Delivery Boy: Disclosure accepted. Checking actual location status...");
+        Map<String, dynamic> locationData = await _configUtils.getSingleLocation();
+
+        if (locationData.isNotEmpty && locationData["latitude"] != null) {
+          print("Delivery Boy: Location obtained. Navigating to Dashboard.");
+          _navigateTo(DeliveryBoyDashboardScreen());
+        } else {
+          print("Delivery Boy: Location not obtainable. Navigating to User Selection.");
+          _navigateTo(UserSelectionScreen());
+        }
+      } else {
+        // If disclosure not accepted, go to user selection (where login/disclosure happens)
+        print("Delivery Boy: Disclosure not yet accepted. Navigating to User Selection.");
+        _navigateTo(UserSelectionScreen());
+      }
     } else {
-      _navigateTo( UserSelectionScreen());
+      // No role or unknown role
+      print("No user role found or unknown role. Navigating to User Selection.");
+      _navigateTo(UserSelectionScreen());
     }
   }
 

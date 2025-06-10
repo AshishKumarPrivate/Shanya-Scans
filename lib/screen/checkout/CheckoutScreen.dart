@@ -23,12 +23,6 @@ import '../cart/cart_list_screen.dart';
 import 'controller/checkout_api_provider.dart';
 
 class CheckoutScreen extends StatefulWidget {
-  // final categoryName, name, price;
-  //
-  // // final Data rateListData; // Accepts the clicked service item
-  //
-  // CheckoutScreen(
-  //     {required this.categoryName, required this.name, required this.price});
 
   @override
   _CheckoutScreenState createState() => _CheckoutScreenState();
@@ -415,23 +409,23 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                             place: selectedPlace.toString(),
                             addressType: selectedAddressType.toString(),
                           );
-                          await checkoutProvider.initRazorpay(context);
+                          // await checkoutProvider.initRazorpay(context);
 
-                          // Provider.of<CheckoutProvider>(context, listen: false)
-                          //     .createOrder(
-                          //   context,
-                          //   selectedDateString.toString(),
-                          //   selectedTimeString.toString(),
-                          //   StorageHelper().getEmail(),
-                          //   fullNameController.text.toString(),
-                          //   ageController.text.toString(),
-                          //   phoneController.text.toString(),
-                          //   altPhoneController.text.toString(),
-                          //   selectedGender.toString(),
-                          //   cityAddressController.text.toString(),
-                          //   selectedPlace.toString(),
-                          //   selectedAddressType.toString(),
-                          // );
+                          Provider.of<CheckoutProvider>(context, listen: false)
+                              .createOrder(
+                            context,
+                            selectedDateString.toString(),
+                            selectedTimeString.toString(),
+                            StorageHelper().getEmail(),
+                            fullNameController.text.toString(),
+                            ageController.text.toString(),
+                            phoneController.text.toString(),
+                            altPhoneController.text.toString(),
+                            selectedGender.toString(),
+                            cityAddressController.text.toString(),
+                            selectedPlace.toString(),
+                            selectedAddressType.toString(),
+                          );
                         }
 
 
@@ -1400,20 +1394,20 @@ class _PaymentSelectionWidgetState extends State<PaymentSelectionWidget> {
           SizedBox(height: 10),
 
           // ✅ Razorpay Payment Option
+          // _buildPaymentOption(
+          //   title: "Pay with Razorpay",
+          //   subtitle: "Pay securely using Razorpay",
+          //   image: "assets/images/razorpayicon.png",
+          //   value: "razorpay",
+          // ),
+
+          //✅ Cash on Delivery (COD) Option
           _buildPaymentOption(
-            title: "Pay with Razorpay",
-            subtitle: "Pay securely using Razorpay",
-            image: "assets/images/razorpayicon.png",
+            title: "Cash on Delivery",
+            subtitle: "Pay cash upon receiving the order",
+            image: "assets/images/codimage.png",
             value: "razorpay",
           ),
-
-          // ✅ Cash on Delivery (COD) Option
-          // _buildPaymentOption(
-          //   title: "Cash on Delivery",
-          //   subtitle: "Pay cash upon receiving the order",
-          //   image: "assets/images/codimage.png",
-          //   value: "cod",
-          // ),
         ],
       ),
     );

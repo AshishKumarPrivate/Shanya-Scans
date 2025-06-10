@@ -94,6 +94,7 @@ class _DeliveryBoyLoginFormWidgetState extends State<DeliveryBoyLoginFormWidget>
                     controller: passwordController,
                     focusNode: _passwordFocusNode,
                     icon: Icons.lock_open,
+                    isPassword: true,
                     hintText: "Enter your password",
                     title: "Password",
                     errorMessage: "Invalid Password",

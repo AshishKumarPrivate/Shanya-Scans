@@ -390,7 +390,8 @@ class _DeliveryBoyOrderDetailScreenState
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) =>
-                                                  SalesLiveTrackingScreen(orderDetail.data!.patientName.toString()),
+                                                  UserLiveTrackingScreen(),
+                                                  // SalesLiveTrackingScreen(orderDetail.data!.patientName.toString()),
                                             ),
                                           );
 

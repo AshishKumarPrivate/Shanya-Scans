@@ -224,8 +224,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       isRefundPolicy: false,
                                       isTermAndConditions: false,
                                       aciviyName: "Privacy Policy",
-                                      url:
-                                          "https://ayush.webakash1806.com/privacy-policy"),
+                                      url:"https://shanyascans.com/privacy-policy"),
                                 ),
                               );
                             },
@@ -247,7 +246,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       isTermAndConditions: true,
                                       aciviyName: "Terms & Conditions",
                                       url:
-                                          "https://ayush.webakash1806.com/term-condition"),
+                                          "https://shanyascans.com/term-condition"),
                                 ),
                               );
                             },
@@ -269,7 +268,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       isTermAndConditions: false,
                                       aciviyName: "Refund & Cancellation",
                                       url:
-                                          "https://ayush.webakash1806.com/term_condition.svg"),
+                                          "https://shanyascans.com/refund-cancelation"),
                                 ),
                               );
                             },

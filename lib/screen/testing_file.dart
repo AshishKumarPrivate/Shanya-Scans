@@ -1,553 +1,352 @@
-// import 'dart:convert';
-//
-// import 'package:dio/dio.dart';
+// import 'package:animated_text_kit/animated_text_kit.dart';
+// import 'package:carousel_slider/carousel_slider.dart'; // Unused, can be removed
 // import 'package:flutter/material.dart';
-// import 'package:razorpay_flutter/razorpay_flutter.dart';
-// import 'package:shanya_scans/screen/checkout/model/store_checkout_form_data_model.dart';
-// import 'package:shanya_scans/screen/order/model/OrderItem.dart';
-// import 'package:shanya_scans/ui_helper/snack_bar.dart';
-// import 'package:shanya_scans/ui_helper/storage_helper.dart';
-// import 'package:shanya_scans/util/StringUtils.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shanya_scans/screen/cart/cart_list_screen.dart';
+// import 'package:shanya_scans/ui_helper/responsive_helper.dart';
+// import 'package:shanya_scans/ui_helper/app_colors.dart';
+// import 'package:shanya_scans/ui_helper/app_text_styles.dart';
+// import 'package:provider/provider.dart';
 //
-// import '../../../network_manager/api_error_handler.dart';
-// import '../../../network_manager/repository.dart';
-// import '../../order/model/CreateOrder2ModelResponse.dart';
-// import '../../order/screen/OrderSuccessScreen.dart';
-// import '../../order/screen/order_failed_screen.dart';
-// import '../model/payment_checkout_model.dart';
+// import '../../../bottom_navigation_screen.dart';
+// import '../../../ui_helper/storage_helper.dart';
+// import '../../../util/config.dart'; // Import the updated ConfigUtils
+// import '../../cart/controller/cart_list_api_provider.dart';
 //
-// class CheckoutProvider with ChangeNotifier {
-//   final Repository _repository = Repository();
-//   List<OrderItem> _checkoutItems = [];
-//   StoreCheckoutFormDataModel? _formData;
+// class HomeToolbarSection extends StatefulWidget {
+//   @override
+//   State<HomeToolbarSection> createState() => _HomeToolbarSectionState();
+// }
 //
-//   StoreCheckoutFormDataModel? get formData => _formData;
+// class _HomeToolbarSectionState extends State<HomeToolbarSection> {
+//   // int currentIndex = 0; // Unused
+//   // final CarouselSliderController _controller = CarouselSliderController(); // Unused
 //
-//   bool _isLoading = false;
-//   String _errorMessage = "";
-//   String? _razorpayKey;
+//   String userName = StorageHelper().getUserName();
+//   String userAddress = "Fetching location...";
 //
-//   late Razorpay _razorpay;
+//   // Get the singleton instance of ConfigUtils
+//   final ConfigUtils _configUtils = ConfigUtils();
 //
-//   PaymentCheckoutModel? _checkoutModel;
-//   PaymentCheckoutModel? get checkoutModel => _checkoutModel;
-//   CreateOrder2ModelResponse? _createOrderModelResponse;
-//   final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+//   @override
+//   void initState() {
+//     super.initState();
+//     WidgetsBinding.instance.addPostFrameCallback((_) {
+//       _loadUserAddress(); // Initial load
 //
-//   String paymentStatus = '';
-//
-//   CreateOrder2ModelResponse? get createOrderModelResponse =>  _createOrderModelResponse;
-//
-//   List<OrderItem> get checkoutItems => _checkoutItems;
-//
-//   bool get isCheckoutEmpty => _checkoutItems.isEmpty;
-//
-//   bool get isLoading => _isLoading;
-//
-//   String get errorMessage => _errorMessage;
-//
-//   String? get razorpayKey => _razorpayKey;
-//   String? _userPhone;
-//   String? _userEmail;
-//   Map<String, dynamic>? _storedOrderDetails;
-//
-//
-//   void reset() {
-//     _isLoading = false;
-//     notifyListeners();
+//       // Listen for changes in location service status
+//       _configUtils.locationServiceStatusNotifier.addListener(_onLocationServiceStatusChanged);
+//     });
 //   }
 //
-//   void notiFylistener() {
-//     notifyListeners();
+//   @override
+//   void dispose() {
+//     _configUtils.locationServiceStatusNotifier.removeListener(_onLocationServiceStatusChanged);
+//     super.dispose();
 //   }
 //
-//   void setLoadingState(bool loading) {
-//     _isLoading = loading;
-//     notifyListeners();
-//   }
-//
-//   void _setErrorState(String message) {
-//     _errorMessage = message;
-//     setLoadingState(false);
-//     notifyListeners();
-//   }
-//
-//   // 🟢 Increase Quantity of an Item
-//   void increaseQuantity(BuildContext context, String id) {
-//     int index = _checkoutItems.indexWhere((item) => item.id == id);
-//
-//     if (index != -1) {
-//       if (_checkoutItems[index].quantity < 5) {
-//         _checkoutItems[index] = OrderItem(
-//           id: _checkoutItems[index].id,
-//           name: _checkoutItems[index].name,
-//           category: _checkoutItems[index].category,
-//           price: _checkoutItems[index].price,
-//           imageUrl: _checkoutItems[index].imageUrl,
-//           orderType: _checkoutItems[index].orderType,
-//           packageDetail: _checkoutItems[index].packageDetail,
-//           quantity: _checkoutItems[index].quantity + 1,
-//         );
-//
-//         saveCheckoutItems(); // Save updated cart
-//         notifyListeners();
-//       } else {
-//         // Show Snackbar when quantity exceeds 5
-//         ScaffoldMessenger.of(context).showSnackBar(
-//           SnackBar(
-//               content: Text("You can't add more than 5 items."),
-//               duration: Duration(seconds: 2)),
-//         );
-//       }
-//
-//       saveCheckoutItems(); // Save updated cart
-//       notifyListeners();
-//     }
-//   }
-//
-//   // 🟢 Decrease Quantity of an Item
-//   void decreaseQuantity(BuildContext context, String id) {
-//     int index = _checkoutItems.indexWhere((item) => item.id == id);
-//     if (index != -1 && _checkoutItems[index].quantity > 1) {
-//       _checkoutItems[index] = OrderItem(
-//         id: _checkoutItems[index].id,
-//         name: _checkoutItems[index].name,
-//         category: _checkoutItems[index].category,
-//         price: _checkoutItems[index].price,
-//         imageUrl: _checkoutItems[index].imageUrl,
-//         orderType: _checkoutItems[index].orderType,
-//         packageDetail: _checkoutItems[index].packageDetail,
-//         quantity: _checkoutItems[index].quantity - 1,
-//       );
-//
-//       saveCheckoutItems(); // Save updated cart
-//       notifyListeners();
-//     } else if (index != -1 && _checkoutItems[index].quantity == 1) {
-//       // Remove item if quantity reaches 0
-//       // removeFromCart(null, id);
-//       OrderItem? removedItem = _checkoutItems
-//           .firstWhere((item) => item.id == id, orElse: () => OrderItem.empty());
-//       _checkoutItems.removeWhere((item) => item.id == id);
-//       saveCheckoutItems(); // Save updated cart
-//       notifyListeners();
-//     }
-//   }
-//
-//   // 🟢 Save Cart to SharedPreferences
-//   Future<void> saveCheckoutItems() async {
-//     final prefs = await SharedPreferences.getInstance();
-//     final String encodedData =
-//     jsonEncode(_checkoutItems.map((item) => item.toJson()).toList());
-//     await prefs.setString('checkout_items', encodedData);
-//   }
-//
-//   // 🟢 Load Cart from SharedPreferences
-//   Future<void> loadCheckoutItems() async {
-//     final prefs = await SharedPreferences.getInstance();
-//     final cartData = prefs.getString('checkout_items');
-//
-//     if (cartData != null) {
-//       final List<dynamic> decodedData = jsonDecode(cartData);
-//       _checkoutItems =
-//           decodedData.map((item) => OrderItem.fromJson(item)).toList();
-//       notifyListeners();
-//     }
-//   }
-//
-//   // 🟢 Add Item to Cart
-//   void addToCheckout(BuildContext context, OrderItem item) {
-//     int index = _checkoutItems.indexWhere((element) => element.id == item.id);
-//
-//     if (index != -1) {
-//       _checkoutItems[index] = OrderItem(
-//         id: item.id,
-//         name: item.name,
-//         category: item.category,
-//         price: item.price,
-//         imageUrl: item.imageUrl,
-//         orderType: item.orderType,
-//         packageDetail: item.packageDetail,
-//         quantity: _checkoutItems[index].quantity + 1,
-//       );
+//   void _onLocationServiceStatusChanged() {
+//     // This callback fires when location service status changes (e.g., enabled/disabled)
+//     if (_configUtils.locationServiceStatusNotifier.value) {
+//       // If location services are now enabled, try to get the address again
+//       print("Location service status changed to ENABLED. Re-fetching address...");
+//       _loadUserAddress(); // Re-attempt to get location
 //     } else {
-//       _checkoutItems.clear(); // Clear previous checkout items
-//       _checkoutItems.add(item);
+//       // If location services are disabled, update UI to reflect it
+//       setState(() {
+//         userAddress = "Location services disabled";
+//       });
 //     }
-//
-//     saveCheckoutItems(); // Save updated cart
-//     notifyListeners();
-//     // ✅ Show Snackbar from Helper
-//     // showCustomSnackbarHelper.showSnackbar(
-//     //   context: context,
-//     //   message: "${item.name} added to your cart!",
-//     //   duration: Duration(seconds: 2),
-//     // );
 //   }
 //
-//   // 🟢 Add Multiple Items to Cart in CheckoutProvider
-//   void addMultipleToCheckout(BuildContext context, List<OrderItem> items) {
-//     for (var item in items) {
-//       int index = _checkoutItems.indexWhere((element) => element.id == item.id);
+//   Future<void> _loadUserAddress() async {
+//     final storageHelper = StorageHelper();
+//     String? storedAddress = storageHelper.getUserLiveAddress();
 //
-//       if (index != -1) {
-//         _checkoutItems[index] = OrderItem(
-//           id: item.id,
-//           name: item.name,
-//           category: item.category,
-//           price: item.price,
-//           imageUrl: item.imageUrl,
-//           orderType: item.orderType,
-//           packageDetail: item.packageDetail,
-//           quantity: _checkoutItems[index].quantity + item.quantity,
-//         );
-//       } else {
-//         _checkoutItems.add(item);
+//     if (storedAddress != null && storedAddress.isNotEmpty) {
+//       setState(() {
+//         userAddress = storedAddress;
+//       });
+//     } else {
+//       await _fetchUserAddress();
+//     }
+//   }
+//
+//   Future<void> _fetchUserAddress() async {
+//     final storageHelper = StorageHelper();
+//     bool alreadyAcceptedDisclosure = storageHelper.isUserLocationDisclosureAccepted();
+//
+//     // Show disclosure dialog only if not accepted previously
+//     if (!alreadyAcceptedDisclosure) {
+//       bool accepted = await _showLocationDisclosureDialog(context);
+//       if (!accepted) {
+//         setState(() {
+//           userAddress = "Location access denied";
+//         });
+//         return; // User denied disclosure, stop here.
 //       }
+//       await storageHelper.setUserLocationDisclosureAccepted(true);
 //     }
 //
-//     saveCheckoutItems(); // Save updated cart
-//     notifyListeners();
+//     // Attempt to get location using ConfigUtils
+//     Map<String, dynamic> locationData = await _configUtils.getSingleLocation();
 //
-//     // ✅ Show Snackbar
-//     showCustomSnackbarHelper.showSnackbar(
-//       context: context,
-//       message: "Items added to checkout!",
-//       duration: Duration(seconds: 2),
-//     );
-//   }
-//
-//   // 🟢 Remove Item from Cart
-//   void removeFromCart(BuildContext context, String id) {
-//     OrderItem? removedItem = _checkoutItems.firstWhere((item) => item.id == id,
-//         orElse: () => OrderItem.empty());
-//     _checkoutItems.removeWhere((item) => item.id == id);
-//     saveCheckoutItems(); // Save updated cart
-//     notifyListeners();
-//
-//     if (removedItem.id.isNotEmpty) {
-//       showCustomSnackbarHelper.showSnackbar(
-//         context: context,
-//         backgroundColor: Colors.red,
-//         message: "${removedItem.name} removed from cart ",
-//         duration: Duration(seconds: 2),
-//       );
-//     }
-//   }
-//
-//   setUserContactDetails(String phone, String email) {
-//     _userPhone = phone;
-//     _userEmail = email;
-//   }
-//   void storeOrderDetails(Map<String, dynamic> details) {
-//     _storedOrderDetails = details;
-//   }
-//
-//   void saveFormData({
-//     required String selectedDate,
-//     required String selectedTime,
-//     required String email,
-//     required String fullName,
-//     required String age,
-//     required String phone,
-//     required String altPhone,
-//     required String gender,
-//     required String cityAddress,
-//     required String place,
-//     required String addressType,
-//   }) {
-//     _formData = StoreCheckoutFormDataModel(
-//       selectedDate: selectedDate,
-//       selectedTime: selectedTime,
-//       email: email,
-//       fullName: fullName,
-//       age: age,
-//       phone: phone,
-//       altPhone: altPhone,
-//       gender: gender,
-//       cityAddress: cityAddress,
-//       place: place,
-//       addressType: addressType,
-//     );
-//     notifyListeners();
-//   }
-//
-//   Future<bool> createOrder(
-//       BuildContext context,
-//       String bookingDate,
-//       String bookingTime,
-//       String email,
-//       String name,
-//       String age,
-//       String phone,
-//       String altPhone,
-//       String gender,
-//       String cityState,
-//       String selectedPlace,
-//       String addressType) async {
-//     setLoadingState(true);
-//     _errorMessage = "";
-//     _createOrderModelResponse = null;
-//
-//     try {
-//       // Convert order details list to JSON format
-//       // List<Map<String, dynamic>> orderDetailsJson = _checkoutItems.map((orderDetail) {
-//       //   return {
-//       //     "patientName": name,
-//       //     "patientAge": age,
-//       //     "patientGender": gender,
-//       //     "tests": _checkoutItems.map((test) {
-//       //       return {
-//       //         // "id": test.id,
-//       //         "name": test.name,
-//       //         "price": test.price,
-//       //         "category": test.category,
-//       //         "orderType": test.orderType,
-//       //         "quantity": test.quantity,
-//       //         "bookingDate": bookingDate,
-//       //         "bookingTime": bookingTime,
-//       //       };
-//       //     }).toList(),
-//       //   };
-//       // }).toList();
-//
-//       // Convert checkout items into structured order details
-//       // Collect all tests for the single patient
-//       List<Map<String, dynamic>> tests = _checkoutItems.map((test) {
-//         return {
-//           "orderName": test.name, // Test Name
-//           "quantity": test.quantity,
-//           "category": test.category,
-//           "orderType": test.orderType,
-//           "orderPrice": test.price,
-//           "bookingDate": _formData!.selectedDate.toString(),
-//           "bookingTime":  _formData!.selectedTime.toString(),
-//         };
-//       }).toList();
-//
-//       // Construct order details with patient info only once
-//       List<Map<String, dynamic>> orderDetailsJson = [
-//         {
-//           "patientName":  _formData!.fullName.toString(),
-//           "patientAge":  _formData!.age.toString(),
-//           "patientGender": StringUtils.toLowerCase( _formData!.gender.toString()),
-//           "tests": tests, // All tests for the patient
+//     if (locationData.isNotEmpty && locationData.containsKey("address")) {
+//       String address = locationData["address"];
+//       storageHelper.setUserLiveAddress(address);
+//       setState(() {
+//         userAddress = address;
+//       });
+//     } else {
+//       // ConfigUtils will have printed specific error messages.
+//       // Here, we update the UI to a general "Unable to fetch" message.
+//       setState(() {
+//         // If locationServiceStatusNotifier is false, it means services are off or permission denied.
+//         if (!_configUtils.locationServiceStatusNotifier.value) {
+//           userAddress = "Location services off or denied";
+//         } else {
+//           userAddress = "Unable to fetch address";
 //         }
-//       ];
-//
-//       // Construct request body
-//       Map<String, dynamic> requestBody = {
-//         "email":  _formData!.email.toString(),
-//         "address":  _formData!.cityAddress.toString(),
-//         "selectedPlace":  _formData!.place.toString(),
-//         "addressType":  _formData!.addressType.toString(),
-//         "phoneNumber":  _formData!.phone.toString(),
-//         "altPhoneNumber":  _formData!.altPhone.toString(),
-//         "orderDetails": orderDetailsJson,
-//       };
-//
-//       // Debugging log
-//       print("bodyRequest => ${requestBody.toString()}");
-//
-//       // Map<String, dynamic> requestBody = {
-//       //   "testName": testName,
-//       //   "bookingDate": bookingDate,
-//       //   "bookingTime": bookingTime,
-//       //   "category": category,
-//       //   "rate": rate,
-//       //   "email": email,
-//       //   "name": name,
-//       //   "age": age,
-//       //   "phone": phone,
-//       //   "altPhone": altPhone,
-//       //   "gender": gender,
-//       //   "cityState": cityState
-//       // };
-//
-//       var response = await _repository.createOrderResponse(requestBody);
-//
-//       print("bodyRequest=>${requestBody.toString()}");
-//       if (response.success == true && response.data != null) {
-//         print("✅ Order created successfully!");
-//         _createOrderModelResponse = response;
-//         setLoadingState(false);
-//
-//         Navigator.pushReplacement(
-//           context,
-//           MaterialPageRoute(builder: (context) => OrderSuccessScreen()),
-//         );
-//         return true;
-//       } else {
-//         _setErrorState(response.message ?? "Failed to create order");
-//       }
-//     } on DioException catch (e) {
-//       String errorMessage = ApiErrorHandler.handleError(e);
-//       _setErrorState(errorMessage);
-//       print("⚠️ Order API Error: $errorMessage");
-//       showCustomSnackbarHelper.showSnackbar(
-//         context: context,
-//         message: errorMessage,
-//         backgroundColor: Colors.red,
-//         duration: Duration(seconds: 3),
-//       );
+//       });
 //     }
-//
-//     setLoadingState(false);
-//     return false;
 //   }
 //
-//   // 🟢 Clear Cart
-//   void clearCheckout(BuildContext context) {
-//     _checkoutItems.clear();
-//     // saveCheckoutItems(); // Save updated cart
-//     notifyListeners();
-//     showCustomSnackbarHelper.showSnackbar(
+//   Future<bool> _showLocationDisclosureDialog(BuildContext context) async {
+//     bool userAccepted = false;
+//     await showDialog(
 //       context: context,
-//       message: "Order has  cleared",
-//       duration: Duration(seconds: 2),
+//       barrierDismissible: false,
+//       builder: (BuildContext ctx) {
+//         return AlertDialog(
+//           title: Text("Location Permission Required"),
+//           content: Text(
+//               "We use your device’s location to display your current address and improve your service experience. This data is used only while the app is open and will not be shared with third parties."
+//           ),
+//           actions: [
+//             TextButton(
+//               onPressed: () {
+//                 userAccepted = false;
+//                 Navigator.of(ctx).pop();
+//               },
+//               child: Text("Deny"),
+//             ),
+//             ElevatedButton(
+//               onPressed: () {
+//                 userAccepted = true;
+//                 Navigator.of(ctx).pop();
+//               },
+//               child: Text("Accept"),
+//             ),
+//           ],
+//         );
+//       },
+//     );
+//     return userAccepted;
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       color: AppColors.primary,
+//       child: Padding(
+//         padding: ResponsiveHelper.padding(context, 3, 0.5),
+//         child: Column(
+//           children: [
+//             Row(
+//               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//               crossAxisAlignment: CrossAxisAlignment.start,
+//               children: [
+//                 Expanded(
+//                   child: Padding(
+//                     padding:  EdgeInsets.only(left: 5.0),
+//                     child: Column(
+//                       crossAxisAlignment: CrossAxisAlignment.start,
+//                       children: [
+//                         Row(
+//                           children: [
+//                             Expanded(
+//                               child: Text(
+//                                 "Hello, ${userName}",
+//                                 style: AppTextStyles.heading1(
+//                                   context,
+//                                   overrideStyle: TextStyle(
+//                                       color: Colors.white,
+//                                       fontWeight: FontWeight.w900,
+//                                       fontSize:
+//                                       ResponsiveHelper.fontSize(context, 14)),
+//                                 ),
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                         Row(
+//                           crossAxisAlignment: CrossAxisAlignment.center,
+//                           children: [
+//                             Icon(
+//                               Icons.location_pin,
+//                               size: 18,
+//                               color: Colors.white,
+//                             ),
+//                             SizedBox(
+//                               width: 5,
+//                             ),
+//                             Expanded(
+//                               child: Text(
+//                                 userAddress,
+//                                 maxLines: 1,
+//                                 overflow: TextOverflow.ellipsis,
+//                                 style: AppTextStyles.heading1(context,
+//                                     overrideStyle: TextStyle(
+//                                         color: Colors.white,
+//                                         fontSize:
+//                                         ResponsiveHelper.fontSize(context, 10))),
+//                               ),
+//                             ),
+//                           ],
+//                         ),
+//                       ],
+//                     ),
+//                   ),
+//                 ),
+//                 Row(
+//                   children: [
+//                     InkWell(
+//                       onTap: () {
+//                         Navigator.push(
+//                           context,
+//                           MaterialPageRoute(
+//                             builder: (context) => CartListScreen(),
+//                           ),
+//                         );
+//                       },
+//                       child: Consumer<CartProvider>(
+//                         builder: (context, cartProvider, child) {
+//                           return Stack(
+//                             children: [
+//                               Container(
+//                                 child: Padding(
+//                                   padding: const EdgeInsets.all(8.0),
+//                                   child: Icon(
+//                                     color: Colors.white,
+//                                     Icons.shopping_cart_checkout_outlined,
+//                                     size: ResponsiveHelper.iconSize(
+//                                         context, 24),
+//                                   ),
+//                                 ),
+//                               ),
+//                               if (cartProvider.cartItems.isNotEmpty)
+//                                 Positioned(
+//                                   right: 2,
+//                                   top: -5,
+//                                   child: Container(
+//                                     padding: EdgeInsets.all(5),
+//                                     decoration: BoxDecoration(
+//                                       color: Colors.red,
+//                                       shape: BoxShape.circle,
+//                                     ),
+//                                     child: Text(
+//                                       cartProvider.cartItems.length.toString(),
+//                                       style: TextStyle(
+//                                           color: Colors.white, fontSize: 10),
+//                                     ),
+//                                   ),
+//                                 ),
+//                             ],
+//                           );
+//                         },
+//                       ),
+//                     ),
+//                   ],
+//                 ),
+//               ],
+//             ),
+//             ResponsiveHelper.sizeBoxHeightSpace(context, 1.5),
+//             // Search Bar
+//             Center(
+//               child: GestureDetector(
+//                 onTap: () {
+//                   Navigator.pushReplacement(
+//                     context,
+//                     MaterialPageRoute(
+//                       builder: (context) =>BottomNavigationScreen(initialPageIndex: 1),
+//                     ),
+//                   );
+//                 },
+//                 child: Container(
+//                   width: double.infinity,
+//                   height: ResponsiveHelper.containerWidth(context, 10),
+//                   padding: EdgeInsets.symmetric(horizontal: 10),
+//                   decoration: BoxDecoration(
+//                     color: Colors.white,
+//                     borderRadius: BorderRadius.circular(10.0),
+//                     border: Border.all(
+//                         width: 0.4, color: AppColors.txtLightGreyColor),
+//                     boxShadow: [
+//                       BoxShadow(
+//                         color: Colors.grey.withOpacity(0.3),
+//                         blurRadius: 1.0,
+//                         offset: Offset(0, 2),
+//                       ),
+//                     ],
+//                   ),
+//                   child: Row(
+//                     children: [
+//                       Icon(Icons.search, color: Colors.grey),
+//                       SizedBox(width: 10),
+//                       Expanded(
+//                         child: GestureDetector(
+//                           onTap: () {
+//                             Navigator.pushReplacement(
+//                               context,
+//                               MaterialPageRoute(
+//                                 builder: (context) =>
+//                                     BottomNavigationScreen(initialPageIndex: 1),
+//                               ),
+//                             );
+//                           },
+//                           child: Row(
+//                             mainAxisAlignment: MainAxisAlignment.start,
+//                             children: [
+//                               Padding(
+//                                 padding: EdgeInsets.only(top: 0),
+//                                 child: DefaultTextStyle(
+//                                   style: TextStyle(
+//                                     color: Colors.grey,
+//                                     fontSize:
+//                                     ResponsiveHelper.fontSize(context, 14),
+//                                     fontWeight: FontWeight.bold,
+//                                     height: 1.2,
+//                                   ),
+//                                   child: AnimatedTextKit(
+//                                     repeatForever: true,
+//                                     isRepeatingAnimation: true,
+//                                     pause: Duration(milliseconds: 0),
+//                                     animatedTexts: [
+//                                       RotateAnimatedText( transitionHeight: 30.0,
+//                                           duration: Duration(milliseconds: 2000),
+//                                           'Search for CBC, X-ray, etc.'),
+//                                       RotateAnimatedText( transitionHeight: 30.0,
+//                                           duration: Duration(milliseconds: 2000),
+//                                           'Find Lab Tests, MRI, CT Scan...'),
+//                                       RotateAnimatedText( transitionHeight: 30.0,
+//                                           duration: Duration(milliseconds: 2000),
+//                                           'Search Your Health Test Here...'),
+//                                     ],
+//                                   ),
+//                                 ),
+//                               ),
+//                             ],
+//                           ),
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                 ),
+//               ),
+//             ),
+//             ResponsiveHelper.sizeBoxHeightSpace(context, 0.5),
+//           ],
+//         ),
+//       ),
 //     );
 //   }
-//
-//   //  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ Paymebt api ****************************************
-//
-//   // 🟢 Get Total Amount
-//   double get totalAmount {
-//     return _checkoutItems.fold(
-//         0.0, (sum, item) => sum + ((item.price) * item.quantity));
-//   }
-//
-//   //// Payment call
-//   Future<String?> fetchRazorpayKey() async {
-//     setLoadingState(true);
-//     // notifyListeners();
-//     final response = await _repository.getRazorPaymentKey();
-//
-//     if (response["success"] == true) {
-//       _razorpayKey = response["key"];
-//       if (razorpayKey != null) {
-//         StorageHelper().setPaymentKey(razorpayKey.toString());
-//         return _razorpayKey;
-//       } else {
-//         _razorpayKey = null;
-//       }
-//       setLoadingState(false);
-//       notifyListeners();
-//     }
-//   }
-//
-//
-//   initRazorpay() async {
-//     _razorpay = Razorpay();
-//     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
-//     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
-//     _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
-//     createAndStartPayment(1,"Book Test");
-//   }
-//
-//   Future<void> createAndStartPayment( int total,  String forName) async {
-//     _isLoading = true;
-//     notifyListeners();
-//
-//     final requestBody = {
-//       "total": 1,
-//       "forName": "Book Test",
-//     };
-//
-//     final result = await _repository.createRazerPayOrder(requestBody);
-//     _checkoutModel = result;
-//
-//     _isLoading = false;
-//     notifyListeners();
-//
-//     if (_checkoutModel?.order?.id != null) {
-//       var apiKey = await fetchRazorpayKey();
-//       _startRazorpayPayment(apiKey.toString(), _checkoutModel!);
-//     }
-//   }
-//
-//   void _startRazorpayPayment(String? apiKey, PaymentCheckoutModel model) {
-//     final order = model.order!;
-//     var options = {
-//       'key': apiKey,
-//       'amount': order.amount, // in paise
-//       'currency': 'INR',
-//       'name': 'Shanya App',
-//       'description': 'Payment for order',
-//       'order_id': order.id,
-//       'prefill': {
-//         'contact': _formData?.phone ?? '',
-//         'email': _formData?.email ?? '',
-//       }
-//     };
-//
-//     _razorpay.open(options);
-//   }
-//
-//   void _handlePaymentSuccess(PaymentSuccessResponse response) async {
-//     final requestBody = {
-//       "razorpay_payment_id": response.paymentId!,
-//       "razorpay_order_id": response.orderId!,
-//       "razorpay_signature": response.signature!,
-//     };
-//
-//     final verified = await _repository.verifyPayment(requestBody);
-//     if (verified) {
-//       // ✅ Payment verified, now create order
-//       bool orderCreated = await createOrder(
-//         navigatorKey.currentContext!, // or pass context differently
-//         _formData!.selectedDate,
-//         _formData!.selectedTime,
-//         _formData!.email,
-//         _formData!.fullName,
-//         _formData!.age,
-//         _formData!.phone,
-//         _formData!.altPhone,
-//         _formData!.gender,
-//         _formData!.cityAddress,
-//         _formData!.place,
-//         _formData!.addressType,
-//       );
-//
-//       if (orderCreated) {
-//         paymentStatus = 'Payment and order successful';
-//         Navigator.pushReplacement(
-//           navigatorKey.currentContext!,
-//           MaterialPageRoute(builder: (_) => OrderSuccessScreen()),
-//         );
-//       } else {
-//         paymentStatus = 'Payment successful, but order failed';
-//         Navigator.pushReplacement(
-//           navigatorKey.currentContext!,
-//           MaterialPageRoute(builder: (_) => OrderFailedScreen(reason: "Order creation failed")),
-//         );
-//       }
-//     } else {
-//       paymentStatus = 'Payment verification failed';
-//       Navigator.pushReplacement(
-//         navigatorKey.currentContext!,
-//         MaterialPageRoute(builder: (_) => OrderFailedScreen(reason: "Payment verification failed")),
-//       );
-//     }
-//
-//     paymentStatus = verified ? 'Payment successful' : 'Payment verification failed';
-//     print("payment status => ${paymentStatus}");
-//     notifyListeners();
-//   }
-//
-//   void _handlePaymentError(PaymentFailureResponse response) {
-//     paymentStatus = 'Payment failed: ${response.message}';
-//     print("payment status => ${paymentStatus}");
-//     notifyListeners();
-//   }
-//
-//   void _handleExternalWallet(ExternalWalletResponse response) {
-//     paymentStatus = 'External wallet selected: ${response.walletName}';
-//     print("payment status => ${paymentStatus}");
-//     notifyListeners();
-//   }
-//
-//   void clearRazorpay() {
-//     _razorpay.clear();
-//   }
-//
 // }

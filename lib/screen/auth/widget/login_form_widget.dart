@@ -92,6 +92,7 @@ class _LoginFormWidgetState extends State<LoginFormWidget> {
                   icon: Icons.lock_open,
                   hintText: "Enter your password",
                   title: "Password",
+                  isPassword: true,
                   errorMessage: "Invalid Password",
                 ),
                 const SizedBox(height: 10),
