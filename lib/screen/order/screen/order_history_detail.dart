@@ -27,8 +27,12 @@ class UserOrderHistoryDetailScreen extends StatefulWidget {
       _UserOrderHistoryDetailScreenState();
 }
 
-class _UserOrderHistoryDetailScreenState
-    extends State<UserOrderHistoryDetailScreen> {
+class _UserOrderHistoryDetailScreenState extends State<UserOrderHistoryDetailScreen> {
+  String _userTestBookingAddress = "";
+  String _userTestBookingPhone = "";
+  String _userTestBookingAltPhone = "";
+
+
   @override
   void initState() {
     super.initState();
@@ -41,11 +45,32 @@ class _UserOrderHistoryDetailScreenState
       Provider.of<DeliveryOrdersProvider>(context, listen: false);
       provider.fetchDeliveryBoyOrderDetails(widget.orderId);
     });
-
+    // Fetch user test booking address from StorageHelper
+    _fetchUserAddress();
     // requestPermissions();
     // getToken();
   }
 
+  Future<void> _fetchUserAddress() async {
+
+    try {
+      _userTestBookingAddress = StorageHelper().getUserTestBookingAddress();
+      _userTestBookingPhone = StorageHelper().getUserTestBookingPhone();
+      _userTestBookingAltPhone = StorageHelper().getUserTestBookingAltPhone();
+      print("Fetched address from StorageHelper: $_userTestBookingAddress");
+    } catch (e) {
+      print("Error fetching address from StorageHelper: $e");
+      _userTestBookingAddress = "";
+      _userTestBookingPhone = "";
+      _userTestBookingAltPhone = "";
+    } finally {
+      // Use setState to trigger a rebuild only after the address is fetched.
+      // This will cause the Visibility widget to re-evaluate.
+      setState(() {
+        // _isAddressLoading is implicitly false now as data is fetched.
+      });
+    }
+  }
   @override
   void dispose() {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -115,7 +140,7 @@ class _UserOrderHistoryDetailScreenState
                           CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '${orderDetail.data!.orderName.toString()}',
+                              '${orderDetail.data!.orderName.toString().trim()}',
                               style: AppTextStyles.heading1(
                                 context,
                                 overrideStyle: TextStyle(
@@ -303,7 +328,7 @@ class _UserOrderHistoryDetailScreenState
                   SizedBox(height: 10),
                   Text(
                     '${orderDetail.data!.patientName.toString()}',
-                    style: AppTextStyles.bodyText1(
+                    style: AppTextStyles.heading1(
                       context,
                       overrideStyle: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -313,58 +338,139 @@ class _UserOrderHistoryDetailScreenState
                     ),
                   ),
                   SizedBox(height: 4),
+                  // Instead of the single Text widget, replace it with this RichText:
                   Visibility(
-                    visible: orderDetail
-                        .data?.patientAddress?.isNotEmpty ??
-                        false,
-                    child: Text(
-                      orderDetail.data?.patientAddress ?? '',
-                      style: AppTextStyles.bodyText1(
-                        context,
-                        overrideStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: ResponsiveHelper.fontSize(
-                              context, 12),
-                        ),
+                    // visible: _userTestBookingAddress.isNotEmpty,
+                    visible: orderDetail.data?.patientAddress?.isNotEmpty ?? false,
+                    child: RichText( // Changed from Text to RichText
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "Address - ", // The "Address -" part
+                            style: AppTextStyles.heading1(
+                              context,
+                              overrideStyle: TextStyle(
+                                fontSize: ResponsiveHelper.fontSize(context, 12),
+                                color: AppColors.txtGreyColor, // Ensure color is set, as default might be different
+                              ),
+                            ),
+                          ),
+                          TextSpan(
+                            // text: _userTestBookingAddress, // The actual address from storage
+
+                          text: orderDetail.data?.patientAddress ?? '',
+                            style: AppTextStyles.bodyText1(
+                              context,
+                              overrideStyle: TextStyle(
+                                // No specific bold here, it will inherit from the parent or be normal
+                                fontSize: ResponsiveHelper.fontSize(context, 12),
+                                color: Colors.black, // Ensure color is set
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
+                  SizedBox(height: 2),
                   Visibility(
-                    visible: orderDetail
-                        .data
-                        ?.patientSelectedAddress
-                        ?.isNotEmpty ??
-                        false,
-                    child: Text(
-                      orderDetail.data?.patientSelectedAddress ??
-                          '',
-                      style: AppTextStyles.bodyText1(
-                        context,
-                        overrideStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: ResponsiveHelper.fontSize(
-                              context, 12),
-                        ),
+                    // visible: _userTestBookingAddress.isNotEmpty,
+                    visible: orderDetail.data?.patientPhoneNumber?.isNotEmpty ?? false,
+                    child: RichText( // Changed from Text to RichText
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "Phone - ", // The "Address -" part
+                            style: AppTextStyles.heading1(
+                              context,
+                              overrideStyle: TextStyle(
+                                fontSize: ResponsiveHelper.fontSize(context, 12),
+                                color: AppColors.txtGreyColor, // Ensure color is set, as default might be different
+                              ),
+                            ),
+                          ),
+                          TextSpan(
+                            // text: _userTestBookingAddress, // The actual address from storage
+
+                            text: orderDetail.data?.patientPhoneNumber ?? '',
+                            style: AppTextStyles.bodyText1(
+                              context,
+                              overrideStyle: TextStyle(
+                                // No specific bold here, it will inherit from the parent or be normal
+                                fontSize: ResponsiveHelper.fontSize(context, 12),
+                                color: Colors.black, // Ensure color is set
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  SizedBox(height: 4),
+                  SizedBox(height: 2),
                   Visibility(
-                    visible: orderDetail
-                        .data
-                        ?.patientSelectedAddress
-                        ?.isNotEmpty ??
-                        false,
-                    child: Text(
-                      " Phone Number ${orderDetail.data
-                          ?.patientSelectedAddress ?? ''}",
-                      style: AppTextStyles.bodyText1(
-                        context,
-                        overrideStyle: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: ResponsiveHelper.fontSize(
-                              context, 12),
-                        ),
+                    // visible: _userTestBookingAddress.isNotEmpty,
+                    visible: orderDetail.data?.patientAltPhoneNumber?.isNotEmpty ?? false,
+                    child: RichText( // Changed from Text to RichText
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "Alternate Phone - ", // The "Address -" part
+                            style: AppTextStyles.heading1(
+                              context,
+                              overrideStyle: TextStyle(
+                                fontSize: ResponsiveHelper.fontSize(context, 12),
+                                color: AppColors.txtGreyColor, // Ensure color is set, as default might be different
+                              ),
+                            ),
+                          ),
+                          TextSpan(
+                            // text: _userTestBookingAddress, // The actual address from storage
+
+                            text: orderDetail.data?.patientAltPhoneNumber ?? '',
+                            style: AppTextStyles.bodyText1(
+                              context,
+                              overrideStyle: TextStyle(
+                                // No specific bold here, it will inherit from the parent or be normal
+                                fontSize: ResponsiveHelper.fontSize(context, 12),
+                                color: Colors.black, // Ensure color is set
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 2),
+                  Visibility(
+                    // visible: _userTestBookingAddress.isNotEmpty,
+                    visible: orderDetail.data?.patientSelectedAddress?.isNotEmpty ?? false,
+                    child: RichText( // Changed from Text to RichText
+                      text: TextSpan(
+                        children: [
+                          TextSpan(
+                            text: "Location - ", // The "Address -" part
+                            style: AppTextStyles.heading1(
+                              context,
+                              overrideStyle: TextStyle(
+                                fontSize: ResponsiveHelper.fontSize(context, 12),
+                                color: AppColors.txtGreyColor, // Ensure color is set, as default might be different
+                              ),
+                            ),
+                          ),
+                          TextSpan(
+                            // text: _userTestBookingAddress, // The actual address from storage
+
+                            text: orderDetail.data?.patientSelectedAddress ?? '',
+                            style: AppTextStyles.bodyText1(
+                              context,
+                              overrideStyle: TextStyle(
+                                // No specific bold here, it will inherit from the parent or be normal
+                                fontSize: ResponsiveHelper.fontSize(context, 12),
+                                color: Colors.black, // Ensure color is set
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -405,7 +511,7 @@ class _UserOrderHistoryDetailScreenState
                             context,
                             MaterialPageRoute(
                               builder: (context) =>
-                                  UserLiveTrackingScreen(),
+                                  UserLiveTrackingScreen(salesPersonName:orderDetail.data?.assignedTo?.name.toString(),patientName:orderDetail.data?.patientName , isSalesPerson: false),
                                   // UserLiveTrackingScreen(orderDetail.data!.assignedTo!.name.toString()),
                             ),
                           );

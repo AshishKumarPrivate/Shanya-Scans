@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shanya_scans/deliveryBoy/screen/deleivery_boy_dashboard.dart';
+import 'package:shanya_scans/deliveryBoy/screen/delivery_boy_login_screen.dart';
 import 'package:shanya_scans/network_manager/repository.dart';
 import 'package:shanya_scans/screen/auth/login_screen.dart';
 import 'package:shanya_scans/ui_helper/app_colors.dart';
@@ -18,7 +19,7 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
   final Repository _repository = Repository();
   bool _isLoading = false;
 
-  final ConfigUtils _configUtils = ConfigUtils();
+  late final ConfigUtils _configUtils;
   bool get isLoading => _isLoading;
   // To store email and password when waiting for location to be enabled
   String? _pendingEmail;
@@ -27,6 +28,7 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
 
 
   DeliveryBoyAuthApiProvider() {
+    _configUtils = ConfigUtils();
     WidgetsBinding.instance.addObserver(this); // Add observer
     _configUtils.locationServiceStatusNotifier.addListener(_onLocationServiceStatusChanged);
 
@@ -55,9 +57,13 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
       if (_pendingEmail != null && _pendingPassword != null && _pendingContext != null) {
         print("App resumed, re-attempting location acquisition for pending login.");
         // We re-attempt _getLocationAndProceedLogin. ConfigUtils will re-verify permissions/service.
+        final email = _pendingEmail;
+        final password = _pendingPassword;
+        final context = _pendingContext;
+        _clearPendingLoginState();
         _getLocationAndProceedLogin(_pendingContext!, _pendingEmail!, _pendingPassword!);
         // Clear pending state after re-attempt
-        _clearPendingLoginState();
+
       }
     }
   }
@@ -67,9 +73,10 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
     // If we have a pending login and location service becomes enabled, re-attempt login
     if (_pendingEmail != null && _pendingPassword != null && _pendingContext != null && _configUtils.locationServiceStatusNotifier.value) {
       print("Location service enabled, re-attempting pending login...");
+
+      _clearPendingLoginState();
       _getLocationAndProceedLogin(_pendingContext!, _pendingEmail!, _pendingPassword!);
       // Clear pending state after re-attempt
-      _clearPendingLoginState();
     }
     // You could also notify listeners here if your UI needs to react to this status change
     // For example, if you have a "Location Services Off" banner on your login screen.
@@ -96,7 +103,8 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
         return AlertDialog(
           title: const Text("Location Permission Required"),
           content: const Text(
-            "We need to track your location in the background to help you reach users for test collection. Your data will only be used for this purpose and not shared with anyone.",
+            "To help you reach users for test collection, this app requests location access. This data is used only to track your delivery routes and will not be shared.",
+            // "We need to track your location in the background to help you reach users for test collection. Your data will only be used for this purpose and not shared with anyone.",
           ),
           actions: [
             TextButton(
@@ -104,7 +112,7 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
                 userAccepted = false;
                 Navigator.of(ctx).pop();
               },
-              child: const Text("Deny"),
+              child: const Text("Not Now"),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -112,7 +120,7 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
                 await StorageHelper().setSalesLocationDisclosureAccepted(true);
                 Navigator.of(ctx).pop();
               },
-              child: const Text("Accept"),
+              child: const Text("Continue"),
             ),
           ],
         );
@@ -124,32 +132,45 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
   // New method to handle location acquisition and continuation of login
   Future<void> _getLocationAndProceedLogin(BuildContext context, String email, String password) async {
     _setLoading(true);
-    Map<String, dynamic> locationData = {};
-    // Attempt to get a single location first
-    locationData = await _configUtils.getSingleLocation();
+    Map<String, dynamic> locationData = await _configUtils.getSingleLocation();
+
     if (locationData.isEmpty || locationData["latitude"] == null || locationData["longitude"] == null) {
-      // If getSingleLocation failed (due to permissions, service off, or timeout),
-      // ConfigUtils would have already shown a snackbar/dialog if needed.
-      // We check if location services are off as a specific condition for pending login.
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      LocationPermission permission = await Geolocator.checkPermission();
+
+      _pendingEmail = email;
+      _pendingPassword = password;
+      _pendingContext = context;
       if (!serviceEnabled) {
-        print("Location service off after initial attempts. Setting pending state.");
-        _pendingEmail = email;
-        _pendingPassword = password;
-        _pendingContext = context;
-        _setLoading(false); // Hide loader as we wait for user action
-        return; // Exit and wait for didChangeAppLifecycleState
-      } else {
-        // Location services are on, but we still couldn't get a location.
-        // This indicates a deeper problem or very poor GPS.
         showCustomSnackbarHelper.showSnackbar(
           context: context,
-          message: "Failed to get location. Please ensure you have a strong GPS signal.",
+          message: "Location services are OFF. Please enable them to login.",
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        );
+        print("Location service off after initial attempts. Setting pending state.");
+        _setLoading(false);
+        return;
+      } else if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        showCustomSnackbarHelper.showSnackbar(
+          context: context,
+          message: "Location permission denied. Please grant permission to login.",
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
+        );
+        print("Location permission denied. Setting pending state.");
+        _setLoading(false); // Stop loading if waiting for user action
+        return;
+      } else {
+        showCustomSnackbarHelper.showSnackbar(
+          context: context,
+          message: "Failed to get precise location. Please ensure you have a strong GPS signal or stable network.",
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 4),
         );
         _setLoading(false);
         _configUtils.stopTracking(); // Ensure tracking is stopped
+        _clearPendingLoginState();
         return;
       }
     }
@@ -170,10 +191,10 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
         _setLoading(false);
         return;
       }
+    } else {
+      print("Location disclosure already accepted.");
     }
-    // --- END NEW LOGIC ---
 
-    // Store credentials for potential re-attempt on app resume
     _pendingEmail = email;
     _pendingPassword = password;
     _pendingContext = context;
@@ -210,7 +231,7 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
       } else {
         showCustomSnackbarHelper.showSnackbar(
           context: context,
-          message: response.message ?? 'Login failed! User not exist.', // Use server message, fallback if null
+          message: "Invalid Credential" ?? 'Login failed! User not exist.', // Use server message, fallback if null
           backgroundColor: AppColors.deliveryPrimary,
           duration: const Duration(seconds: 2),
         );
@@ -305,7 +326,7 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
       StorageHelper().logout();
       _setLoading(false);
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => LoginScreen()),
+        MaterialPageRoute(builder: (context) => DeliveryLoginScreen()),
         (route) => false,
       );
     });
@@ -333,6 +354,7 @@ class DeliveryBoyAuthApiProvider with ChangeNotifier, WidgetsBindingObserver {
   }
 
   void _handleUnexpectedErrors(  BuildContext context, dynamic e, String message) {
+
     showCustomSnackbarHelper.showSnackbar(
       context: context,
       message: message,

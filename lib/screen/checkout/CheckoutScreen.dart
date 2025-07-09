@@ -55,12 +55,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       date: DateTime.now().toString(),
       currentFormat: "yyyy-MM-dd HH:mm:ss.SSS",
       desiredFormat: "yyyy-MM-dd"); // ✅ Store default date
-  // String? selectedTimeString;
-  String? selectedTimeString = DateUtil.formatDate(
-      date: DateTime.now().toString(),
-      currentFormat: "yyyy-MM-dd HH:mm:ss.SSS",
-      desiredFormat: "HH:mm" // or any format you need like "hh:mm a"
-  );
+  String? selectedTimeString;
+  // String? selectedTimeString = DateUtil.formatDate(
+  //     date: DateTime.now().toString(),
+  //     currentFormat: "yyyy-MM-dd HH:mm:ss.SSS",
+  //     desiredFormat: "HH:mm" // or any format you need like "hh:mm a"
+  // );
 
   bool showBookingFor = false;
   bool showGender = false;
@@ -79,9 +79,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   // late Razorpay _razorpay;
 
+
   @override
   void initState() {
     super.initState();
+    initializeTime();
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: AppColors.primary,
       statusBarIconBrightness: Brightness.light,
@@ -92,6 +94,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       Provider.of<CheckoutProvider>(context, listen: false).loadCheckoutItems();
     });
 
+  }
+
+
+  /// Function to set the initial 1-hour-later time
+  void initializeTime() {
+    DateTime now = DateTime.now();
+    DateTime oneHourLater = now.add(const Duration(hours: 1));
+
+    setState(() { // Use setState to ensure UI updates immediately
+      selectedTime = TimeOfDay.fromDateTime(oneHourLater);
+      selectedTimeString = DateUtil.formatDate(
+          date: oneHourLater.toString(),
+          currentFormat: "yyyy-MM-dd HH:mm:ss.SSS",
+          desiredFormat: "hh:mm a" // Or "HH:mm" for 24-hour format
+      );
+    });
+
+    print("Initially set selectedTimeString to: $selectedTimeString");
   }
 
   void defaultStatusBarColor() {
@@ -186,6 +206,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return WillPopScope(
       onWillPop: () async {
         bool shouldExit = await _showExitDialog(context);
@@ -730,6 +751,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   /// **Time Picker Function**
   void _selectTime() async {
+    // Calculate initial time as 1 hour later than current time
+    DateTime now = DateTime.now();
+    DateTime initialDateTime = now.add(const Duration(hours: 1));
+    TimeOfDay initialTimeOfDay = TimeOfDay.fromDateTime(initialDateTime);
+
     TimeOfDay? pickedTime = await showTimePicker(
       context: context,
       initialTime: selectedTime ?? TimeOfDay.now(),
@@ -741,6 +767,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         print("selected booking time=>${selectedTime}");
         selectedTimeString = "${selectedTime!.hourOfPeriod}:${selectedTime!.minute.toString().padLeft(2, '0')} ${selectedTime!.period == DayPeriod.am ? "AM" : "PM"}";
         print("selected booking time=>${selectedTime}");
+      });
+    }else if (pickedTime == null && selectedTime == null) {
+      // If no time was previously selected AND the user dismissed the picker
+      // Set the selected time and string to the calculated initial 1-hour-later time
+      setState(() {
+        selectedTime = initialTimeOfDay;
+        print("selected booking time (default 1 hour later)=> ${selectedTime}");
+        selectedTimeString = "${selectedTime!.hourOfPeriod}:${selectedTime!.minute.toString().padLeft(2, '0')} ${selectedTime!.period == DayPeriod.am ? "AM" : "PM"}";
+        print("selected booking time string (default 1 hour later)=> ${selectedTimeString}");
       });
     }
   }

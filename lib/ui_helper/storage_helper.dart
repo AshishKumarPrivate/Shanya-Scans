@@ -51,7 +51,7 @@ class StorageHelper {
 
     for (String key in keysToRemove) {
       await sp.remove(key);
-      sp.clear();
+      // sp.clear();
     }
 
     print("✅ User logged out successfully!");
@@ -229,6 +229,32 @@ class StorageHelper {
   String getAge() {
     return sp.getString('age') ?? "";
   }
+  void setUserTestBookingAddress(String address) {
+    sp.setString('setUserTestBookingAddress', address);
+  }
+
+  String getUserTestBookingAddress() {
+    return sp.getString('setUserTestBookingAddress') ?? "";
+  }
+
+  void setUserTestBookingPhone(String address) {
+    sp.setString('setUserTestBookingPhone', address);
+  }
+
+  String getUserTestBookingPhone() {
+    return sp.getString('setUserTestBookingPhone') ?? "";
+  }
+
+  void setUserTestBookingAltPhone(String address) {
+    sp.setString('setUserTestBookingAltPhone', address);
+  }
+
+  String getUserTestBookingAltPhone() {
+    return sp.getString('setUserTestBookingAltPhone') ?? "";
+  }
+
+
+
 
   void setWhatsappNumber(String whatsappNumber) {
     sp.setString('whatsappNumber', whatsappNumber);

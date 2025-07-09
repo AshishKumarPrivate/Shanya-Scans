@@ -10,6 +10,7 @@ import '../../ui_helper/app_text_styles.dart';
 import '../../ui_helper/responsive_helper.dart';
 import '../../ui_helper/storage_helper.dart';
 import '../../util/StringUtils.dart';
+import '../../util/config.dart';
 import '../../util/date_formate.dart';
 import 'SalesTrackingScreen.dart';
 import 'UserTrackingScreen.dart';
@@ -110,7 +111,7 @@ class _DeliveryBoyOrderDetailScreenState
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            '${orderDetail.data!.orderName.toString()}',
+                                            '${orderDetail.data!.orderName.toString().trim()}',
                                             style: AppTextStyles.heading1(
                                               context,
                                               overrideStyle: TextStyle(
@@ -376,24 +377,35 @@ class _DeliveryBoyOrderDetailScreenState
                                         : false,
                                     child: Expanded(
                                       child: ElevatedButton.icon(
-                                        onPressed: () {
-                                          StorageHelper().setUserOrderId(
-                                              orderDetail.data!.sId.toString());
-                                          StorageHelper().setUserLat(double.parse(
-                                              orderDetail.data!.lat.toString()));
-                                          StorageHelper().setUserLong(
-                                              double.parse(orderDetail.data!.lng
-                                                  .toString()));
+                                        onPressed: () async{
 
-                                          // Start live tracking
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  UserLiveTrackingScreen(),
-                                                  // SalesLiveTrackingScreen(orderDetail.data!.patientName.toString()),
-                                            ),
-                                          );
+                                          // Ensure location access before proceeding
+                                          bool hasLocationAccess = await ConfigUtils().ensureLocationAccess();
+
+                                          if (hasLocationAccess) {
+                                            // Location services are enabled and permissions are granted, proceed to tracking screen
+                                            StorageHelper().setUserOrderId(orderDetail.data!.sId.toString());
+                                            StorageHelper().setUserLat(double.parse(orderDetail.data!.lat.toString()));
+                                            StorageHelper().setUserLong(double.parse(orderDetail.data!.lng.toString()));
+
+                                            // Start live tracking
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => UserLiveTrackingScreen(
+                                                  salesPersonName: orderDetail.data?.assignedTo?.name.toString(),
+                                                  patientName: orderDetail.data?.patientName,
+                                                  isSalesPerson: true,
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            // Location access not granted or service not enabled.
+                                            // The _ensureLocationAccess method already shows the appropriate snackbar.
+                                            debugPrint("LocationManager: Cannot proceed to tracking screen: Location access denied or service off.");
+                                            // You might want to add a small visual feedback here if the snackbar isn't immediately obvious,
+                                            // though _ensureLocationAccess should handle the primary notification.
+                                          }
 
                                           /// Stop tracking (if needed)
                                           //    ConfigUtils().stopTracking();

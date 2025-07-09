@@ -92,8 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     width: ResponsiveHelper.containerWidth(context, 40),
                     height: ResponsiveHelper.containerWidth(context, 60))
                 ),
-            ResponsiveHelper.sizeBoxHeightSpace(
-                context, Dimensions.sizeBoxVerticalSpace_2),
+            ResponsiveHelper.sizeBoxHeightSpace(context, Dimensions.sizeBoxVerticalSpace_2),
             Padding(
               padding: ResponsiveHelper.padding(
                   context, Dimensions.paddingHorizontalSmall_5, 0),

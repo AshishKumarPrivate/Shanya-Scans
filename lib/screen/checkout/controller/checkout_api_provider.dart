@@ -355,6 +355,9 @@ class CheckoutProvider with ChangeNotifier {
         print("✅ Order created successfully!");
         _createOrderModelResponse = response;
         setLoadingState(false);
+        StorageHelper().setUserTestBookingAddress( _formData!.cityAddress.toString());
+        StorageHelper().setUserTestBookingPhone( _formData!.phone.toString());
+        StorageHelper().setUserTestBookingAltPhone( _formData!.altPhone.toString());
 
         Navigator.pushReplacement(
           context,

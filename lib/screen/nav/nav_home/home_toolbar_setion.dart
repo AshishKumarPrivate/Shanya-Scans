@@ -129,14 +129,14 @@ class _HomeToolbarSectionState extends State<HomeToolbarSection> {
                 userAccepted = false;
                 Navigator.of(ctx).pop();
               },
-              child: const Text("Deny"),
+              child: const Text("Not Now"),
             ),
             ElevatedButton(
               onPressed: () {
                 userAccepted = true;
                 Navigator.of(ctx).pop();
               },
-              child: const Text("Accept"),
+              child: const Text("Continue"),
             ),
           ],
         );

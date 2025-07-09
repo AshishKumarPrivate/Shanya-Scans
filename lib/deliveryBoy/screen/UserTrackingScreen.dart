@@ -14,9 +14,15 @@ import 'package:shanya_scans/ui_helper/app_colors.dart';
 import '../controller/socket_provider.dart';
 
 class UserLiveTrackingScreen extends StatefulWidget {
-  final String? salesPersonName,patientName ;
-  const UserLiveTrackingScreen({super.key, this.salesPersonName, this.patientName});
+  final String? salesPersonName, patientName;
+  final bool isSalesPerson; // Add this flag
 
+  const UserLiveTrackingScreen({
+    super.key,
+    this.salesPersonName,
+    this.patientName,
+    this.isSalesPerson = false, // Default to false (patient view)
+  });
   @override
   State<UserLiveTrackingScreen> createState() => _UserLiveTrackingScreenState();
 }
@@ -34,7 +40,7 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
   double bearing = 0.0;
 
   String salesPersonDisplayName = "Sales Person";
-  String salesPersonPhone = "Not Available";
+  String salesPersonPhone = "Sales Person";
 
   BitmapDescriptor customSalesPersonIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
   BitmapDescriptor defaultSalesPersonIcon = BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
@@ -69,6 +75,10 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
   }
 
   void _handleSalesPersonLocationUpdate() {
+
+    if (!mounted) {
+      return; // Do nothing if the widget is not mounted
+    }
     // We are listening to changes in SocketProvider directly.
     // So, we get the current salesPersonPosition from the provider.
     final socketProvider = Provider.of<SocketProvider>(context, listen: false);
@@ -186,8 +196,9 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
         icon: customSalesPersonIcon,
         anchor: const Offset(0.5, 0.5),
         infoWindow: InfoWindow(
-          title: salesPersonDisplayName,
-          snippet: salesPersonPhone,
+          // Use widget.salesPersonName for the marker info window
+          title: widget.salesPersonName ?? "Sales Person",
+          // snippet: salesPersonPhone,
         ),
       ),
     );
@@ -315,21 +326,44 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Determine the current viewer using the isSalesPerson flag.
+    final bool isPatientViewing = !widget.isSalesPerson;
+    final bool isSalesPersonViewing = widget.isSalesPerson;
+
+    // Determine the name to display for the "other party".
+    String trackedPersonName;
+    String viewerName;
+
+    if (isPatientViewing) {
+      trackedPersonName = widget.salesPersonName ?? "Sales Person";
+      viewerName = widget.patientName ?? "You";
+    } else { // isSalesPersonViewing
+      trackedPersonName = widget.patientName ?? "Patient";
+      viewerName = widget.salesPersonName ?? "You"; // This is the salesperson's own name
+    }
+
+
     return Consumer<SocketProvider>(
       builder: (context, socketProvider, child) {
         return Scaffold(
           appBar: AppBar(
-            backgroundColor: AppColors.primary,
+            backgroundColor: isPatientViewing ? AppColors.primary:AppColors.deliveryPrimary,
             elevation: 0,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            title: const Text(
-              "Track Sales Person",
-              style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            title: Text(
+
+              isPatientViewing
+                  ? "Track Order" // Patient sees "Tracking John Doe (Sales)"
+                  : "Track Order", // Salesperson sees "Tracking Jane Smith's Order"
+              // isPatientViewing
+              //     ? "Tracking $trackedPersonName" // Patient sees "Tracking John Doe (Sales)"
+              //     : "Tracking $trackedPersonName's Order", // Salesperson sees "Tracking Jane Smith's Order"
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold,fontSize: 14),
             ),
-            centerTitle: true,
+            // centerTitle: true,
           ),
           body: Stack(
             children: [
@@ -360,13 +394,26 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5)],
                   ),
-                  child: Column(
+                  child:  Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
+                      // Conditionally display Patient's Order or Delivery Tracking
+                      Text(
+                        isPatientViewing
+                            ? "${viewerName}'s Order" // Patient sees "Your Order" or "Jane Smith's Order"
+                            : "Delivery Tracking", // Salesperson sees this
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.primary),
+                      ),
+                      const SizedBox(height: 10),
+                      // Conditionally display the correct message based on viewer and arrival status
                       Text(
                         hasArrived
-                            ? "Salesperson has reached your location!"
-                            : "Salesperson is on the way...",
+                            ? (isPatientViewing
+                            ? "$trackedPersonName has reached your destination!"
+                            : "$viewerName have reached $trackedPersonName's location!")
+                            : (isPatientViewing
+                            ? "$trackedPersonName is on the way..."
+                            : "$viewerName is on the way to $trackedPersonName..."),
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 8),
@@ -381,13 +428,19 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              // Display dynamic sales person name and phone from props or fetched data
-                              Text(salesPersonPhone,
-                                  style: const TextStyle(
-                                      fontSize: 16, fontWeight: FontWeight.w600)),
-                              Text(widget.salesPersonName ?? salesPersonDisplayName,
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.grey[700])),
+                              // Conditionally display the correct name in the details section
+                              Text(
+                                widget.patientName != null ? widget.salesPersonName ?? "Sales Person" : "You",
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              // Display salesPersonPhone (consider how this value is obtained)
+                              Text(
+                                salesPersonPhone, // This is still a hardcoded fallback or needs to be fetched
+                                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                              ),
                             ],
                           ),
                         ],
@@ -395,9 +448,11 @@ class _UserLiveTrackingScreenState extends State<UserLiveTrackingScreen> {
                       const SizedBox(height: 10),
                       if (!hasArrived)
                         LinearProgressIndicator(
-                            color: AppColors.primary, backgroundColor: Colors.grey[300]),
+                          color: AppColors.primary,
+                          backgroundColor: Colors.grey[300],
+                        ),
                     ],
-                  ),
+                  )
                 ),
               ),
             ],

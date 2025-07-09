@@ -3,7 +3,7 @@
 <plist version="1.0">
 	<dict>
 		<key>NSLocationWhenInUseUsageDescription</key>
-		<string>We use your location to improve your service experience.</string>
+		<string>We use your location to allow our delivery partner to reach your address for sample collection</string>
 		<key>FirebaseAppDelegateProxyEnabled</key>
 		<false/>
 		<key>NSAppTransportSecurity</key>
@@ -13,14 +13,8 @@
 		</dict>
 		<key>NSPushNotificationUsageDescription</key>
 		<string>We would like to send you notifications related to your order and reports.</string>
-		<key>NSLocationAlwaysUsageDescription</key>
-		<string>We need your location for better experience</string>
-		<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-        <string>Your location is required to provide relevant services in all app states.</string>
-        <key>UIBackgroundModes</key>
-        <array>
-            <string>location</string>
-        </array>
+
+
 
 
 

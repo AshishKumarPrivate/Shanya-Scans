@@ -49,10 +49,10 @@ class _SplashScreenState extends State<SplashScreen> {
         _navigateTo( UserSelectionScreen());
       }
     } else if (userRole == "delivery_boy") {
-      _configUtils = ConfigUtils();
       final isAcceptedDisclosure = await StorageHelper().isSalesLocationDisclosureAccepted();
 
       if (isAcceptedDisclosure) {
+        _configUtils = ConfigUtils();
         print("Delivery Boy: Disclosure accepted. Checking actual location status...");
         Map<String, dynamic> locationData = await _configUtils.getSingleLocation();
 
@@ -61,7 +61,7 @@ class _SplashScreenState extends State<SplashScreen> {
           _navigateTo(DeliveryBoyDashboardScreen());
         } else {
           print("Delivery Boy: Location not obtainable. Navigating to User Selection.");
-          _navigateTo(UserSelectionScreen());
+          _navigateTo(DeliveryBoyDashboardScreen());
         }
       } else {
         // If disclosure not accepted, go to user selection (where login/disclosure happens)

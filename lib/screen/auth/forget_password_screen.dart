@@ -18,6 +18,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final TextEditingController _otpController = TextEditingController();
   final TextEditingController _newPasswordController = TextEditingController();
 
+  final FocusNode _emailFocusNode = FocusNode();
   final FocusNode _otpFocusNode = FocusNode();
   final FocusNode _passwordFocusNode = FocusNode();
   final _formKey = GlobalKey<FormState>();
@@ -132,7 +133,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             iconColor: AppColors.primary,
                             shadowColor: AppColors.primary.withAlpha(70),
                             borderColor: AppColors.primary,
-                            focusNode: _otpFocusNode,
+                            focusNode: _emailFocusNode,
                             icon: Icons.email,
                             hintText: "Enter email",
                             title: "Email",
@@ -183,7 +184,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             title: "Password",
                             // errorMessage: "Invalid password",
                             errorMessage: _passwordError.toString(),
-                            keyboardType: TextInputType.number,
+                            keyboardType: TextInputType.text,
                           ),
                         ],
                       ],

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shanya_scans/network_manager/repository.dart';
+import 'package:shanya_scans/screen/auth/login_screen.dart';
 import 'package:shanya_scans/screen/auth/otp_screen.dart';
 import 'package:shanya_scans/screen/other/screen/user_selection_screen.dart';
 import 'package:shanya_scans/ui_helper/app_colors.dart';
@@ -293,7 +294,7 @@ class AuthApiProvider with ChangeNotifier {
       StorageHelper().logout();
       _setLoading(false);
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => UserSelectionScreen()),
+        MaterialPageRoute(builder: (context) => LoginScreen()),
         (route) => false,
       );
     });

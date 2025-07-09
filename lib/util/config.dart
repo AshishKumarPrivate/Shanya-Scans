@@ -1,232 +1,146 @@
+// lib/services/location_manager.dart (REVISED AGAIN)
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:permission_handler/permission_handler.dart';
 
-import '../main.dart'; // Assuming your main.dart provides navigatorKey
+import '../main.dart'; // Import the global navigatorKey
 
+/// A singleton class to manage all location-related operations,
+/// including permissions, service status, and continuous/one-time location fetching.
 class ConfigUtils with WidgetsBindingObserver {
-  StreamSubscription<Position>? positionStream;
-  final StreamController<Map<String, dynamic>> _locationController = StreamController.broadcast();
-  bool _isDialogShown = false; // Flag to prevent multiple dialogs/snackbars
-  final ValueNotifier<bool> _locationServiceStatusNotifier = ValueNotifier<bool>(true); // True initially, will be updated.
-  bool _isPersistentSnackbarActive = false;
-  // Getter for the location service status notifier
-  ValueNotifier<bool> get locationServiceStatusNotifier => _locationServiceStatusNotifier;
-
-  // Keep track of the last reported location to debounce
-  Position? _lastReportedPosition;
-  final int _minDistanceForUpdate = 5; // Meters
-  final int _minTimeBetweenUpdatesMs = 1000; // Minimum 1 second between UI updates
-  DateTime _lastUpdateTime = DateTime.now();
-
-
-  Stream<Map<String, dynamic>> get locationStream => _locationController.stream;
+  // --- Singleton Setup ---
   static final ConfigUtils _instance = ConfigUtils._internal();
 
-  // Private constructor for the singleton
-  ConfigUtils._internal() {
-    WidgetsBinding.instance.addObserver(this); // Add observer to listen for app lifecycle changes
-    _checkLocationServiceStatus(); // Check status on initialization
-  }
-
-  // Factory constructor (the public way to get the instance)
   factory ConfigUtils() {
     return _instance;
   }
 
+  ConfigUtils._internal() {
+    WidgetsBinding.instance.addObserver(this);
+    // Initial check of location status when the manager is first created
+    // This initial check will manage the snackbar on app start if needed.
+    _checkLocationServiceAndPermissionStatus();
+  }
+
+  // --- Location Data & State Management ---
+  final StreamController<Map<String, dynamic>> _locationController = StreamController.broadcast();
+  Stream<Map<String, dynamic>> get locationStream => _locationController.stream;
+
+  final ValueNotifier<bool> _locationServiceStatusNotifier = ValueNotifier<bool>(true);
+  ValueNotifier<bool> get locationServiceStatusNotifier => _locationServiceStatusNotifier;
+
+  // --- Internal State & Debouncing ---
+  StreamSubscription<Position>? _positionStreamSubscription;
+  bool _isSnackbarActive = false; // Flag to manage the persistent snackbar's state
+  Position? _lastReportedPosition;
+  final int _minDistanceForUpdate = 1;
+  final int _minTimeBetweenUpdatesMs = 1000;
+  DateTime _lastUpdateTime = DateTime.now();
+
+  // Reference to the currently shown snackbar, to programmatically dismiss it
+  SnackBarClosedReason? _lastSnackbarCloseReason; // To track why the snackbar closed
+
+  // --- App Lifecycle Management ---
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
-      // When the app comes to the foreground, re-check location service status
-      print("App Resumed: Checking location service status...");
-      _checkLocationServiceStatus();
+      debugPrint("LocationManager: App Resumed, re-checking location status.");
+      // On resume, always re-check status. This will manage the snackbar state.
+      _checkLocationServiceAndPermissionStatus();
     }
   }
 
-  /// Checks the current status of location services and updates the notifier.
-  /// Shows/hides the persistent snackbar accordingly.
-  Future<void> _checkLocationServiceStatus() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    print("Location Service Enabled: $serviceEnabled");
-    _locationServiceStatusNotifier.value = serviceEnabled; // Update the notifier
+  // --- Core Location Logic ---
 
-    // We don't request permission here, just check status.
+  /// Checks the current status of location services and permissions.
+  /// Manages `_locationServiceStatusNotifier` and the persistent warning snackbar.
+  Future<void> _checkLocationServiceAndPermissionStatus() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     LocationPermission permission = await Geolocator.checkPermission();
 
-    if (!serviceEnabled) {
-      // If service is disabled, show warning for service.
-      await _showPersistentLocationSnackbar(isPermissionDenied: false);
-    } else if (permission == LocationPermission.deniedForever) {
-      // If permission is denied forever, show warning for permission.
-      await _showPersistentLocationSnackbar(isPermissionDenied: true);
+    debugPrint("LocationManager: Service Enabled: $serviceEnabled, Permission: $permission");
+
+    // Update the notifier first
+    _locationServiceStatusNotifier.value = serviceEnabled;
+
+    // Determine if a warning should be shown
+    bool shouldShowWarning = !serviceEnabled || permission == LocationPermission.deniedForever;
+
+    if (shouldShowWarning) {
+      // If a warning is needed and not already active, show the snackbar
+      // The _showPersistentSnackbar method itself handles the _isSnackbarActive flag.
+      await _showPersistentSnackbar(isPermissionDenied: permission == LocationPermission.deniedForever);
     } else {
-      // If all is good (service enabled, permission granted or temporary denied), hide snackbar.
-      _hidePersistentLocationSnackbar();
+      // If no warning is needed, ensure any active snackbar is hidden
+      _hidePersistentSnackbar();
     }
   }
 
-  /// Requests location permissions from the user.
-  /// Returns true if permission is granted, false otherwise.
-  Future<bool> _requestPermission() async {
+
+  /// Ensures that location services are enabled and permissions are granted.
+  /// Handles requesting permissions and checks for service enablement.
+  /// Returns `true` if location access is granted and service is enabled, `false` otherwise.
+  Future<bool> ensureLocationAccess() async {
+    // Always start by hiding any existing snackbar to prevent it lingering if access becomes available
+    _hidePersistentSnackbar();
+
     LocationPermission permission = await Geolocator.checkPermission();
 
     if (permission == LocationPermission.denied) {
-      // If permission is denied but not permanently, request it.
+      debugPrint("LocationManager: Permission denied, requesting...");
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        print("❌ Location permission denied during request (user tapped 'Don't Allow').");
-        // If still denied after requesting, show persistent snackbar for *permission* denial.
-        await _showPersistentLocationSnackbar(isPermissionDenied: true);
+        debugPrint("LocationManager: ❌ Permission still denied after request.");
+        await _showPersistentSnackbar(isPermissionDenied: true);
         return false;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      print("⚠️ Location permission is permanently denied. User needs to enable it from app settings.");
-      // If permanently denied, try to open app settings directly AND show snackbar.
-      openAppSettings();
-      await _showPersistentLocationSnackbar(isPermissionDenied: true);
+      debugPrint("LocationManager: ⚠️ Permission permanently denied. User must enable in settings.");
+      await _showPersistentSnackbar(isPermissionDenied: true);
       return false;
     }
 
-    // At this point, permission is either granted or restricted.
-    // Confirm with permission_handler for explicit granted status.
-    var status = await Permission.location.status;
-    if (status.isGranted) {
-      _hidePersistentLocationSnackbar(); // Hide snackbar if permission is now granted
-      return true;
-    } else {
-      print("🤔 Location permission state is ambiguous (not granted, not explicitly deniedForever). Status: $status");
-      // This case might be `restricted` or `limited`. For now, treat as a problem.
-      await _showPersistentLocationSnackbar(isPermissionDenied: true);
-      return false;
-    }
-  }
-
-  /// Shows a persistent SnackBar prompting the user to enable location services.
-  /// Uses `navigatorKey.currentContext` to display the SnackBar globally.
-  /// `isPermissionDenied` helps tailor the message slightly.
-  Future<void> _showPersistentLocationSnackbar({required bool isPermissionDenied}) async {
-    if (_isDialogShown || navigatorKey.currentContext == null) return;
-
-    _isDialogShown = true; // Set flag to prevent duplicates
-
-    final context = navigatorKey.currentContext!;
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-
-    // Remove any existing snackbars first to avoid duplicates
-    scaffoldMessenger.hideCurrentSnackBar();
-
-    String message = isPermissionDenied
-        ? "Location permission denied. Please enable it in app settings."
-        : "Location services are disabled. Please enable them.";
-
-    scaffoldMessenger.showSnackBar(
-      SnackBar(
-        content: Text(
-          message,
-          style: TextStyle(color: Colors.white),
-        ),
-        duration: const Duration(days: 1), // Very long duration to make it persistent
-        behavior: SnackBarBehavior.fixed, // Stays at the bottom, covers content
-        action: SnackBarAction(
-          label: 'Open Settings',
-          textColor: Colors.yellowAccent,
-          onPressed: () {
-            // Decide which settings to open based on the type of issue
-              if (isPermissionDenied) {
-              openAppSettings(); // Open app specific settings
-            } else {
-              Geolocator.openLocationSettings(); // Open device location settings
-            }
-          },
-        ),
-        backgroundColor: Colors.redAccent,
-      ),
-    ).closed.then((reason) {
-      // Reset the flag once the snackbar is closed.
-      _isDialogShown = false;
-    });
-  }
-
-  /// Hides the persistent location SnackBar if it is currently shown.
-  void _hidePersistentLocationSnackbar() {
-    if (navigatorKey.currentContext != null && _isDialogShown) {
-      ScaffoldMessenger.of(navigatorKey.currentContext!).hideCurrentSnackBar();
-      _isDialogShown = false; // Reset the flag
-    }
-  }
-
-  /// A utility function to wait for location service to become enabled.
-  /// It polls `Geolocator.isLocationServiceEnabled()` for a given duration.
-  Future<bool> _waitForLocationServiceEnabled({Duration timeout = const Duration(seconds: 5), Duration interval = const Duration(milliseconds: 500)}) async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (serviceEnabled) return true; // Already enabled
-
-    print("Attempting to wait for location service to become enabled...");
-    DateTime startTime = DateTime.now();
-
-    while (DateTime.now().difference(startTime) < timeout) {
-      await Future.delayed(interval);
-      serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (serviceEnabled) {
-        print("Location service became enabled after waiting.");
-        return true;
-      }
+    if (!serviceEnabled) {
+      debugPrint("LocationManager: ⚠️ Location services are off. Prompting user to enable.");
+      await _showPersistentSnackbar(isPermissionDenied: false);
+      return false;
     }
-    print("Location service did not become enabled within timeout.");
-    return false; // Timeout reached, service still not enabled
-  }
 
+    debugPrint("LocationManager: ✅ Location access granted and service enabled.");
+    _hidePersistentSnackbar(); // All clear, hide snackbar
+    return true;
+  }
 
   /// Starts continuous tracking of the user's location.
-  /// Emits location updates to the `locationStream`.
   Future<bool> startTracking() async {
-    _hidePersistentLocationSnackbar(); // Always try to hide if active before re-checking
-
-    // if (_isDialogShown) { // Check if a dialog/snackbar is already active from a previous attempt
-    //   return false; // Already handling a permission/service issue
-    // }
-
-    // 1. Request Permissions
-    bool hasPermission = await _requestPermission();
-    if (!hasPermission) {
-      _locationServiceStatusNotifier.value = false; // Update status
-      return false; // Permission not granted (snackbar already shown by _requestPermission if needed)
+    bool hasAccess = await ensureLocationAccess();
+    if (!hasAccess) {
+      _locationServiceStatusNotifier.value = false;
+      return false;
     }
 
-    // 2. Wait for Location Service to be enabled after permission is granted
-    bool serviceEnabled = await _waitForLocationServiceEnabled();
-    if (!serviceEnabled) {
-      print("⚠️ Location services are OFF after permission and wait. Prompting user...");
-      _locationServiceStatusNotifier.value = false; // Update status
-      await _showPersistentLocationSnackbar(isPermissionDenied: false); // It's a service issue now
-      return false; // Service still off
-    }
+    // stopTracking(); // Stop any existing tracking before starting new.
 
-    _hidePersistentLocationSnackbar(); // Ensure snackbar is hidden if service is now enabled
-    _locationServiceStatusNotifier.value = true;
-    // Stop previous tracking if any to avoid multiple subscriptions
-    stopTracking();
-
-    // 3. Get Initial Position
     try {
       Position initialPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 60),
+        timeLimit: const Duration(seconds: 30),
       );
-      String address = await _getAddressFromLatLng(
-          initialPosition.latitude, initialPosition.longitude);
+      String address = await _getAddressFromLatLng(initialPosition.latitude, initialPosition.longitude);
 
-      // Only add initial position if it's new or sufficiently different
       if (_lastReportedPosition == null ||
           Geolocator.distanceBetween(
               _lastReportedPosition!.latitude,
               _lastReportedPosition!.longitude,
               initialPosition.latitude,
-              initialPosition.longitude) > _minDistanceForUpdate) {
+              initialPosition.longitude) >
+              _minDistanceForUpdate ||
+          DateTime.now().difference(_lastUpdateTime).inMilliseconds >= _minTimeBetweenUpdatesMs) {
         _locationController.add({
           "latitude": initialPosition.latitude,
           "longitude": initialPosition.longitude,
@@ -234,109 +148,100 @@ class ConfigUtils with WidgetsBindingObserver {
         });
         _lastReportedPosition = initialPosition;
         _lastUpdateTime = DateTime.now();
-        print("✅ Initial Location: $address");
+        debugPrint("LocationManager: ✅ Initial Location: $address");
       } else {
-        print("Initial Location: Same as last, not adding to stream.");
+        debugPrint("LocationManager: Initial location not significantly new.");
       }
-
     } catch (e) {
-      print("⚠️ Error Getting Initial Location: $e");
-      _locationServiceStatusNotifier.value = false; // Indicate error
-      return false; // Error getting initial location
+      debugPrint("LocationManager: ⚠️ Error getting initial location for stream: $e");
+      _locationServiceStatusNotifier.value = false;
+      _checkLocationServiceAndPermissionStatus(); // Re-check if initial acquisition failed
+      return false;
     }
 
-    // 4. Start Continuous Stream for updates
-    positionStream = Geolocator.getPositionStream(
+    _positionStreamSubscription = Geolocator.getPositionStream(
       locationSettings: LocationSettings(
         accuracy: LocationAccuracy.high,
-        distanceFilter: _minDistanceForUpdate, // Use the configured minimum distance
+        distanceFilter: _minDistanceForUpdate,
       ),
     ).listen(
           (Position position) async {
-        // Check if enough time has passed and if the position has significantly changed
-        bool hasMovedSignificantly = _lastReportedPosition == null ||
-            Geolocator.distanceBetween(
-                _lastReportedPosition!.latitude,
-                _lastReportedPosition!.longitude,
-                position.latitude,
-                position.longitude) > _minDistanceForUpdate;
-
         bool enoughTimePassed = DateTime.now().difference(_lastUpdateTime).inMilliseconds >= _minTimeBetweenUpdatesMs;
 
-        if (hasMovedSignificantly && enoughTimePassed) {
-          try {
-            String address = await _getAddressFromLatLng(
-                position.latitude, position.longitude);
-            _locationController.add({
-              "latitude": position.latitude,
-              "longitude": position.longitude,
-              "address": address,
-            });
-            _lastReportedPosition = position;
-            _lastUpdateTime = DateTime.now();
-            print(
-                "📍 Live Location: Lat: ${position.latitude}, Lng: ${position.longitude} 🏠 $address");
-          } catch (e) {
-            print("⚠️ Error in location stream (getAddress): $e");
+        if (enoughTimePassed) {
+          bool hasMovedSignificantly = _lastReportedPosition == null ||
+              Geolocator.distanceBetween(
+                  _lastReportedPosition!.latitude,
+                  _lastReportedPosition!.longitude,
+                  position.latitude,
+                  position.longitude) > _minDistanceForUpdate;
+
+          if (hasMovedSignificantly) {
+            try {
+              String address = await _getAddressFromLatLng(position.latitude, position.longitude);
+              _locationController.add({
+                "latitude": position.latitude,
+                "longitude": position.longitude,
+                "address": address,
+              });
+              _lastReportedPosition = position;
+              _lastUpdateTime = DateTime.now();
+              debugPrint("LocationManager: 📍 Live Location: Lat: ${position.latitude}, Lng: ${position.longitude} 🏠 $address");
+            } catch (e) {
+              debugPrint("LocationManager: ⚠️ Error in location stream (getAddress): $e");
+            }
           }
         }
       },
       onError: (e) {
-        print("⚠️ Location stream error: $e");
-        // Re-check status on error (e.g., if permissions revoked while tracking)
-        _checkLocationServiceStatus();
+        debugPrint("LocationManager: ⚠️ Location stream error: $e");
+        // If stream errors, re-check status, which might re-show snackbar
+        _checkLocationServiceAndPermissionStatus();
       },
-      cancelOnError: false, // Don't cancel stream on first error
+      cancelOnError: false,
     );
 
-    return true; // Tracking started successfully
+    return true;
   }
 
-  // get location at once
+  /// Stops continuous location tracking.
+  void stopTracking() {
+    _positionStreamSubscription?.cancel();
+    _positionStreamSubscription = null;
+    _lastReportedPosition = null;
+    _hidePersistentSnackbar(); // Hide snackbar if tracking is explicitly stopped
+    debugPrint("LocationManager: 🛑 Location tracking stopped.");
+  }
+
+  /// Gets a single, current location and its address.
   Future<Map<String, dynamic>> getSingleLocation() async {
-    _hidePersistentLocationSnackbar(); // Hide any active snackbar
-
-    // if (_isDialogShown) { // Check if a dialog/snackbar is already active
-    //   return {}; // Already handling a permission/service issue
-    // }
-
-    // 1. Request Permissions
-    bool hasPermission = await _requestPermission();
-    if (!hasPermission) {
-      _locationServiceStatusNotifier.value = false; // Update status
-      return {}; // Snackbar already shown by _requestPermission if needed
+    bool hasAccess = await ensureLocationAccess();
+    if (!hasAccess) {
+      _locationServiceStatusNotifier.value = false;
+      return {};
     }
-
-    // 2. Wait for Location Service to be enabled after permission is granted
-    bool serviceEnabled = await _waitForLocationServiceEnabled();
-    if (!serviceEnabled) {
-      _locationServiceStatusNotifier.value = false; // Update status
-      await _showPersistentLocationSnackbar(isPermissionDenied: false); // It's a service issue now
-      return {}; // Cannot get single location if service is off
-    }
-
-    _hidePersistentLocationSnackbar(); // Ensure snackbar is hidden if service is now enabled
-    _locationServiceStatusNotifier.value = true;
 
     try {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 60),
+        timeLimit: const Duration(seconds: 30),
       );
-      String address =
-      await _getAddressFromLatLng(position.latitude, position.longitude);
+      String address = await _getAddressFromLatLng(position.latitude, position.longitude);
+      debugPrint("LocationManager: ✅ Single Location: Lat: ${position.latitude}, Lng: ${position.longitude} 🏠 $address");
       return {
         "latitude": position.latitude,
         "longitude": position.longitude,
         "address": address,
       };
     } catch (e) {
-      print("⚠️ Error getting single location: $e");
-      _locationServiceStatusNotifier.value = false; // Indicate error
+      debugPrint("LocationManager: ⚠️ Error getting single location: $e");
+      _locationServiceStatusNotifier.value = false;
+      _checkLocationServiceAndPermissionStatus(); // Re-check if single acquisition failed
       return {};
     }
   }
 
+  /// Converts latitude and longitude to a human-readable address string.
   Future<String> _getAddressFromLatLng(double lat, double lng) async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
@@ -346,7 +251,6 @@ class ConfigUtils with WidgetsBindingObserver {
         if (place.street != null && place.street!.isNotEmpty) addressParts.add(place.street!);
         if (place.subLocality != null && place.subLocality!.isNotEmpty) addressParts.add(place.subLocality!);
         if (place.locality != null && place.locality!.isNotEmpty) addressParts.add(place.locality!);
-        if (place.postalCode != null && place.postalCode!.isNotEmpty) addressParts.add(place.postalCode!);
         if (place.administrativeArea != null && place.administrativeArea!.isNotEmpty) addressParts.add(place.administrativeArea!);
         if (place.country != null && place.country!.isNotEmpty) addressParts.add(place.country!);
 
@@ -354,23 +258,98 @@ class ConfigUtils with WidgetsBindingObserver {
       }
       return "Address Not Found";
     } catch (e) {
-      print("⚠️ Error Fetching Address: $e");
+      debugPrint("LocationManager: ⚠️ Error fetching address from coordinates ($lat, $lng): $e");
       return "Error Fetching Address";
     }
   }
 
-  void stopTracking() {
-    positionStream?.cancel(); // Cancel the stream subscription
-    positionStream = null; // Set to null after canceling
-    _lastReportedPosition = null; // Reset last reported position
-    _hidePersistentLocationSnackbar(); // Ensure snackbar is hidden
+  // --- UI-related Utility Methods (for SnackBar) ---
+
+  /// Displays a persistent SnackBar with a message prompting user to enable location.
+  /// This method is designed to prevent showing duplicate snackbars.
+  Future<void> _showPersistentSnackbar({required bool isPermissionDenied}) async {
+    final context = navigatorKey.currentContext;
+    if (context == null) {
+      debugPrint("LocationManager: Cannot show snackbar, no context available.");
+      return;
+    }
+    if (_isSnackbarActive) {
+      debugPrint("LocationManager: SnackBar already active, not showing duplicate.");
+      return;
+    }
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+    _isSnackbarActive = true; // Set flag when showing
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    // String message = isPermissionDenied
+    //     ? "Location permission denied. Please enable it in app settings."
+    //     : "Location services are currently OFF. Please tap 'Open Settings' and turn Location ON.";
+
+    String message = isPermissionDenied
+        ? "Location permission denied. Please enable it in app settings."
+        : Platform.isIOS
+        ? "Location services are currently OFF. Tap 'Open Settings', then navigate to 'Privacy & Security' > 'Location Services' and turn it ON for your device."
+        : "Location services are currently OFF. Please tap 'Open Settings' and turn Location ON.";
+
+    debugPrint("LocationManager: Showing persistent snackbar: $message");
+
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+        duration: const Duration(days: 1), // Make it truly persistent
+        behavior: SnackBarBehavior.fixed,
+        action: SnackBarAction(
+          label: 'Open Settings',
+          textColor: Colors.yellowAccent,
+          onPressed: () {
+            if (isPermissionDenied) {
+              Geolocator.openAppSettings();
+            } else {
+              // Geolocator.openLocationSettings();
+              if (Platform.isIOS) {
+                Geolocator.openAppSettings(); // iOS doesn't support openLocationSettings
+              } else {
+                Geolocator.openLocationSettings();
+              }
+            }
+          },
+        ),
+        backgroundColor: Colors.redAccent,
+      ),
+    ).closed.then((reason) {
+      debugPrint("LocationManager: Persistent snackbar closed. Reason: $reason");
+      _isSnackbarActive = false;
+      _lastSnackbarCloseReason = reason;
+      if (reason == SnackBarClosedReason.action || reason == SnackBarClosedReason.swipe || reason == SnackBarClosedReason.timeout || reason == SnackBarClosedReason.hide) {
+        _checkLocationServiceAndPermissionStatus();
+      }
+    });
   }
 
+  void _hidePersistentSnackbar() {
+    final context = navigatorKey.currentContext;
+    if (context != null && _isSnackbarActive) {
+      debugPrint("LocationManager: Hiding persistent snackbar explicitly.");
+      // ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).hideCurrentSnackBar(
+          reason: SnackBarClosedReason.hide);
+    } else {
+      debugPrint("LocationManager: No active snackbar to hide or context is null.");
+    }
+  }
+
+  // --- Disposal ---
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this); // Remove observer in dispose
-    stopTracking();
+    debugPrint("LocationManager: Disposing resources.");
+    WidgetsBinding.instance.removeObserver(this);
+    stopTracking(); // Ensure tracking is stopped on dispose
     _locationController.close();
-    _locationServiceStatusNotifier.dispose(); // Dispose the notifier
+    _locationServiceStatusNotifier.dispose();
+    _hidePersistentSnackbar(); // Ensure snackbar is gone on dispose
+    // super.dispose();
   }
 }
