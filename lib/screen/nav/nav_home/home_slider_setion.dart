@@ -19,7 +19,7 @@ class HomeSlider1Section extends StatefulWidget {
 
 class _HomeSlider1SectionState extends State<HomeSlider1Section> {
   int currentIndex = 0;
-  final CarouselSliderController _controller = CarouselSliderController();
+  final CarouselSliderController _controller = CarouselSliderController(); // Use CarouselController
 
   @override
   void didChangeDependencies() {
@@ -41,14 +41,21 @@ class _HomeSlider1SectionState extends State<HomeSlider1Section> {
 
   @override
   Widget build(BuildContext context) {
-    double bannerImageHeight = widget.bannerImageHeight ?? 170;
-    // double bannerImageHeight = widget.bannerImageHeight ?? ResponsiveHelper.containerHeight(context, 2);
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth > 600;
 
+    double bannerImageHeight = widget.bannerImageHeight ??
+        (isTablet
+            ? MediaQuery.of(context).size.height * 0.25 // For tablets
+            : MediaQuery.of(context).size.height * 0.18); // For mobile
+
+    // Adjust viewportFraction for better tablet spacing
+    double viewportFraction = isTablet ? 0.95 : 0.89; // Smaller fraction for wider items on tablet
 
     return Consumer<HomeBannerApiProvider>(
       builder: (context, provider, child) {
-        if (provider.isLoading  && provider.homeBanner1ListModel== null ) {
-          return HomeSliderShimmer();
+        if (provider.isLoading && provider.homeBanner1ListModel == null) {
+          return HomeSliderShimmer(bannerHeight: bannerImageHeight); // Pass height to shimmer
         } else if (provider.errorMessage.isNotEmpty) {
           return Center(
             child: SizedBox(
@@ -78,82 +85,78 @@ class _HomeSlider1SectionState extends State<HomeSlider1Section> {
         }
 
         return Container(
-          padding: ResponsiveHelper.padding(context, 0, 0.8),
+          // No horizontal padding on this container to allow CarouselSlider to control it
           width: double.infinity,
+          height: bannerImageHeight, // Ensure the parent container respects the height
           child: Column(
             children: [
-              ResponsiveHelper.sizeBoxHeightSpace(context, 1),
-              CarouselSlider(
-                items: homeBannerList.map((item) {
-                  return Container(
-                    width: double.infinity,
-                    margin: EdgeInsets.symmetric(horizontal: 5.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        int targetIndex = int.tryParse(item.index.toString()) ?? 0;
-                        // int targetIndex = (int.tryParse(item.index.toString()) ?? 1) - 1;
-                        print("click banner1 index= ${targetIndex}");
-                        if (targetIndex >= 0 && targetIndex <= 4) {
-                          _navigateToBottomNav(targetIndex);
-                        }
-                      },
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child:ImageLoaderUtil.cacheNetworkImage(item.photo!.secureUrl.toString())
+              // No ResponsiveHelper.sizeBoxHeightSpace(context, 1) here to avoid extra top padding that could push content
+              Expanded( // Ensure CarouselSlider takes available space
+                child: CarouselSlider(
+                  items: homeBannerList.map((item) {
+                    return Container(
 
-                        // CachedNetworkImage(
-                        //   imageUrl: item.photo!.secureUrl.toString(),
-                        //   fit: BoxFit.fill,
-                        //   placeholder: (context, url) =>
-                        //       Center(
-                        //         child: Image.asset(
-                        //             "assets/images/img_placeholder.jpeg"), // Placeholder while loading
-                        //       ),
-                        //   errorWidget:
-                        //       (context, url, error) =>
-                        //   const Icon(
-                        //     Icons.error,
-                        //     color: Colors
-                        //         .red, // Show error icon if image fails
-                        //   ),
-                        //   fadeInDuration: const Duration(
-                        //       milliseconds: 500),
-                        //   // Smooth fade-in effect
-                        //   fadeOutDuration: const Duration(
-                        //       milliseconds: 300),
-                        // ),
-
-
-
-                        // Image.network(
-                        //   item.photo!.secureUrl.toString(),
-                        //   fit: BoxFit.fill,
-                        //   width: double.infinity,
-                        //   errorBuilder: (context, error, stackTrace) =>
-                        //       Image.asset("assets/images/img_error.jpg"),
-                        // ),
-
-
-
-
+                      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+                      // No explicit width/margin here, let CarouselSlider handle it
+                      child: GestureDetector(
+                        onTap: () {
+                          int targetIndex = int.tryParse(item.index.toString()) ?? 0;
+                          print("click banner1 index= $targetIndex");
+                          if (targetIndex >= 0 && targetIndex <= 4) {
+                            _navigateToBottomNav(targetIndex);
+                          }
+                        },
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8.0),
+                          child: LayoutBuilder( // Use LayoutBuilder to get constraints
+                            builder: (BuildContext context, BoxConstraints constraints) {
+                              return ImageLoaderUtil.cacheNetworkImage(
+                                item.photo!.secureUrl.toString(),
+                                width: constraints.maxWidth, // Image takes full width of its parent
+                                height: constraints.maxHeight, // Image takes full height of its parent
+                                fit: BoxFit.fill, // Ensure the image fills the allocated space
+                              );
+                            },
+                          ),
+                        ),
                       ),
-                    ),
-                  );
-                }).toList(),
-                carouselController: _controller,
-                options: CarouselOptions(
-                  autoPlay: true,
-                  viewportFraction: 0.89,
-                  height: bannerImageHeight,
-                  // height: ResponsiveHelper.containerHeight(context, bannerImageHeight),
-                  enlargeCenterPage: false,
-                  onPageChanged: (index, reason) {
-                    setState(() {
-                      currentIndex = index;
-                    });
-                  },
+                    );
+                  }).toList(),
+                  carouselController: _controller,
+                  options: CarouselOptions(
+                    autoPlay: true,
+                    viewportFraction: viewportFraction, // Use the adjusted viewportFraction
+                    height: bannerImageHeight, // This height is crucial for the slider itself
+                    enlargeCenterPage: false,
+                    onPageChanged: (index, reason) {
+                      setState(() {
+                        currentIndex = index;
+                      });
+                    },
+                  ),
                 ),
               ),
+              // Indicator dots (optional, but good for UX)
+              // This is a common pattern for indicators, add if you need them
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: homeBannerList.asMap().entries.map((entry) {
+              //     return GestureDetector(
+              //       onTap: () => _controller.animateToPage(entry.key),
+              //       child: Container(
+              //         width: 8.0,
+              //         height: 8.0,
+              //         margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+              //         decoration: BoxDecoration(
+              //             shape: BoxShape.circle,
+              //             color: (Theme.of(context).brightness == Brightness.dark
+              //                 ? Colors.white
+              //                 : Colors.black)
+              //                 .withOpacity(currentIndex == entry.key ? 0.9 : 0.4)),
+              //       ),
+              //     );
+              //   }).toList(),
+              // ),
               ResponsiveHelper.sizeBoxHeightSpace(context, 1),
             ],
           ),
@@ -164,85 +167,29 @@ class _HomeSlider1SectionState extends State<HomeSlider1Section> {
 }
 
 class HomeSliderShimmer extends StatelessWidget {
+  final double? bannerHeight; // Added to make shimmer height responsive too
+
+  HomeSliderShimmer({this.bannerHeight});
+
   @override
   Widget build(BuildContext context) {
+    double shimmerHeight = bannerHeight ?? (MediaQuery.of(context).size.width > 600
+        ? MediaQuery.of(context).size.height * 0.25
+        : MediaQuery.of(context).size.height * 0.18);
+
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+      // Keep horizontal padding consistent with how the CarouselSlider is displayed
       width: double.infinity,
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            colors: [
-              Color(0xFFffff),
-              Color(0xFFffff),
-            ],
-            begin: Alignment.bottomLeft,
-            end: Alignment.topRight,
-            stops: [0.4, 0.7],
-            tileMode: TileMode.repeated,
+      height: shimmerHeight, // Use the responsive height for the shimmer container
+      child: Shimmer.fromColors(
+        baseColor: Colors.grey[300]!,
+        highlightColor: Colors.grey[100]!,
+        child: Container(
+          margin: EdgeInsets.symmetric(horizontal: 5.0), // Match carousel item margin
+          decoration: BoxDecoration(
+            color: Colors.grey[300], // Shimmer color
+            borderRadius: BorderRadius.circular(8.0),
           ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(
-              height: ResponsiveHelper.containerWidth(context, 30),
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: 5,
-                itemBuilder: (context, index) {
-                  return Container(
-                    margin: EdgeInsets.symmetric(horizontal: 8.0),
-                    width: ResponsiveHelper.containerWidth(context, 100),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Center(
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Container(
-                                width: ResponsiveHelper.containerWidth(
-                                    context, 17),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.white.withAlpha(150),
-                                      blurRadius: 10,
-                                      spreadRadius: 4,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Shimmer.fromColors(
-                                  baseColor: Colors.grey[300]!,
-                                  highlightColor: Colors.grey[100]!,
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: ResponsiveHelper.containerWidth(
-                                        context, 30),
-                                    color: Colors.grey[300],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 15),
-          ],
         ),
       ),
     );

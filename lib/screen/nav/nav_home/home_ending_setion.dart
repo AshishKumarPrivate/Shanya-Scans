@@ -23,8 +23,10 @@ class HomeEndingSection extends StatelessWidget {
             ? 4 // Tablets
             : 3; // Mobile (Default)
     return Container(
+
       // color: AppColors.lightBlueColor,
       child: Container(
+
         width: double.infinity,
         color: AppColors.endingGreyColor,
         child: Padding(
@@ -272,8 +274,8 @@ class HomeEndingSection extends StatelessWidget {
               ),
               // const SizedBox(height: 15),
               Visibility(visible: true, child: buildEndingInformation()),
-              // const SizedBox(height: 15),
-              // const SizedBox(height: 50),
+              const SizedBox(height: 15),
+           
             ],
           ),
         ),

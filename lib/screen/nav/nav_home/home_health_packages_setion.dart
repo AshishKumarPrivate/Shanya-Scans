@@ -197,7 +197,9 @@ class _HomeHealthPackageSectionState extends State<HomeHealthPackageSection> {
             final packageListByTabId =
                 packageListProvider.packageListByTabModel?.data ?? [];
             return SizedBox(
-              height: ResponsiveHelper.containerWidth(context, 70),
+              height: ResponsiveHelper.isTablet(context)
+                  ? ResponsiveHelper.containerHeight(context, 40) // reduced height for tablet
+                  : ResponsiveHelper.containerHeight(context, 32), // default for mobile
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 itemCount: packageListByTabId.length,

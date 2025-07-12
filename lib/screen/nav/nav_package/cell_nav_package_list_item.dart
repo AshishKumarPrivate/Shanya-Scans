@@ -33,6 +33,8 @@ class CellNavPackageListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth > 600;
     return Card(
       elevation: elevation,
       shape: RoundedRectangleBorder(
@@ -173,27 +175,38 @@ class CellNavPackageListItem extends StatelessWidget {
                            // ),
                          ],
                        ),
-                       SizedBox(
-                         width: 100,
-                         height: 30,
-                         child: SolidRoundedButton(
-                           text: 'Buy Now',
-                           color: AppColors.primary,
-                           borderRadius: 10.0,
-                           onPressed: () {
-                             print('Button clicked: ${item.slug}');
-                             Navigator.push(
-                               context,
-                               MaterialPageRoute(
-                                 builder: (context) =>
-                                     ViewDetailBottomNavPackageScreen(
-                                       packagetName: item.packageName.toString(),
-                                       packageSlug: item.slug.toString(),
-                                     ),
-                               ),
-                             );
-                           },
-                           textStyle: TextStyle(color: Colors.white, fontSize: 14),
+                       Padding( // Add padding around the button if needed for spacing
+                         padding: const EdgeInsets.only(left: 8.0), // Spacing from text
+                         child: ConstrainedBox( // Use ConstrainedBox for min/max width
+                           constraints: BoxConstraints(
+                             minWidth: ResponsiveHelper.containerWidth(context, isTablet ? 15 : 20), // Adjust min width for tablets
+                             maxWidth: ResponsiveHelper.containerWidth(context, isTablet ? 25 : 30), // Adjust max width for tablets
+                             minHeight: ResponsiveHelper.containerHeight(context, isTablet ? 4.0 : 3.5), // Adjust min height
+                             maxHeight: ResponsiveHelper.containerHeight(context, isTablet ? 4.5 : 4.0), // Adjust max height
+                           ),
+                           child: SolidRoundedButton(
+                             text: 'Buy Now',
+                             color: AppColors.primary,
+                             borderRadius: 10.0,
+                             onPressed: () {
+                               print('Button clicked: ${item.slug}');
+                               Navigator.push(
+                                 context,
+                                 MaterialPageRoute(
+                                   builder: (context) =>
+                                       ViewDetailBottomNavPackageScreen(
+                                         packagetName: item.packageName.toString(),
+                                         packageSlug: item.slug.toString(),
+                                       ),
+                                 ),
+                               );
+                             },
+                             textStyle: TextStyle(
+                               color: Colors.white,
+                               fontSize: ResponsiveHelper.fontSize(context, isTablet ? 12 : 14), // Make font size responsive
+                             ),
+                             padding: EdgeInsets.symmetric(horizontal: ResponsiveHelper.containerWidth(context, isTablet ? 2 : 3)), // Adjust horizontal padding
+                           ),
                          ),
                        ),
                      ],

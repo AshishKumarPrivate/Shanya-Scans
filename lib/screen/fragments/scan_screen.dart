@@ -14,7 +14,13 @@ import '../service/controller/service_scans_provider.dart';
 import '../splash/controller/network_provider_controller.dart';
 
 class ScanScreen extends StatefulWidget {
-  ScanScreen({super.key});
+  // ScanScreen({super.key});
+
+  final double? bannerImageHeight;
+
+  ScanScreen({this.bannerImageHeight, Key? key}) : super(key: key);
+
+
 
   @override
   State<ScanScreen> createState() => _ScanScreenState();
@@ -34,6 +40,10 @@ class _ScanScreenState extends State<ScanScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate responsiveness once
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth > 600;
+
     final double radius = ResponsiveHelper.containerWidth(context, 13);
     final double circleRadius = radius;
     final provider = Provider.of<ServiceApiProvider>(context);
@@ -41,6 +51,17 @@ class _ScanScreenState extends State<ScanScreen> {
     final services = provider.scanList;
 
     _isInternetAvailable = Provider.of<NetworkProvider>(context).isConnected;
+
+    // double bannerImageHeight = widget.bannerImageHeight ??
+    //     (MediaQuery.of(context).size.width > 600
+    //         ? MediaQuery.of(context).size.height * 0.25  // For tablets
+    //         : MediaQuery.of(context).size.height * 0.18); // For mobile
+
+
+    double bannerImageHeight = widget.bannerImageHeight ??
+        (isTablet
+            ? MediaQuery.of(context).size.height * 0.25 // For tablets
+            : MediaQuery.of(context).size.height * 0.18); // For mobile
 
     return Scaffold(
             backgroundColor: AppColors.primary,
@@ -69,10 +90,10 @@ class _ScanScreenState extends State<ScanScreen> {
                           children: [
                             Padding(
                               padding:
-                                  const EdgeInsets.symmetric(vertical: 0.0),
+                                  const EdgeInsets.symmetric(vertical: 10.0),
                               child: Container(
                                 width: double.infinity,
-                                height: 200,
+                                height: bannerImageHeight,
                                 // height: ResponsiveHelper.containerHeight(context, 21),
                                 // decoration: BoxDecoration(
                                 //   gradient: LinearGradient(
@@ -97,10 +118,12 @@ class _ScanScreenState extends State<ScanScreen> {
                                 //   ),
                                 // ),
                                 child: HomeSlider1Section(
-                                  bannerImageHeight: 160,
+                                  bannerImageHeight: bannerImageHeight,
                                 ),
+
                               ),
                             ),
+                            SizedBox(height: isTablet ? 50 : 10,),
                             Padding(
                               padding: EdgeInsets.symmetric(
                                   horizontal: 10.0, vertical: 10.0),
@@ -128,8 +151,10 @@ class _ScanScreenState extends State<ScanScreen> {
                                             crossAxisCount: 3, // 3 columns
                                             crossAxisSpacing:
                                                 8.0, // Space between columns
-                                            mainAxisSpacing:
-                                                0.0, // Removed spacing between rows
+                                                mainAxisSpacing: isTablet
+                                                    ? 15.0
+                                                    : 0.0, // Removed spacing between rows
+
                                           ),
                                           // itemCount: provider.scanList.length,
                                           itemCount: services.length,

@@ -43,6 +43,8 @@ class HomeFirstServiceSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth > 600;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
       child: Row(
@@ -170,8 +172,12 @@ class HomeFirstServiceSection extends StatelessWidget {
                             child: ClipOval(
                               child: Image.asset(
                                 service['image']!,
-                                width: ResponsiveHelper.iconSize(context, 66),
-                                height: ResponsiveHelper.iconSize(context, 75),
+
+                                // width: ResponsiveHelper.iconSize(context, 66),
+                                // height: ResponsiveHelper.iconSize(context, 75),
+                                width: isTablet ? ResponsiveHelper.iconSize(context, 100): ResponsiveHelper.iconSize(context, 10),
+                                height: isTablet ? ResponsiveHelper.iconSize(context, 100): ResponsiveHelper.iconSize(context, 10),
+
                                 fit: BoxFit.cover,
                               ),
                             ),

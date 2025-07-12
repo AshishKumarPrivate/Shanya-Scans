@@ -10,6 +10,12 @@ import 'package:shimmer/shimmer.dart';
 import '../../../bottom_navigation_screen.dart';
 
 class HomeSlider2Section extends StatefulWidget {
+
+  final double? bannerImageHeight;
+
+  HomeSlider2Section({this.bannerImageHeight, Key? key}) : super(key: key);
+
+
   @override
   State<HomeSlider2Section> createState() => _HomeSlider2SectionState();
 }
@@ -38,6 +44,24 @@ class _HomeSlider2SectionState extends State<HomeSlider2Section> {
 
   @override
   Widget build(BuildContext context) {
+
+    // double bannerImageHeight = widget.bannerImageHeight ??
+    //     (MediaQuery.of(context).size.width > 600
+    //         ? MediaQuery.of(context).size.height * 0.25  // For tablets
+    //         : MediaQuery.of(context).size.height * 0.18); // For mobile
+
+
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth > 600;
+
+    double bannerImageHeight = widget.bannerImageHeight ??
+        (isTablet
+            ? MediaQuery.of(context).size.height * 0.25 // For tablets
+            : MediaQuery.of(context).size.height * 0.18); // For mobile
+
+    // Adjust viewportFraction for better tablet spacing
+    double viewportFraction = isTablet ? 0.95 : 0.89; // Smaller fraction for wider items on tablet
+
     return Consumer<HomeBannerApiProvider>(
       builder: (context, provider, child) {
         if (provider.isLoading  && provider.homeBanner2ListModel== null ) {
@@ -107,42 +131,16 @@ class _HomeSlider2SectionState extends State<HomeSlider2Section> {
                       },
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8.0),
-                        child: ImageLoaderUtil.cacheNetworkImage(item.photo!.secureUrl.toString())
-                        // CachedNetworkImage(
-                        //   imageUrl: item.photo!.secureUrl.toString(),
-                        //   fit: BoxFit.fill,
-                        //   placeholder: (context, url) =>
-                        //       Center(
-                        //         child: Image.asset(
-                        //             "assets/images/img_placeholder.jpeg"), // Placeholder while loading
-                        //       ),
-                        //   errorWidget:
-                        //       (context, url, error) =>
-                        //   const Icon(
-                        //     Icons.error,
-                        //     color: Colors
-                        //         .red, // Show error icon if image fails
-                        //   ),
-                        //   fadeInDuration: const Duration(
-                        //       milliseconds: 500),
-                        //   // Smooth fade-in effect
-                        //   fadeOutDuration: const Duration(
-                        //       milliseconds: 300),
-                        // ),
-
-
-
-                        // Image.network(
-                        //   item.photo!.secureUrl.toString(),
-                        //   fit: BoxFit.fill,
-                        //   width: double.infinity,
-                        //   errorBuilder: (context, error, stackTrace) =>
-                        //       Image.asset("assets/images/img_error.jpg"),
-                        // ),
-
-
-
-
+                        child: LayoutBuilder( // Use LayoutBuilder to get constraints
+                          builder: (BuildContext context, BoxConstraints constraints) {
+                            return ImageLoaderUtil.cacheNetworkImage(
+                              item.photo!.secureUrl.toString(),
+                              width: constraints.maxWidth, // Image takes full width of its parent
+                              height: constraints.maxHeight, // Image takes full height of its parent
+                              fit: BoxFit.fill, // Ensure the image fills the allocated space
+                            );
+                          },
+                        ),
                       ),
                     ),
                   );
@@ -150,8 +148,9 @@ class _HomeSlider2SectionState extends State<HomeSlider2Section> {
                 carouselController: _controller,
                 options: CarouselOptions(
                   autoPlay: true,
-                  viewportFraction: 0.89,
-                  height: ResponsiveHelper.containerHeight(context, 20),
+                  viewportFraction: viewportFraction,
+                  height: bannerImageHeight,
+                  // height: ResponsiveHelper.containerHeight(context, 20),
                   enlargeCenterPage: false,
                   onPageChanged: (index, reason) {
                     setState(() {

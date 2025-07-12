@@ -106,7 +106,8 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
                 return SizedBox(
                   // this is the sizebox for the service main height
                   width: ResponsiveHelper.containerHeight(context, 100),
-                  height: 360,
+                  height: ResponsiveHelper.isTablet(context) ? 420 : 360,
+
                   // height: ResponsiveHelper.containerHeight(context, 40),
                   child: provider.isLoading && services.isEmpty
                       ? HomeServiceShimmer(
@@ -167,7 +168,9 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
                                               bottom: 8.0),
                                           child: Container(
                                             width: screenWidth * 0.5,
-                                            height: screenWidth * 0.25,
+                                            height: ResponsiveHelper.isTablet(context)
+                                                ? screenWidth * 0.30
+                                                : screenWidth * 0.25,
                                             decoration: BoxDecoration(
                                               color: AppColors.whiteColor,
                                               borderRadius:
@@ -188,7 +191,7 @@ class _HomeServicesSectionState extends State<HomeServicesSection> {
                                             child: Column(
                                               children: [
                                                 // SizedBox( height: ResponsiveHelper .containerHeight( context, 4.2)),
-                                                SizedBox(height: 35),
+                                                SizedBox(height: ResponsiveHelper.isTablet(context) ? 60 : 35),
                                                 Padding(
                                                   padding: const EdgeInsets
                                                       .symmetric(

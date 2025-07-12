@@ -114,6 +114,10 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
   }
 
   Widget _buildRateList(List<Data> servicesRateList) {
+
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth > 600;
+
     print("BuildRateList ");
     return ListView.builder(
       shrinkWrap: true,
@@ -221,9 +225,13 @@ class _CellServiceListItemState extends State<CellServiceListItem> {
                           )
                         ],
                       ),
-                      SizedBox(
-                        width: 100,
-                        height: 30,
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minWidth: ResponsiveHelper.containerWidth(context, isTablet ? 15 : 20), // Adjust min width for tablets
+                          maxWidth: ResponsiveHelper.containerWidth(context, isTablet ? 25 : 30), // Adjust max width for tablets
+                          minHeight: ResponsiveHelper.containerHeight(context, isTablet ? 4.0 : 3.5), // Adjust min height
+                          maxHeight: ResponsiveHelper.containerHeight(context, isTablet ? 4.5 : 4.0), // Adjust max height
+                        ),
                         child: SolidRoundedButton(
                           text: 'Buy Now',
                           color: AppColors.primary,

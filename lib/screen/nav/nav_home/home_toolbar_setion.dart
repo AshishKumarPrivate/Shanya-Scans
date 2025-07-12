@@ -157,6 +157,8 @@ class _HomeToolbarSectionState extends State<HomeToolbarSection> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isTablet = screenWidth > 600;
     return Container(
       color: AppColors.primary,
       child: Padding(
@@ -302,7 +304,7 @@ class _HomeToolbarSectionState extends State<HomeToolbarSection> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.search, color: Colors.grey),
+                       Icon(Icons.search, color: Colors.grey,size:isTablet ? ResponsiveHelper.iconSize(context, 30): ResponsiveHelper.iconSize(context, 10),),
                       const SizedBox(width: 10),
                       Expanded(
                         child: GestureDetector(
