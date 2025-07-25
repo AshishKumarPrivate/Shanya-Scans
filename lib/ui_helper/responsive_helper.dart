@@ -3,51 +3,6 @@ import 'package:flutter/material.dart';
 
 class ResponsiveHelper {
 
-  // static bool isMobilePhone() {
-  //   if (!kIsWeb) {
-  //     return true;
-  //   }else {
-  //     return false;
-  //   }
-  // }
-  //
-  // static bool isWeb() {
-  //   return kIsWeb;
-  // }
-  //
-  // static bool isMobile(context) {
-  //   final size = MediaQuery.of(context).size.width;
-  //   if (size < 600 || !kIsWeb) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
-  //
-  // static bool isTab(context) {
-  //   final size = MediaQuery.of(context).size.width;
-  //   if (size < 1300 && size >= 600) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
-  //
-  // static bool isDesktop(context) {
-  //   final size = MediaQuery.of(context).size.width;
-  //   if (size >= 1300) {
-  //     return true;
-  //   } else {
-  //     return false;
-  //   }
-  // }
-
-
-
-  // -------------------------------------------------------
-  //   1) Device Type Checkers
-  // -------------------------------------------------------
-  /// Mobile breakpoint
   static bool isMobile(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     return screenWidth < 600; // 600 se kam ko mobile manenge
@@ -56,9 +11,13 @@ class ResponsiveHelper {
   /// Tablet breakpoint
   static bool isTablet(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+    return screenWidth >= 600 ;
     return screenWidth >= 600 && screenWidth < 1024;
     // 600 se 1024 ke beech ko tablet manenge
   }
+
+
+  
 
   /// (Optional) Desktop breakpoint
   static bool isDesktop(BuildContext context) {

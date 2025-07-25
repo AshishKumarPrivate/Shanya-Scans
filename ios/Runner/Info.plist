@@ -13,7 +13,8 @@
 		</dict>
 		<key>NSPushNotificationUsageDescription</key>
 		<string>We would like to send you notifications related to your order and reports.</string>
-
+        <key>NSUserTrackingUsageDescription</key>
+        <string>This data is used to deliver personalized health services and improve delivery tracking.</string>
 
 
 

@@ -67,7 +67,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         ),
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios),
+          icon: const Icon(Icons.arrow_back_ios,color: Colors.black,),
           tooltip: 'Back',
           onPressed: () {
             Navigator.pop(context);

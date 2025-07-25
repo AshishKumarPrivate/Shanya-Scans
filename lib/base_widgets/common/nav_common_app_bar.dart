@@ -195,7 +195,7 @@ class _NavCommonAppBarState extends State<NavCommonAppBar> {
                       isDense: true,
                       prefixIcon: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Icon(Icons.search_sharp, color: Colors.grey,size: 24,),
+                        child: Icon(Icons.search_sharp, color: Colors.grey,size:ResponsiveHelper.isTablet(context) ? ResponsiveHelper.iconSize(context, 30): ResponsiveHelper.iconSize(context, 20),),
                       ),
                       hintText: "Enter your test here",
                       hintStyle: TextStyle(color: Colors.black54),

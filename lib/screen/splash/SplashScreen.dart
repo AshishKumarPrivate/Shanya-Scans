@@ -1,4 +1,6 @@
+import 'dart:io';
 
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:flutter/material.dart';
 import 'package:shanya_scans/deliveryBoy/screen/deleivery_boy_dashboard.dart';
 import 'package:shanya_scans/screen/other/screen/user_selection_screen.dart';
@@ -21,19 +23,49 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
-
   late final ConfigUtils _configUtils;
 
   @override
   void initState() {
     super.initState();
+    _initTrackingThenCheckConnectivity();
+  }
+
+  Future<void> _initTrackingThenCheckConnectivity() async {
+    if (Platform.isIOS) {
+      final status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      if (status == TrackingStatus.notDetermined) {
+        // Show pre-permission alert
+        await showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: const Text('Permission Required'),
+            content: const Text(
+              'We use location data to help track deliveries and assign test collection agents. '
+                  'This data is only used to improve service quality.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Continue'),
+              ),
+            ],
+          ),
+        );
+        // Then request ATT
+        await AppTrackingTransparency.requestTrackingAuthorization();
+      }
+    }
+
     _checkConnectivity();
   }
+
+
   void _checkConnectivity() async {
     await Future.delayed(const Duration(seconds: 1));
 
-    bool isConnected = Provider.of<NetworkProvider>(context, listen: false).isConnected;
+    bool isConnected =
+        Provider.of<NetworkProvider>(context, listen: false).isConnected;
 
     if (!isConnected) {
       _navigateTo(NoInternetScreen());
@@ -46,37 +78,43 @@ class _SplashScreenState extends State<SplashScreen> {
       if (isOtpVerified) {
         _navigateTo(const BottomNavigationScreen());
       } else {
-        _navigateTo( UserSelectionScreen());
+        _navigateTo(UserSelectionScreen());
       }
     } else if (userRole == "delivery_boy") {
       final isAcceptedDisclosure = await StorageHelper().isSalesLocationDisclosureAccepted();
 
       if (isAcceptedDisclosure) {
         _configUtils = ConfigUtils();
-        print("Delivery Boy: Disclosure accepted. Checking actual location status...");
-        Map<String, dynamic> locationData = await _configUtils.getSingleLocation();
+        print(
+            "Delivery Boy: Disclosure accepted. Checking actual location status...");
+        Map<String, dynamic> locationData =
+            await _configUtils.getSingleLocation();
 
         if (locationData.isNotEmpty && locationData["latitude"] != null) {
           print("Delivery Boy: Location obtained. Navigating to Dashboard.");
           _navigateTo(DeliveryBoyDashboardScreen());
         } else {
-          print("Delivery Boy: Location not obtainable. Navigating to User Selection.");
+          print(
+              "Delivery Boy: Location not obtainable. Navigating to User Selection.");
           _navigateTo(DeliveryBoyDashboardScreen());
         }
       } else {
         // If disclosure not accepted, go to user selection (where login/disclosure happens)
-        print("Delivery Boy: Disclosure not yet accepted. Navigating to User Selection.");
+        print(
+            "Delivery Boy: Disclosure not yet accepted. Navigating to User Selection.");
         _navigateTo(UserSelectionScreen());
       }
     } else {
       // No role or unknown role
-      print("No user role found or unknown role. Navigating to User Selection.");
+      print(
+          "No user role found or unknown role. Navigating to User Selection.");
       _navigateTo(UserSelectionScreen());
     }
   }
 
   void _navigateTo(Widget screen) {
-    Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => screen));
+    Navigator.of(context)
+        .pushReplacement(MaterialPageRoute(builder: (_) => screen));
   }
 
   @override

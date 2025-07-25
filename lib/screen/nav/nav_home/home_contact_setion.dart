@@ -61,8 +61,8 @@ class HomeContactSection extends StatelessWidget {
                       children: [
                         Image.asset(
                           "assets/images/whatsapp.png",
-                          width: isTablet ? ResponsiveHelper.iconSize(context, 30): ResponsiveHelper.iconSize(context, 10),
-                          height: isTablet ? ResponsiveHelper.iconSize(context, 30): ResponsiveHelper.iconSize(context, 10),
+                          width: ResponsiveHelper.isTablet(context) ? ResponsiveHelper.iconSize(context, 30): ResponsiveHelper.iconSize(context, 20),
+                          height: isTablet ? ResponsiveHelper.iconSize(context, 30): ResponsiveHelper.iconSize(context, 20),
 
                           color: AppColors.primary,
                         ),
@@ -96,7 +96,7 @@ class HomeContactSection extends StatelessWidget {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.call_rounded,size:isTablet ? ResponsiveHelper.iconSize(context, 30): ResponsiveHelper.iconSize(context, 10),color: AppColors.primary,),
+                        Icon(Icons.call_rounded,size:isTablet ? ResponsiveHelper.iconSize(context, 30): ResponsiveHelper.iconSize(context, 20),color: AppColors.primary,),
                         const SizedBox(width: 5),
                         Text(
                           "Call",

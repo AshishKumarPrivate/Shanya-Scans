@@ -304,7 +304,7 @@ class _HomeToolbarSectionState extends State<HomeToolbarSection> {
                   ),
                   child: Row(
                     children: [
-                       Icon(Icons.search, color: Colors.grey,size:isTablet ? ResponsiveHelper.iconSize(context, 30): ResponsiveHelper.iconSize(context, 10),),
+                       Icon(Icons.search, color: Colors.grey,size:isTablet ? ResponsiveHelper.iconSize(context, 30): ResponsiveHelper.iconSize(context, 20),),
                       const SizedBox(width: 10),
                       Expanded(
                         child: GestureDetector(

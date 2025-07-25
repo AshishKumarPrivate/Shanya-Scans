@@ -172,11 +172,10 @@ class HomeFirstServiceSection extends StatelessWidget {
                             child: ClipOval(
                               child: Image.asset(
                                 service['image']!,
-
                                 // width: ResponsiveHelper.iconSize(context, 66),
                                 // height: ResponsiveHelper.iconSize(context, 75),
-                                width: isTablet ? ResponsiveHelper.iconSize(context, 100): ResponsiveHelper.iconSize(context, 10),
-                                height: isTablet ? ResponsiveHelper.iconSize(context, 100): ResponsiveHelper.iconSize(context, 10),
+                                width: isTablet ? ResponsiveHelper.iconSize(context, 100): ResponsiveHelper.iconSize(context, 66),
+                                height: isTablet ? ResponsiveHelper.iconSize(context, 100): ResponsiveHelper.iconSize(context, 70),
 
                                 fit: BoxFit.cover,
                               ),
